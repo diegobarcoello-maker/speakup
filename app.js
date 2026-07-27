@@ -39,9 +39,10 @@ const PATHS = {
   compass:   '<circle cx="12" cy="12" r="9"/><path d="m15 9-2 5-4 1 2-5z"/>',
   pen:       '<path d="M14 4l6 6L8 22H2v-6z"/><path d="m12 6 6 6"/>'
 };
+// width/height por defecto: cualquier regla CSS más específica los sobrescribe
 function ic(n, cls) {
-  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" ' +
-    'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"' +
+  return '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" ' +
+    'stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"' +
     (cls ? ' class="' + cls + '"' : '') + '>' + (PATHS[n] || '') + '</svg>';
 }
 
@@ -359,7 +360,7 @@ function levelUpModal(levelId) {
   bg.className = 'modal-bg';
   bg.innerHTML =
     '<div class="modal" role="dialog" aria-modal="true" aria-label="Subiste de nivel">' +
-      '<div style="color:var(--accent);margin-bottom:8px">' + ic('trophy') + '</div>' +
+      '<div style="color:var(--accent);margin-bottom:8px">' + ic('trophy', 'ic-lg') + '</div>' +
       '<h2>¡Subiste a ' + esc(lv.id) + '!</h2>' +
       '<p class="muted small">' + esc(lv.desc) + '</p>' +
       '<button class="btn btn-primary btn-block" data-act="closemodal">Seguir aprendiendo</button>' +
@@ -726,7 +727,7 @@ function viewUnitDone(u) {
             : score >= 70   ? 'Muy bien. Ya dominas la idea principal.'
             : 'Buen intento. Repite la unidad en unos días y verás la diferencia.';
   return '<div class="card center" style="margin-top:24px">' +
-    '<div style="color:var(--accent)">' + ic('trophy') + '</div>' +
+    '<div style="color:var(--accent)">' + ic('trophy', 'ic-lg') + '</div>' +
     '<h1 style="margin:10px 0 4px">' + score + '%</h1>' +
     '<p class="muted">' + esc(msg) + '</p>' +
     '<div class="divider"></div>' +
@@ -1072,7 +1073,7 @@ function viewReview() {
     const upcoming = Object.values(S.srs).filter(c => c.due > startOfDay(Date.now()) + 86400000 - 1).length;
     return '<h1>Repaso</h1>' +
       '<div class="card center" style="margin-top:20px">' +
-        '<div style="color:var(--ok)">' + ic('check') + '</div>' +
+        '<div style="color:var(--ok)">' + ic('check', 'ic-lg') + '</div>' +
         '<h2 style="margin:10px 0 4px">' + (R.done ? 'Repaso terminado' : 'Nada pendiente por hoy') + '</h2>' +
         '<p class="muted small">' + (R.done ? 'Repasaste ' + R.done + ' tarjeta' + (R.done === 1 ? '' : 's') + '. ' : '') +
           upcoming + ' palabra' + (upcoming === 1 ? '' : 's') + ' volverán en los próximos días, justo antes de que las olvides.</p>' +

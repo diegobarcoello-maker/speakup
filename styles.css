@@ -468,7 +468,12 @@ input:focus, select:focus, textarea:focus { border-color: var(--brand); }
 }
 .notice.warn { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 30%, transparent); }
 .notice.err  { background: var(--err-soft);    border-color: color-mix(in srgb, var(--err) 30%, transparent); }
-.notice b { display: block; margin-bottom: 3px; }
+.notice b { display: flex; align-items: center; gap: 7px; margin-bottom: 4px; }
+.notice b svg { width: 18px; height: 18px; flex: none; }
+.notice.warn b { color: var(--accent); }
+
+/* Iconos destacados (trofeo, check de fin de repaso) */
+svg.ic-lg { width: 36px; height: 36px; }
 
 /* ---------- Toast ---------- */
 .toast-wrap { position: fixed; left: 50%; bottom: 96px; transform: translateX(-50%); z-index: 90; display: grid; gap: 8px; width: calc(100% - 32px); max-width: 420px; }
