@@ -1,8 +1,12 @@
 # SpeakUp — Tutor personal de inglés A1 → B2
 
+### ▶ La app está publicada en **https://diegobarcoello-maker.github.io/speakup/**
+
 Aplicación web que enseña inglés a un hispanohablante desde cero hasta nivel B2, con peso extra en inglés profesional y de comercio exterior. Interfaz 100 % en español, contenido de aprendizaje en inglés.
 
 Funciona **entera dentro del navegador**: sin backend, sin compilación, sin instalar nada.
+
+> **Primeros pasos:** abre el enlace, escribe tu nombre, elige tu nivel de partida y empieza. El progreso se guarda solo, en tu navegador. Para que el tutor converse de verdad, pega tu clave de API de Anthropic en Ajustes (ver más abajo).
 
 ---
 
@@ -36,27 +40,25 @@ Todas las rutas son **relativas** (`styles.css`, `data.js`, `app.js`), así que 
 
 ---
 
-## Publicar en GitHub Pages
+## Actualizar la app
 
-1. **Crea el repositorio.** Entra en [github.com/new](https://github.com/new), ponle un nombre (por ejemplo `speakup`), márcalo como **Public** y créalo.
+Ya está publicada desde la rama `main`, carpeta raíz. Para cambiar cualquier cosa:
 
-2. **Sube los archivos.** En la página del repositorio pulsa **Add file → Upload files** y arrastra los cinco archivos (`index.html`, `styles.css`, `data.js`, `app.js`, `README.md`). Importante: sube los archivos sueltos, **no la carpeta que los contiene**, para que `index.html` quede en la raíz. Pulsa **Commit changes** sobre la rama `main`.
+1. Edita el archivo en tu computadora (el contenido vive en `data.js`).
+2. En el repositorio pulsa **Add file → Upload files**, arrastra el archivo modificado y pulsa **Commit changes**.
+3. GitHub Pages se actualiza solo en 1-2 minutos. Si no ves el cambio, recarga con **Ctrl + Shift + R** para saltarte la caché del navegador.
 
-3. **Activa Pages.** Ve a **Settings → Pages**. En *Source* elige **Deploy from a branch**; en *Branch* selecciona **main** y la carpeta **/ (root)**. Pulsa **Save**.
+También puedes editar directamente en GitHub: entra al archivo, pulsa el lápiz, cambia y confirma.
 
-4. **Abre tu sitio.** Espera 1-2 minutos y entra en:
+### Si algo falla
 
-   ```
-   https://TU-USUARIO.github.io/speakup/
-   ```
-
-   Si ves un 404, refresca pasado un minuto: GitHub tarda un poco en publicar la primera vez.
-
-### Comprobación rápida tras publicar
-
-- La página carga con el diseño aplicado (si se ve texto sin estilos, `styles.css` no está en la raíz).
-- Aparece la pantalla de bienvenida pidiendo tu nombre.
-- En una lección, el botón de altavoz reproduce audio en inglés.
+| Síntoma | Causa habitual |
+|---|---|
+| Texto sin estilos | `styles.css` no está en la raíz del repositorio |
+| Página en blanco | Falta `data.js` o `app.js`; ábrela y mira la consola (F12) |
+| 404 al publicar | Espera un minuto más, o revisa Settings → Pages |
+| No se oye el audio | Prueba en Chrome o Edge; algunos sistemas no traen voces en inglés |
+| El micrófono no aparece | Solo funciona en Chrome, Edge y Safari, y siempre sobre HTTPS |
 
 ---
 
