@@ -37,7 +37,11 @@ const PATHS = {
   lock:      '<rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',
   target:    '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/>',
   compass:   '<circle cx="12" cy="12" r="9"/><path d="m15 9-2 5-4 1 2-5z"/>',
-  pen:       '<path d="M14 4l6 6L8 22H2v-6z"/><path d="m12 6 6 6"/>'
+  pen:       '<path d="M14 4l6 6L8 22H2v-6z"/><path d="m12 6 6 6"/>',
+  sparkle:   '<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M18 15l.8 2.2L21 18l-2.2.8L18 21l-.8-2.2L15 18l2.2-.8z"/>',
+  note:      '<path d="M5 3h11l4 4v14H5z"/><path d="M15 3v5h5"/><path d="M9 12h7M9 16h5"/>',
+  trash:     '<path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M6 7l1 13h10l1-13"/><path d="M10 11v6M14 11v6"/>',
+  upload:    '<path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>'
 };
 // width/height por defecto: cualquier regla CSS más específica los sobrescribe
 function ic(n, cls) {
@@ -108,6 +112,8 @@ const DEFAULT_STATE = {
   dailyXp: 0,
   completed: {},   // unitId -> { score, date }
   srs: {},         // en -> tarjeta
+  customUnits: [], // unidades generadas con IA
+  mistakes: [],    // libreta de errores: { id, date, wrong, right, note, tag, source }
   convTurns: 0,
   pronBest: 0,
   pronCount: 0,
@@ -138,6 +144,35 @@ function load() {
 function save() {
   try { localStorage.setItem(KEY, JSON.stringify(S)); }
   catch (e) { console.warn('No se pudo guardar el progreso:', e); }
+}
+
+/* Unidades del curso + las que hayas generado con la IA */
+function allUnits() { return UNITS.concat(S.customUnits || []); }
+
+/* ---- Libreta de errores ---- */
+function addMistake(m) {
+  if (!m || (!m.right && !m.note)) return;
+  const norma = s => String(s || '').toLowerCase().replace(/[^a-z0-9' ]/g, '').trim();
+  const dup = S.mistakes.find(x => norma(x.right) === norma(m.right) && norma(x.wrong) === norma(m.wrong));
+  if (dup) { dup.count = (dup.count || 1) + 1; dup.date = todayKey(); return; }
+  S.mistakes.unshift({
+    id: 'e' + Date.now() + Math.floor(Math.random() * 999),
+    date: todayKey(),
+    wrong: (m.wrong || '').slice(0, 160),
+    right: (m.right || '').slice(0, 160),
+    note:  (m.note  || '').slice(0, 260),
+    tag:   (m.tag   || 'General').slice(0, 40),
+    source: m.source || 'chat',
+    count: 1
+  });
+  if (S.mistakes.length > 300) S.mistakes.length = 300;
+}
+function mistakesByTag() {
+  const map = {};
+  S.mistakes.forEach(m => { (map[m.tag] = map[m.tag] || []).push(m); });
+  return Object.entries(map)
+    .map(([tag, list]) => ({ tag, list, total: list.reduce((a, m) => a + (m.count || 1), 0) }))
+    .sort((a, b) => b.total - a.total);
 }
 
 function currentLevel() {
@@ -328,10 +363,15 @@ function apiErrorText(err) {
 
 /* ══════════════════ 6. CORRECTOR SIN IA ══════════════════ */
 function offlineCoach(text) {
-  const notes = [];
+  const notes = [], errors = [];
   const t = ' ' + text.trim() + ' ';
   for (const r of OFFLINE_RULES) {
-    if (r.re.test(t)) { notes.push(r.fix); if (notes.length >= 2) break; }
+    const m = t.match(r.re);
+    if (m) {
+      notes.push(r.fix);
+      errors.push({ wrong: m[0].trim(), right: '', note: r.fix, tag: r.tag || 'General' });
+      if (notes.length >= 2) break;
+    }
   }
   if (!notes.length) {
     if (/^[a-z]/.test(text.trim())) notes.push('Recuerda empezar la frase con mayúscula.');
@@ -339,7 +379,7 @@ function offlineCoach(text) {
     else if (text.trim().split(/\s+/).length < 4) notes.push('Intenta responder con frases un poco más largas: añade un detalle o una pregunta de vuelta.');
     else notes.push('Se entiende bien. Para sonar más natural, intenta terminar tu turno con una pregunta al otro.');
   }
-  return notes.join(' ');
+  return { note: notes.join(' '), errors: errors };
 }
 
 /* ══════════════════ 7. AVISOS Y MODALES ══════════════════ */
@@ -407,6 +447,7 @@ function render() {
 
   let html = '';
   if (V.tab === 'home')            html = viewHome();
+  else if (V.tab === 'create')     html = viewCreate();
   else if (V.tab === 'lessons')    html = V.unit ? viewUnit() : viewLessons();
   else if (V.tab === 'talk')       html = viewTalk();
   else if (V.tab === 'pron')       html = viewPron();
@@ -414,8 +455,9 @@ function render() {
   else if (V.tab === 'settings')   html = viewSettings();
   root.innerHTML = '<div class="view">' + html + '</div>';
 
+  const navTab = V.tab === 'create' ? 'lessons' : V.tab === 'mistakes' ? 'review' : V.tab;
   document.querySelectorAll('.navbtn').forEach(b => {
-    if (b.dataset.tab === V.tab) b.setAttribute('aria-current', 'page');
+    if (b.dataset.tab === navTab) b.setAttribute('aria-current', 'page');
     else b.removeAttribute('aria-current');
   });
   afterRender();
@@ -483,7 +525,8 @@ function viewHome() {
   const hour = new Date().getHours();
   const greet = hour < 12 ? 'Buenos días' : hour < 19 ? 'Buenas tardes' : 'Buenas noches';
 
-  const nextUnit = UNITS.find(u => !S.completed[u.id] && isLevelUnlocked(u.level));
+  const nextUnit = allUnits().find(u => !S.completed[u.id] && (u.custom || isLevelUnlocked(u.level)));
+  const topTag = mistakesByTag().filter(g => g.total >= 2)[0];
 
   return '' +
   '<h1>' + esc(greet) + (S.name ? ', ' + esc(S.name) : '') + '</h1>' +
@@ -529,6 +572,16 @@ function viewHome() {
       '</div>'
     : '') +
 
+  (topTag
+    ? '<div class="card">' +
+        '<div class="row-between">' +
+          '<div><b>Tu error más repetido: ' + esc(topTag.tag) + '</b>' +
+          '<div class="small muted">' + topTag.total + ' veces. Practicar justo esto rinde más que una lección nueva.</div></div>' +
+          '<button class="btn btn-soft btn-sm" data-act="go-mistakes">Verlo</button>' +
+        '</div>' +
+      '</div>'
+    : '') +
+
   '<div class="card">' +
     '<div class="card-title"><span style="color:var(--accent)">' + ic('target') + '</span><h3>Tu ruta hasta B2</h3></div>' +
     '<div class="roadmap">' +
@@ -564,8 +617,37 @@ function viewHome() {
 }
 
 /* ══════════════════ 11. LECCIONES ══════════════════ */
+function unitTile(u) {
+  const done = !!S.completed[u.id];
+  return '<button class="tile' + (done ? ' done' : '') + '" data-act="open-unit" data-id="' + u.id + '">' +
+    '<span class="tile-ico">' + ic(done ? 'check' : u.custom ? 'sparkle' : 'book') + '</span>' +
+    '<span class="tile-body">' +
+      '<span class="tile-t">' + esc(u.title) +
+        (u.custom ? ' <span class="pill">tuya</span>' : '') +
+        (done ? ' <span class="pill">' + S.completed[u.id].score + '%</span>' : '') + '</span>' +
+      '<span class="tile-d">' + esc(u.goal) + '</span>' +
+    '</span>' +
+    '<span class="tile-go">' + ic('right') + '</span>' +
+  '</button>';
+}
+
 function viewLessons() {
-  let html = '<h1>Lecciones</h1><p class="muted" style="margin-top:-6px">Trece unidades que te llevan de A1 a B2, con peso extra en inglés de negocios y comercio exterior.</p>';
+  const mine = S.customUnits || [];
+  let html = '<h1>Lecciones</h1><p class="muted" style="margin-top:-6px">Trece unidades que te llevan de A1 a B2, con peso extra en inglés de negocios y comercio exterior. Y las que crees tú.</p>' +
+    '<button class="tile" data-act="open-create" style="border-style:dashed;border-color:var(--accent)">' +
+      '<span class="tile-ico" style="background:var(--accent-soft);color:var(--accent)">' + ic('sparkle') + '</span>' +
+      '<span class="tile-body">' +
+        '<span class="tile-t">Crear una lección a tu medida</span>' +
+        '<span class="tile-d">Dile el tema — aduanas, cobranzas, reclamos — y el tutor la arma con tu vocabulario.</span>' +
+      '</span>' +
+      '<span class="tile-go">' + ic('right') + '</span>' +
+    '</button>';
+
+  if (mine.length) {
+    html += '<div class="level-head">Tus lecciones · ' + mine.length + '</div><div class="tile-list">' +
+      mine.map(unitTile).join('') + '</div>';
+  }
+
   for (const l of LEVELS) {
     const unlocked = isLevelUnlocked(l.id);
     html += '<div class="level-head">' + esc(l.name) + (unlocked ? '' : ' · bloqueado') + '</div>';
@@ -573,24 +655,171 @@ function viewLessons() {
       html += '<div class="notice"><b>' + ic('lock') + ' Se desbloquea con ' + l.xp + ' XP</b>Te faltan ' + (l.xp - S.xp) + ' XP. Completa lecciones, conversa y repasa para llegar.</div>';
       continue;
     }
-    html += '<div class="tile-list">';
-    for (const u of UNITS.filter(u => u.level === l.id)) {
-      const done = !!S.completed[u.id];
-      html += '<button class="tile' + (done ? ' done' : '') + '" data-act="open-unit" data-id="' + u.id + '">' +
-        '<span class="tile-ico">' + ic(done ? 'check' : 'book') + '</span>' +
-        '<span class="tile-body">' +
-          '<span class="tile-t">' + esc(u.title) + (done ? ' <span class="pill">' + S.completed[u.id].score + '%</span>' : '') + '</span>' +
-          '<span class="tile-d">' + esc(u.goal) + '</span>' +
-        '</span>' +
-        '<span class="tile-go">' + ic('right') + '</span>' +
-      '</button>';
-    }
-    html += '</div>';
+    html += '<div class="tile-list">' + UNITS.filter(u => u.level === l.id).map(unitTile).join('') + '</div>';
   }
-  return html;
+  return html + '<div style="height:20px"></div>';
 }
 
-function unitById(id) { return UNITS.find(u => u.id === id); }
+/* ---- Generador de lecciones con IA ---- */
+function createState() {
+  if (!V.create) V.create = { topic: '', level: currentLevel().id, busy: false, err: '' };
+  return V.create;
+}
+
+function viewCreate() {
+  const C = createState();
+  const noKey = !(S.settings.apiKey || '').trim();
+  return '' +
+  '<button class="back-link" data-act="tab" data-tab="lessons">' + ic('left') + ' Lecciones</button>' +
+  '<h1>Crear una lección</h1>' +
+  '<p class="muted" style="margin-top:-6px">Escribe el tema en español. El tutor genera vocabulario, frases, una nota de gramática y los ejercicios, todo a tu nivel.</p>' +
+
+  (noKey
+    ? '<div class="notice warn"><b>' + ic('lock') + ' Necesita tu clave de API</b>Esta función usa la IA para escribir la lección. Pega tu clave en ' +
+      '<button class="btn btn-sm btn-soft" data-act="tab" data-tab="settings">Ajustes</button></div>'
+    : '') +
+
+  '<div class="card">' +
+    '<div class="field">' +
+      '<label for="ctopic">¿Sobre qué quieres la lección?</label>' +
+      '<input type="text" id="ctopic" placeholder="Ej.: reclamar un pedido que llegó dañado" value="' + esc(C.topic) + '"' + (C.busy ? ' disabled' : ' data-autofocus') + '>' +
+    '</div>' +
+    '<div class="field">' +
+      '<label for="clevel">Nivel</label>' +
+      '<select id="clevel"' + (C.busy ? ' disabled' : '') + '>' +
+        LEVELS.map(l => '<option value="' + l.id + '"' + (C.level === l.id ? ' selected' : '') + '>' + esc(l.name) + '</option>').join('') +
+      '</select>' +
+      '<div class="hint">Por defecto tu nivel actual. Súbelo un escalón si quieres estirarte.</div>' +
+    '</div>' +
+    '<button class="btn btn-primary btn-block" data-act="gen-unit"' + (C.busy || noKey ? ' disabled' : '') + '>' +
+      (C.busy ? 'Escribiendo la lección… (20-40 s)' : ic('sparkle') + ' Generar la lección') + '</button>' +
+    (C.err ? '<div class="notice err" style="margin:12px 0 0"><b>No se pudo crear</b>' + esc(C.err) + '</div>' : '') +
+  '</div>' +
+
+  '<div class="card">' +
+    '<div class="card-title"><h3>Ideas para tu trabajo</h3></div>' +
+    '<div class="btn-row">' +
+      TOPIC_SUGGESTIONS.map(t => '<button class="btn btn-ghost btn-sm" data-act="use-topic" data-topic="' + esc(t) + '">' + esc(t) + '</button>').join('') +
+    '</div>' +
+  '</div><div style="height:20px"></div>';
+}
+
+async function generateUnit() {
+  const C = createState();
+  const topic = (document.getElementById('ctopic') || {}).value || '';
+  const level = (document.getElementById('clevel') || {}).value || currentLevel().id;
+  if (!topic.trim()) { toast('Escribe primero el tema.'); return; }
+  C.topic = topic; C.level = level; C.busy = true; C.err = ''; render();
+
+  const lv = LEVELS.find(l => l.id === level);
+  const system =
+    'You write English lessons for a Spanish-speaking adult professional who works in foreign trade and regional sales management. ' +
+    'Target CEFR level: ' + level + ' (' + lv.desc + '). Use ' + (S.settings.accent === 'en-GB' ? 'British' : 'American') + ' English. ' +
+    'ALL explanations, translations and feedback must be in SPANISH. All the English content must be natural and genuinely useful at work. ' +
+    'At A1/A2 keep sentences short and use only high-frequency words; at B1/B2 use fluent, professional English. ' +
+    'Reply with ONE valid JSON object and nothing else — no markdown, no code fences. Exact shape:\n' +
+    '{"title": short Spanish title (max 6 words),\n' +
+    ' "goal": one Spanish sentence saying what the student will be able to do,\n' +
+    ' "grammar": {"title": Spanish title of one grammar point, "es": explanation in SPANISH, 2-4 sentences, warning about the typical Spanish-speaker mistake, "examples": [3 objects {"en": English sentence, "es": Spanish translation}]},\n' +
+    ' "vocab": [10-14 objects {"en": English word or expression, "es": Spanish translation}],\n' +
+    ' "phrases": [5-6 objects {"en": full useful English sentence, "es": Spanish translation}],\n' +
+    ' "exercises": [6-7 objects, MIXING these five types:\n' +
+    '    {"t":"mc","q":question in SPANISH,"opts":[3 English options],"a":index of correct option,"why":explanation in SPANISH},\n' +
+    '    {"t":"fill","q":English sentence containing ___ ,"a":[accepted words],"why":explanation in SPANISH},\n' +
+    '    {"t":"tr","q":Spanish sentence to translate,"a":[2-3 accepted English translations],"why":explanation in SPANISH},\n' +
+    '    {"t":"listen","audio":English sentence to be read aloud,"opts":[3 Spanish meanings],"a":index of correct one,"why":explanation in SPANISH},\n' +
+    '    {"t":"order","words":[4-9 English words in CORRECT order, punctuation attached to its word],"why":explanation in SPANISH}]}\n' +
+    'Every "why" must teach something, never just repeat the answer. Options must all be different and plausible.';
+
+  try {
+    const raw = await callClaude(system, [{ role: 'user', content: 'Tema de la lección: ' + topic.trim() }], 4000);
+    const j = parseJson(raw);
+    if (!j) throw new Error('La IA no devolvió una lección legible. Vuelve a intentar.');
+    const res = sanitizeUnit(j, level);
+    if (res.error) throw new Error(res.error + ' Prueba otra vez o con un tema más concreto.');
+    S.customUnits.unshift(res.unit);
+    if (S.customUnits.length > 40) S.customUnits.length = 40;
+    save();
+    C.busy = false; C.topic = '';
+    V.tab = 'lessons'; V.unit = res.unit.id; V.lesson = { step: 'study' };
+    render();
+    toast('Lección creada: ' + res.unit.title);
+    return;
+  } catch (err) {
+    C.err = err.code ? apiErrorText(err) : err.message;
+  }
+  C.busy = false; render();
+}
+
+function unitById(id) { return allUnits().find(u => u.id === id); }
+
+/* ---- Validación de una unidad generada por la IA ---- */
+function sanitizeUnit(raw, level) {
+  const str = (v, max) => typeof v === 'string' ? v.trim().slice(0, max || 200) : '';
+  const pairs = (arr, max) => (Array.isArray(arr) ? arr : [])
+    .map(p => ({ en: str(p && p.en, 120), es: str(p && p.es, 120) }))
+    .filter(p => p.en && p.es).slice(0, max);
+
+  const u = {
+    id: 'custom-' + Date.now(),
+    level: LEVELS.find(l => l.id === level) ? level : 'A1',
+    custom: true,
+    title: str(raw && raw.title, 60),
+    goal:  str(raw && raw.goal, 140),
+    grammar: {
+      title: str(raw && raw.grammar && raw.grammar.title, 80),
+      es:    str(raw && raw.grammar && raw.grammar.es, 600),
+      examples: pairs(raw && raw.grammar && raw.grammar.examples, 3)
+    },
+    vocab:   pairs(raw && raw.vocab, 14),
+    phrases: pairs(raw && raw.phrases, 6),
+    exercises: []
+  };
+
+  (Array.isArray(raw && raw.exercises) ? raw.exercises : []).forEach(ex => {
+    if (!ex || typeof ex !== 'object') return;
+    const why = str(ex.why, 260);
+    if ((ex.t === 'mc' || ex.t === 'listen')) {
+      const opts = (Array.isArray(ex.opts) ? ex.opts : []).map(o => str(o, 120)).filter(Boolean);
+      const a = Number(ex.a);
+      if (opts.length < 3 || !(a >= 0 && a < opts.length)) return;
+      if (new Set(opts.map(o => o.toLowerCase())).size !== opts.length) return;
+      if (ex.t === 'listen') {
+        const audio = str(ex.audio, 160);
+        if (!audio) return;
+        u.exercises.push({ t: 'listen', audio, opts, a, why });
+      } else {
+        const q = str(ex.q, 200);
+        if (!q) return;
+        u.exercises.push({ t: 'mc', q, opts, a, why });
+      }
+    } else if (ex.t === 'fill') {
+      const q = str(ex.q, 200);
+      const a = (Array.isArray(ex.a) ? ex.a : [ex.a]).map(x => str(x, 60)).filter(Boolean);
+      if (!q || q.indexOf('___') < 0 || !a.length) return;
+      u.exercises.push({ t: 'fill', q, a, why });
+    } else if (ex.t === 'tr') {
+      const q = str(ex.q, 200);
+      const a = (Array.isArray(ex.a) ? ex.a : [ex.a]).map(x => str(x, 160)).filter(Boolean);
+      if (!q || !a.length) return;
+      u.exercises.push({ t: 'tr', q, a, why });
+    } else if (ex.t === 'order') {
+      const words = (Array.isArray(ex.words) ? ex.words : []).map(w => str(w, 30)).filter(Boolean);
+      if (words.length < 3 || words.length > 12) return;
+      u.exercises.push({ t: 'order', words, a: words.join(' '), why });
+    }
+  });
+
+  u.exercises = u.exercises.slice(0, 8);
+  const faltan = [];
+  if (!u.title) faltan.push('título');
+  if (!u.goal) faltan.push('objetivo');
+  if (!u.grammar.title || !u.grammar.es) faltan.push('gramática');
+  if (u.vocab.length < 6) faltan.push('vocabulario (mínimo 6 palabras)');
+  if (u.phrases.length < 3) faltan.push('frases útiles (mínimo 3)');
+  if (u.exercises.length < 4) faltan.push('ejercicios (mínimo 4 válidos)');
+  return faltan.length ? { error: 'A la lección le falta: ' + faltan.join(', ') + '.' } : { unit: u };
+}
 
 function viewUnit() {
   const u = unitById(V.unit);
@@ -642,8 +871,12 @@ function viewUnitStudy(u) {
     ).join('') +
   '</div>' +
 
-  '<button class="btn btn-primary btn-block" style="margin-bottom:22px" data-act="start-ex" data-id="' + u.id + '">' +
-    'Practicar (' + u.exercises.length + ' ejercicios) ' + ic('right') + '</button>';
+  '<button class="btn btn-primary btn-block" data-act="start-ex" data-id="' + u.id + '">' +
+    'Practicar (' + u.exercises.length + ' ejercicios) ' + ic('right') + '</button>' +
+  (u.custom
+    ? '<div class="center" style="margin-top:10px"><button class="btn btn-ghost btn-sm" data-act="del-unit" data-id="' + u.id + '" style="color:var(--err)">' + ic('trash') + ' Borrar esta lección</button></div>'
+    : '') +
+  '<div style="height:22px"></div>';
 }
 
 function viewExercise(u) {
@@ -674,7 +907,13 @@ function viewExercise(u) {
 
   } else if (ex.t === 'order') {
     const picked = L.picked || [];
-    const bank = ex.words.map((w, i) => ({ w, i })).filter(x => picked.indexOf(x.i) < 0);
+    // barajar el banco: si no, las palabras aparecen ya en el orden correcto
+    if (!L.bankOrder || L.bankOrder.length !== ex.words.length) {
+      let o = shuffle(ex.words.map((_, i) => i));
+      if (ex.words.length > 2 && o.every((v, i) => v === i)) o = o.slice().reverse();
+      L.bankOrder = o;
+    }
+    const bank = L.bankOrder.map(i => ({ w: ex.words[i], i })).filter(x => picked.indexOf(x.i) < 0);
     body = '<div class="ex-q">Ordena las palabras para formar la frase</div>' +
       '<div class="word-slot" aria-live="polite">' +
         (picked.length ? picked.map(i => '<button class="wchip" data-act="unpick" data-i="' + i + '"' + (answered ? ' disabled' : '') + '>' + esc(ex.words[i]) + '</button>').join('')
@@ -840,7 +1079,8 @@ async function sendChat(text) {
     'ALWAYS reply with a single valid JSON object and nothing else. No markdown, no code fences. Keys exactly: ' +
     '"reply_en" (your in-character line in English, 1-3 sentences, almost always ending with a question to keep the conversation going), ' +
     '"coach_es" (feedback in SPANISH about the student\'s last message: if there is a mistake, give the corrected English sentence and explain briefly why; if it was correct, give one short tip to sound more natural. Max 45 words), ' +
-    '"hint_es" (a short suggestion in SPANISH of what the student could say next, including a model English sentence. Max 25 words).';
+    '"hint_es" (a short suggestion in SPANISH of what the student could say next, including a model English sentence. Max 25 words), ' +
+    '"error" (ONLY if the student made a real mistake, an object {"wrong": the exact wrong English fragment they wrote, "right": the corrected English fragment, "tag": the grammar category in SPANISH, chosen from: Verbo to be, Presente simple, Pasado simple, Present perfect, Futuro, Condicionales, Preposiciones, Artículos, Orden de palabras, Comparativos, Incontables y plurales, Phrasal verbs, Vocabulario, Registro y cortesía}. If there was no mistake, set "error" to null).';
 
   const history = T.msgs.slice(-12).map(m => ({
     role: m.who === 'me' ? 'user' : 'assistant',
@@ -853,14 +1093,19 @@ async function sendChat(text) {
     const j = parseJson(raw);
     if (!j || !j.reply_en) throw new Error('respuesta no válida');
     T.msgs.push({ who: 'them', text: j.reply_en, coach: j.coach_es || '', hint: j.hint_es || '' });
+    if (j.error && (j.error.right || j.error.wrong)) {
+      addMistake({ wrong: j.error.wrong, right: j.error.right, note: j.coach_es, tag: j.error.tag, source: 'Conversar · ' + sc.title });
+    }
     addXp(8, true);
   } catch (err) {
     const turn = T.msgs.filter(m => m.who === 'me').length - 1;
     const line = sc.fallback[Math.min(turn, sc.fallback.length - 1)];
+    const oc = offlineCoach(text);
+    oc.errors.forEach(e => addMistake(Object.assign({}, e, { source: 'Conversar · ' + sc.title })));
     T.msgs.push({
       who: 'them',
       text: line,
-      coach: offlineCoach(text) + (err.code === 'nokey' ? '' : ' (' + apiErrorText(err) + ')'),
+      coach: oc.note + (err.code === 'nokey' ? '' : ' (' + apiErrorText(err) + ')'),
       hint: 'Responde con una frase completa y termina preguntando algo de vuelta.'
     });
     if (err.code === 'nokey') { if (!T.warned) { toast('Modo sin IA: respuestas guiadas.'); T.warned = true; } }
@@ -952,7 +1197,7 @@ async function reviewEmail() {
     'Reply with a single valid JSON object and nothing else (no markdown, no code fences). Keys exactly: ' +
     '"score" (integer 0-100 for clarity, correctness and professional tone), ' +
     '"summary_es" (2 sentences in SPANISH: what they did well and the main thing to fix), ' +
-    '"notes_es" (array of max 5 objects with "issue" = the specific problem written in SPANISH quoting the English fragment, and "why" = a short explanation in SPANISH plus the corrected English), ' +
+    '"notes_es" (array of max 5 objects with "issue" = the specific problem written in SPANISH quoting the English fragment, "why" = a short explanation in SPANISH plus the corrected English, "wrong" = the exact wrong English fragment, "right" = the corrected English fragment, and "tag" = the category in SPANISH from: Verbo to be, Presente simple, Pasado simple, Present perfect, Futuro, Condicionales, Preposiciones, Artículos, Orden de palabras, Comparativos, Incontables y plurales, Phrasal verbs, Vocabulario, Registro y cortesía), ' +
     '"improved_en" (the full email rewritten in natural, professional English, keeping their intent and any names they used).';
 
   try {
@@ -960,11 +1205,22 @@ async function reviewEmail() {
     const j = parseJson(raw);
     if (!j) throw new Error('respuesta no válida');
     T.emailResult = j;
+    (j.notes_es || []).forEach(n => {
+      if (n && typeof n === 'object' && (n.right || n.wrong)) {
+        addMistake({ wrong: n.wrong, right: n.right, note: n.why || n.issue, tag: n.tag, source: 'Correo · ' + task.title });
+      }
+    });
     addXp(20, true);
     toast('+20 XP', 'xp');
   } catch (err) {
     const notes = [];
-    for (const r of OFFLINE_RULES) if (r.re.test(' ' + text + ' ')) notes.push({ issue: 'Revisa esto', why: r.fix });
+    for (const r of OFFLINE_RULES) {
+      const m = (' ' + text + ' ').match(r.re);
+      if (m) {
+        notes.push({ issue: 'Revisa esto', why: r.fix });
+        addMistake({ wrong: m[0].trim(), right: '', note: r.fix, tag: r.tag, source: 'Correo · ' + task.title });
+      }
+    }
     if (!/^(dear|hi|hello)/i.test(text.trim())) notes.push({ issue: 'Falta el saludo', why: 'Los correos profesionales empiezan con "Dear Mr./Ms. Apellido," o "Hello NAME,".' });
     if (!/(regards|sincerely|best wishes|thank you)/i.test(text)) notes.push({ issue: 'Falta la despedida', why: 'Cierra con "Best regards," o "Kind regards," seguido de tu nombre.' });
     if (!notes.length) notes.push({ issue: 'Estructura', why: 'Revisa que tengas saludo, motivo del correo, petición concreta y despedida.' });
@@ -978,7 +1234,7 @@ async function reviewEmail() {
 function pronPool() {
   const lv = currentLevel().id;
   let pool = (PRONUNCIATION_SETS[lv] || []).slice();
-  UNITS.filter(u => S.completed[u.id]).forEach(u => u.phrases.forEach(p => pool.push(p.en)));
+  allUnits().filter(u => S.completed[u.id]).forEach(u => u.phrases.forEach(p => pool.push(p.en)));
   if (!pool.length) pool = PRONUNCIATION_SETS.A1.slice();
   return Array.from(new Set(pool));
 }
@@ -1055,6 +1311,114 @@ function reviewState() {
 }
 
 function viewReview() {
+  if (!V.reviewTab) V.reviewTab = 'vocab';
+  const n = S.mistakes.length;
+  const tabs = '<div class="tabs" role="tablist">' +
+    '<button class="tab" role="tab" aria-selected="' + (V.reviewTab === 'vocab') + '" data-act="review-tab" data-t="vocab">' + ic('cards') + ' Vocabulario</button>' +
+    '<button class="tab" role="tab" aria-selected="' + (V.reviewTab === 'errors') + '" data-act="review-tab" data-t="errors">' + ic('note') + ' Mis errores' + (n ? ' (' + n + ')' : '') + '</button>' +
+  '</div>';
+  return tabs + (V.reviewTab === 'errors' ? viewMistakes() : viewVocabReview());
+}
+
+/* ---- Libreta de errores ---- */
+function viewMistakes() {
+  const groups = mistakesByTag();
+  const M = V.drill || (V.drill = { busy: false, err: '' });
+
+  if (!S.mistakes.length) {
+    return '<div class="empty">' + ic('note') +
+      '<p><b>Tu libreta está vacía.</b><br>Cada vez que el tutor te corrija en Conversar o en Correo de negocios, el error se guarda aquí con su categoría.<br>Así ves cuáles repites y puedes atacarlos.</p>' +
+      '<button class="btn btn-primary" data-act="tab" data-tab="talk">Ir a Conversar</button></div>';
+  }
+
+  const top = groups.slice(0, 3);
+  let html = '<h1 style="margin-bottom:4px">Mis errores</h1>' +
+    '<p class="muted small">' + S.mistakes.length + ' correcciones guardadas. Lo que repites es lo que más te frena.</p>';
+
+  html += '<div class="card">' +
+    '<div class="card-title"><span style="color:var(--accent)">' + ic('target') + '</span><h3>Lo que más repites</h3></div>' +
+    top.map((g, i) => {
+      const pct = Math.round((g.total / groups.reduce((a, x) => a + x.total, 0)) * 100);
+      return '<div style="margin-bottom:12px">' +
+        '<div class="row-between small" style="margin-bottom:5px"><b>' + (i + 1) + '. ' + esc(g.tag) + '</b>' +
+        '<span class="muted">' + g.total + ' ' + (g.total === 1 ? 'vez' : 'veces') + '</span></div>' +
+        '<div class="bar accent"><i style="width:' + Math.max(8, pct) + '%"></i></div></div>';
+    }).join('') +
+    '<button class="btn btn-primary btn-block" style="margin-top:6px" data-act="drill-mistakes"' + (M.busy ? ' disabled' : '') + '>' +
+      (M.busy ? 'Preparando tu práctica…' : ic('sparkle') + ' Practicar justo estos errores') + '</button>' +
+    (M.err ? '<div class="notice err" style="margin:12px 0 0"><b>No se pudo preparar</b>' + esc(M.err) + '</div>' : '') +
+  '</div>';
+
+  groups.forEach(g => {
+    html += '<div class="level-head">' + esc(g.tag) + ' · ' + g.total + '</div><div class="tile-list">';
+    g.list.slice(0, 12).forEach(m => {
+      html += '<div class="card tight" style="margin-bottom:0">' +
+        (m.wrong ? '<div class="small"><span style="color:var(--err);text-decoration:line-through">' + esc(m.wrong) + '</span>' +
+          (m.right ? ' <span class="muted">→</span> <b style="color:var(--ok)">' + esc(m.right) + '</b>' : '') + '</div>' : '') +
+        (m.note ? '<div class="tiny muted" style="margin-top:5px">' + esc(m.note) + '</div>' : '') +
+        '<div class="row-between" style="margin-top:8px">' +
+          '<span class="tiny muted">' + esc(m.source || '') + (m.count > 1 ? ' · ' + m.count + ' veces' : '') + '</span>' +
+          '<span class="btn-row" style="flex:none">' +
+            (m.right ? '<button class="spk" data-act="say" data-text="' + esc(m.right) + '" aria-label="Escuchar la versión correcta">' + ic('volume') + '</button>' : '') +
+            '<button class="btn btn-ghost btn-sm" data-act="drop-mistake" data-id="' + m.id + '">' + ic('check') + ' Ya lo domino</button>' +
+          '</span>' +
+        '</div>' +
+      '</div>';
+    });
+    html += '</div>';
+  });
+  return html + '<div style="height:20px"></div>';
+}
+
+async function drillMistakes() {
+  const M = V.drill || (V.drill = { busy: false, err: '' });
+  const groups = mistakesByTag().slice(0, 3);
+  if (!groups.length) return;
+  M.busy = true; M.err = ''; render();
+
+  const lista = groups.map(g =>
+    g.tag + ': ' + g.list.slice(0, 4).map(m => '"' + (m.wrong || '?') + '"' + (m.right ? ' → "' + m.right + '"' : '') + ' (' + (m.note || '') + ')').join(' | ')
+  ).join('\n');
+
+  const system =
+    'You are an English tutor for a Spanish-speaking sales manager in foreign trade, CEFR level ' + currentLevel().id + '. ' +
+    'Below are the mistakes this student actually keeps making. Build a short targeted practice unit that drills EXACTLY those weaknesses, ' +
+    'using realistic work situations (clients, suppliers, quotations, shipments). Do not drill anything else. ' +
+    'ALL explanations in SPANISH. Use ' + (S.settings.accent === 'en-GB' ? 'British' : 'American') + ' English. ' +
+    'Reply with ONE valid JSON object and nothing else — no markdown, no code fences. Exact shape:\n' +
+    '{"title": Spanish title (max 5 words), "goal": one Spanish sentence,\n' +
+    ' "grammar": {"title": Spanish title, "es": SPANISH explanation of the rule they keep breaking, "examples": [3 objects {"en","es"}]},\n' +
+    ' "vocab": [8-10 objects {"en","es"}], "phrases": [4-5 objects {"en","es"}],\n' +
+    ' "exercises": [6-7 objects mixing types:\n' +
+    '    {"t":"mc","q":Spanish question,"opts":[3 English options],"a":index,"why":SPANISH},\n' +
+    '    {"t":"fill","q":English sentence with ___ ,"a":[accepted words],"why":SPANISH},\n' +
+    '    {"t":"tr","q":Spanish sentence,"a":[2-3 English translations],"why":SPANISH},\n' +
+    '    {"t":"order","words":[4-9 English words in correct order],"why":SPANISH}]}\n' +
+    'At least half the exercises must directly target the listed mistakes.';
+
+  try {
+    const raw = await callClaude(system, [{ role: 'user', content: 'Errores que repite:\n' + lista }], 3500);
+    const j = parseJson(raw);
+    if (!j) throw new Error('La IA no devolvió una práctica legible. Vuelve a intentar.');
+    const res = sanitizeUnit(j, currentLevel().id);
+    if (res.error) throw new Error(res.error);
+    res.unit.title = res.unit.title || 'Práctica de tus errores';
+    res.unit.drill = true;
+    S.customUnits.unshift(res.unit);
+    save();
+    M.busy = false;
+    V.tab = 'lessons'; V.unit = res.unit.id;
+    V.lesson = { step: 'ex', i: 0, right: 0, answered: false, picked: null, correct: false, solution: '', typed: '' };
+    window.scrollTo(0, 0); render();
+    toast('Práctica lista, hecha con tus errores');
+    return;
+  } catch (err) {
+    M.err = err.code ? apiErrorText(err) : err.message;
+  }
+  M.busy = false; render();
+}
+
+function viewVocabReview() {
   const R = reviewState();
   if (R.queue === null) {
     R.queue = shuffle(dueCards());
@@ -1173,8 +1537,18 @@ function viewSettings() {
   '</div>' +
 
   '<button class="btn btn-primary btn-block" data-act="save-settings">Guardar cambios</button>' +
-  '<div style="height:12px"></div>' +
-  '<button class="btn btn-ghost btn-block" data-act="export">Exportar mi progreso (copia de seguridad)</button>' +
+
+  '<div class="card" style="margin-top:14px">' +
+    '<div class="card-title"><h3>Copia de seguridad</h3></div>' +
+    '<p class="small muted">Tu progreso vive solo en este navegador. Exporta un archivo e impórtalo en tu teléfono o en otro equipo para seguir donde ibas.</p>' +
+    '<div class="btn-row">' +
+      '<button class="btn btn-ghost" data-act="export">' + ic('note') + ' Exportar</button>' +
+      '<button class="btn btn-ghost" data-act="import">' + ic('upload') + ' Importar</button>' +
+    '</div>' +
+    '<input type="file" id="importfile" accept="application/json,.json" class="sr-only" tabindex="-1" aria-hidden="true">' +
+    '<div class="hint">Al importar se reemplaza el progreso de este navegador por el del archivo.</div>' +
+  '</div>' +
+
   '<div style="height:8px"></div>' +
   '<button class="btn btn-ghost btn-block" data-act="reset" style="color:var(--err)">Borrar todo y empezar de cero</button>' +
   '<p class="tiny muted center" style="margin:16px 0 24px">SpeakUp · Tu progreso vive en este navegador. Si borras los datos del sitio, se pierde.</p>';
@@ -1214,6 +1588,7 @@ document.addEventListener('click', async (e) => {
 
   /* --- navegación --- */
   if (act === 'tab') { go(t.dataset.tab); return; }
+  if (act === 'go-mistakes') { V.reviewTab = 'errors'; go('review'); return; }
 
   /* --- audio --- */
   if (act === 'say')      { Voice.speak(t.dataset.text); return; }
@@ -1230,6 +1605,33 @@ document.addEventListener('click', async (e) => {
       setTimeout(next, 1300);
     };
     next();
+    return;
+  }
+
+  /* --- generador de lecciones --- */
+  if (act === 'open-create') { V.tab = 'create'; V.unit = null; window.scrollTo(0, 0); render(); return; }
+  if (act === 'use-topic') {
+    createState().topic = t.dataset.topic;
+    const inp = document.getElementById('ctopic');
+    if (inp) { inp.value = t.dataset.topic; inp.focus(); } else render();
+    return;
+  }
+  if (act === 'gen-unit') { generateUnit(); return; }
+  if (act === 'del-unit') {
+    if (!confirm('¿Borrar esta lección que creaste? No se puede deshacer.')) return;
+    S.customUnits = S.customUnits.filter(u => u.id !== t.dataset.id);
+    delete S.completed[t.dataset.id];
+    save(); V.unit = null; V.lesson = null; V.tab = 'lessons'; render();
+    toast('Lección borrada');
+    return;
+  }
+
+  /* --- libreta de errores --- */
+  if (act === 'review-tab')     { V.reviewTab = t.dataset.t; window.scrollTo(0, 0); render(); return; }
+  if (act === 'drill-mistakes') { drillMistakes(); return; }
+  if (act === 'drop-mistake')   {
+    S.mistakes = S.mistakes.filter(m => m.id !== t.dataset.id);
+    save(); render(); toast('Fuera de la libreta');
     return;
   }
 
@@ -1291,7 +1693,7 @@ document.addEventListener('click', async (e) => {
   if (act === 'next-ex') {
     const u = unitById(V.unit), L = V.lesson;
     if (L.i + 1 < u.exercises.length) {
-      L.i++; L.answered = false; L.picked = null; L.correct = false; L.solution = ''; L.typed = '';
+      L.i++; L.answered = false; L.picked = null; L.correct = false; L.solution = ''; L.typed = ''; L.bankOrder = null;
       window.scrollTo(0, 0); render(); return;
     }
     // fin de la lección
@@ -1433,6 +1835,11 @@ document.addEventListener('click', async (e) => {
     toast('Copia de seguridad descargada');
     return;
   }
+  if (act === 'import') {
+    const f = document.getElementById('importfile');
+    if (f) f.click();
+    return;
+  }
   if (act === 'reset') {
     if (!confirm('Se borrará tu racha, tu XP, tu vocabulario y tus lecciones. Esta acción no se puede deshacer. ¿Continuar?')) return;
     localStorage.removeItem(KEY);
@@ -1470,6 +1877,37 @@ document.addEventListener('keydown', e => {
 document.addEventListener('input', e => {
   if (e.target.id === 'chatinput') talkState().draft = e.target.value;
   if (e.target.id === 'emailtext') talkState().emailText = e.target.value;
+});
+
+/* --- importar una copia de seguridad --- */
+document.addEventListener('change', e => {
+  if (e.target.id !== 'importfile') return;
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    let data;
+    try { data = JSON.parse(reader.result); }
+    catch (err) { toast('Ese archivo no es una copia válida de SpeakUp.'); return; }
+    if (!data || typeof data !== 'object' || typeof data.xp !== 'number' || !data.settings) {
+      toast('Ese archivo no parece una copia de SpeakUp.'); return;
+    }
+    const resumen = (data.name ? data.name + ', ' : '') + data.xp + ' XP · ' +
+      Object.keys(data.srs || {}).length + ' palabras · ' + Object.keys(data.completed || {}).length + ' lecciones';
+    if (!confirm('Se reemplazará el progreso de este navegador por:\n\n' + resumen + '\n\n¿Continuar?')) return;
+    const claveActual = S.settings.apiKey;
+    S = Object.assign({}, JSON.parse(JSON.stringify(DEFAULT_STATE)), data);
+    S.settings = Object.assign({}, DEFAULT_STATE.settings, data.settings || {});
+    if (!S.settings.apiKey && claveActual) S.settings.apiKey = claveActual;  // no pierdas la clave de este equipo
+    S.customUnits = Array.isArray(S.customUnits) ? S.customUnits : [];
+    S.mistakes = Array.isArray(S.mistakes) ? S.mistakes : [];
+    save();
+    V.tab = 'home'; V.unit = null; V.lesson = null; V.review = null; V.talk = null; V.pron = null;
+    render();
+    toast('Progreso importado');
+  };
+  reader.readAsText(file);
+  e.target.value = '';
 });
 
 /* --- reaccionar al tema del sistema --- */

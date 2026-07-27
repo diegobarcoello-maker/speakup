@@ -855,26 +855,42 @@ const EMAIL_TASKS = [
 /* ══════════════════ REGLAS DE CORRECCIÓN SIN IA (respaldo) ══════════════════ */
 
 const OFFLINE_RULES = [
-  { re: /\bi have \d{1,2} years\b/i,   fix: 'La edad se dice con el verbo TO BE, no con HAVE: "I’m … years old" en vez de "I have … years".' },
-  { re: /\bi am agree\b/i,             fix: '"Agree" ya es un verbo: se dice "I agree", no "I am agree".' },
-  { re: /\bhe have\b|\bshe have\b/i,   fix: 'Con he/she el verbo es "has": "He has a meeting", no "He have".' },
-  { re: /\bdepend of\b/i,              fix: 'Se dice "depend ON", no "depend of".' },
-  { re: /\bresponsible of\b/i,         fix: 'Se dice "responsible FOR", no "responsible of".' },
-  { re: /\bin my point of view\b/i,    fix: 'Se dice "FROM my point of view" o "IN my opinion".' },
-  { re: /\bfor my opinion\b/i,         fix: 'Se dice "IN my opinion".' },
-  { re: /\bdidn'?t \w+ed\b/i,          fix: 'Después de "didn’t" el verbo va en forma base: "didn’t send", no "didn’t sent".' },
-  { re: /\bdoes .*\w+s\b/i,            fix: 'Después de "does" el verbo va sin -s: "Does he work?", no "Does he works?".' },
-  { re: /\bif .*\bwill\b/i,            fix: 'Después de IF no se usa WILL: "If you order more, we will give a discount".' },
-  { re: /\bpeoples\b/i,                fix: '"People" ya es plural. No existe "peoples" en este sentido.' },
-  { re: /\binformations\b/i,           fix: '"Information" es incontable: nunca lleva -s.' },
-  { re: /\badvices\b/i,                fix: '"Advice" es incontable: "some advice", "a piece of advice".' },
-  { re: /\bthe most cheap\b/i,         fix: 'El superlativo de "cheap" es "the cheapest".' },
-  { re: /\bmore better\b/i,            fix: '"Better" ya es comparativo: solo "better".' },
-  { re: /\bi am living here since\b/i, fix: 'Con SINCE se usa present perfect: "I’ve been living here since...".' },
-  { re: /\bexplain me\b/i,             fix: 'Se dice "explain to me" o "explain it to me".' },
-  { re: /\bi wait you\b/i,             fix: 'Se dice "I’ll wait FOR you".' },
-  { re: /\bmake a question\b/i,        fix: 'Se dice "ASK a question", no "make a question".' },
-  { re: /\bactually\b/i,               fix: 'Ojo: "actually" significa "en realidad", no "actualmente". Para eso usa "currently".', soft: true }
+  { re: /\bi have \d{1,2} years\b/i,   tag: 'Verbo to be', fix: 'La edad se dice con el verbo TO BE, no con HAVE: "I’m … years old" en vez de "I have … years".' },
+  { re: /\bi am agree\b/i,             tag: 'Verbo to be', fix: '"Agree" ya es un verbo: se dice "I agree", no "I am agree".' },
+  { re: /\bhe have\b|\bshe have\b/i,   tag: 'Presente simple', fix: 'Con he/she el verbo es "has": "He has a meeting", no "He have".' },
+  { re: /\bdepend of\b/i,              tag: 'Preposiciones', fix: 'Se dice "depend ON", no "depend of".' },
+  { re: /\bresponsible of\b/i,         tag: 'Preposiciones', fix: 'Se dice "responsible FOR", no "responsible of".' },
+  { re: /\bin my point of view\b/i,    tag: 'Preposiciones', fix: 'Se dice "FROM my point of view" o "IN my opinion".' },
+  { re: /\bfor my opinion\b/i,         tag: 'Preposiciones', fix: 'Se dice "IN my opinion".' },
+  { re: /\bdidn'?t \w+ed\b/i,          tag: 'Pasado simple', fix: 'Después de "didn’t" el verbo va en forma base: "didn’t send", no "didn’t sent".' },
+  { re: /\bdoes \w+ \w+s\b/i,          tag: 'Presente simple', fix: 'Después de "does" el verbo va sin -s: "Does he work?", no "Does he works?".' },
+  { re: /\bif [^.?!]*\bwill\b/i,       tag: 'Condicionales', fix: 'Después de IF no se usa WILL: "If you order more, we will give a discount".' },
+  { re: /\bpeoples\b/i,                tag: 'Incontables y plurales', fix: '"People" ya es plural. No existe "peoples" en este sentido.' },
+  { re: /\binformations\b/i,           tag: 'Incontables y plurales', fix: '"Information" es incontable: nunca lleva -s.' },
+  { re: /\badvices\b/i,                tag: 'Incontables y plurales', fix: '"Advice" es incontable: "some advice", "a piece of advice".' },
+  { re: /\bthe most cheap\b/i,         tag: 'Comparativos', fix: 'El superlativo de "cheap" es "the cheapest".' },
+  { re: /\bmore better\b/i,            tag: 'Comparativos', fix: '"Better" ya es comparativo: solo "better".' },
+  { re: /\bi am living here since\b/i, tag: 'Present perfect', fix: 'Con SINCE se usa present perfect: "I’ve been living here since...".' },
+  { re: /\bexplain me\b/i,             tag: 'Orden de palabras', fix: 'Se dice "explain to me" o "explain it to me".' },
+  { re: /\bi wait you\b/i,             tag: 'Preposiciones', fix: 'Se dice "I’ll wait FOR you".' },
+  { re: /\bmake a question\b/i,        tag: 'Vocabulario', fix: 'Se dice "ASK a question", no "make a question".' },
+  { re: /\bi am accord\b|\bi am accord/i, tag: 'Verbo to be', fix: 'No existe "I am accord". Para estar de acuerdo: "I agree".' },
+  { re: /\bhow is called\b/i,          tag: 'Orden de palabras', fix: 'Se dice "What is it called?", no "How is called?".' },
+  { re: /\bi have \d+ years old\b/i,   tag: 'Verbo to be', fix: 'Sobra "have": "I’m 40 years old".' }
+];
+
+/* Temas sugeridos para generar lecciones a medida */
+const TOPIC_SUGGESTIONS = [
+  'Reclamos de calidad de un cliente',
+  'Aduanas y documentos de importación',
+  'Cobranzas y pagos atrasados',
+  'Feria comercial: presentar el stand',
+  'Logística y seguimiento de un embarque',
+  'Reunión de resultados con la gerencia',
+  'Visitar a un cliente nuevo en frío',
+  'Small talk antes de una reunión',
+  'Viajar: hotel, taxi y restaurante',
+  'Presentar un informe de ventas'
 ];
 
 /* Frases para el módulo de pronunciación, por nivel */
