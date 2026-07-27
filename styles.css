@@ -255,8 +255,8 @@ input:focus, select:focus, textarea:focus { border-color: var(--brand); }
 .rm-step.current .rm-dot { background: var(--brand); color: #fff; }
 [data-theme="dark"] .rm-step.current .rm-dot { color: #06231f; }
 .rm-step.goal .rm-dot    { background: var(--accent-soft); color: var(--accent); }
-.rm-name { font-weight: 700; font-size: .95rem; }
-.rm-desc { font-size: .8rem; color: var(--text-dim); }
+.rm-name { display: block; font-weight: 700; font-size: .95rem; }
+.rm-desc { display: block; font-size: .8rem; color: var(--text-dim); }
 
 /* ---------- Cuadrícula de estadísticas ---------- */
 .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
@@ -427,7 +427,8 @@ input:focus, select:focus, textarea:focus { border-color: var(--brand); }
   font-size: 1.35rem; font-weight: 700; line-height: 1.45; text-align: center;
   padding: 22px 12px; letter-spacing: -.01em;
 }
-.pron-phrase .w { padding: 1px 3px; border-radius: 5px; }
+.pron-phrase .w { border-radius: 5px; }
+.pron-phrase .w.hit, .pron-phrase .w.miss { padding: 2px 4px; margin: 0 -2px; }
 .pron-phrase .w.hit  { background: var(--ok-soft);  color: var(--ok); }
 .pron-phrase .w.miss { background: var(--err-soft); color: var(--err); text-decoration: underline wavy; text-underline-offset: 4px; }
 

@@ -855,9 +855,9 @@ const EMAIL_TASKS = [
 /* ══════════════════ REGLAS DE CORRECCIÓN SIN IA (respaldo) ══════════════════ */
 
 const OFFLINE_RULES = [
-  { re: /\bi have (\d{1,2}) years\b/i, fix: 'La edad se dice con TO BE: "I’m 35 years old", no "I have 35 years".' },
+  { re: /\bi have \d{1,2} years\b/i,   fix: 'La edad se dice con el verbo TO BE, no con HAVE: "I’m … years old" en vez de "I have … years".' },
   { re: /\bi am agree\b/i,             fix: '"Agree" ya es un verbo: se dice "I agree", no "I am agree".' },
-  { re: /\bi have \d+ years old\b/i,   fix: 'Correcto: "I’m 35 years old".' },
+  { re: /\bhe have\b|\bshe have\b/i,   fix: 'Con he/she el verbo es "has": "He has a meeting", no "He have".' },
   { re: /\bdepend of\b/i,              fix: 'Se dice "depend ON", no "depend of".' },
   { re: /\bresponsible of\b/i,         fix: 'Se dice "responsible FOR", no "responsible of".' },
   { re: /\bin my point of view\b/i,    fix: 'Se dice "FROM my point of view" o "IN my opinion".' },

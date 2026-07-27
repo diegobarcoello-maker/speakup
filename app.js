@@ -545,7 +545,7 @@ function viewHome() {
             '<span class="rm-name">' + esc(l.name) + (l.id === 'B2' ? ' — meta' : '') + '</span>' +
             '<span class="rm-desc">' + (l.id === 'B2' ? 'Hablar y entender con fluidez · ' : '') + doneOfLevel + '/' + unitsOfLevel.length + ' unidades</span>' +
           '</span>' +
-          '<span class="pill ' + l.id + '">' + (cur ? 'Estás aquí' : done ? 'Superado' : 'Bloqueado') + '</span>' +
+          '<span class="pill' + (cur || done ? ' ' + l.id : '') + '">' + (cur ? 'Estás aquí' : done ? 'Superado' : 'Bloqueado') + '</span>' +
         '</div>';
       }).join('') +
     '</div>' +
