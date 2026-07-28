@@ -15,7 +15,7 @@ Funciona **entera dentro del navegador**: sin backend, sin compilación, sin ins
 | Sección | Qué hace |
 |---|---|
 | **Inicio** | Meta diaria de XP, racha, palabras aprendidas y mapa de ruta visible A1 → A2 → B1 → B2 con B2 marcado como meta. |
-| **Lecciones** | 13 unidades sembradas (3 de A1, 2 de A2, 4 de B1, 4 de B2) con vocabulario con audio, frases útiles, gramática explicada en español y 6-7 ejercicios por unidad de 5 tipos distintos. |
+| **Lecciones** | 15 unidades (3 de A1, 4 de A2, 4 de B1, 4 de B2). Cada una trae un punto de gramática explicado a fondo en español, 1-2 puntos adicionales, una tabla de errores típicos del hispanohablante, 26-30 palabras de vocabulario con audio, 12 frases útiles y 11-12 ejercicios de 5 tipos. |
 | **Crear lección** | Escribes un tema en español —*aduanas*, *cobranzas*, *reclamos de calidad*— y el tutor genera una unidad completa a tu nivel: vocabulario, frases, gramática y ejercicios. Se guarda junto a las demás. |
 | **Mis errores** | Cada corrección del tutor se guarda con su categoría gramatical. La app te muestra qué fallas más y genera una práctica hecha solo con tus errores reales. |
 | **Conversar** | 10 escenarios de roleplay con el tutor de IA. Responde en inglés, se puede escuchar, y cada turno trae una **nota de coach** que corrige en español y una pista de qué decir. Entrada por texto o por voz. |
@@ -24,7 +24,9 @@ Funciona **entera dentro del navegador**: sin backend, sin compilación, sin ins
 | **Repaso** | Repetición espaciada (SRS) sobre todo el vocabulario aprendido, con tres niveles de recuerdo. |
 | **Ajustes** | Nombre, meta diaria, nivel de partida, acento (americano/británico), voz del tutor, clave de API, modelo, tema claro/oscuro, y exportar/importar el progreso para llevarlo a otro equipo o al teléfono. |
 
-El nivel sube solo al acumular XP: **A1** 0 · **A2** 600 · **B1** 1800 · **B2** 4000.
+El nivel sube solo al acumular XP: **A1** 0 · **A2** 450 · **B1** 1300 · **B2** 2800.
+
+En total: **433 palabras de vocabulario**, 180 frases, 173 ejercicios, 75 errores típicos documentados y unos 30.000 caracteres de explicación gramatical en español. Las lecciones por sí solas dan unos 2.180 XP, así que llegar a B2 exige también conversar y repasar — que es justo lo que se busca.
 
 ---
 

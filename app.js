@@ -753,6 +753,20 @@ async function generateUnit() {
 
 function unitById(id) { return allUnits().find(u => u.id === id); }
 
+/* Convierte un texto con saltos de línea en párrafos, resaltando lo escrito en MAYÚSCULAS */
+function paras(text) {
+  return String(text || '').split(/\n{2,}/).map(p => {
+    let h = esc(p.trim()).replace(/\n/g, '<br>');
+    h = h.replace(/\b([A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑ' ]{3,}[A-ZÁÉÍÓÚÑ])\b/g, '<b>$1</b>');
+    return h ? '<p>' + h + '</p>' : '';
+  }).join('');
+}
+function exampleRow(e) {
+  return '<div class="ex">' +
+    '<button class="spk" data-act="say" data-text="' + esc(e.en) + '" aria-label="Escuchar: ' + esc(e.en) + '">' + ic('volume') + '</button>' +
+    '<span><b>' + esc(e.en) + '</b><br><span>' + esc(e.es) + '</span></span></div>';
+}
+
 /* ---- Validación de una unidad generada por la IA ---- */
 function sanitizeUnit(raw, level) {
   const str = (v, max) => typeof v === 'string' ? v.trim().slice(0, max || 200) : '';
@@ -840,13 +854,40 @@ function viewUnitStudy(u) {
   '<div class="card">' +
     '<div class="grammar">' +
       '<h3>' + esc(u.grammar.title) + '</h3>' +
-      '<p style="margin-bottom:10px">' + esc(u.grammar.es) + '</p>' +
-      u.grammar.examples.map(e =>
-        '<div class="ex"><button class="spk" data-act="say" data-text="' + esc(e.en) + '" aria-label="Escuchar: ' + esc(e.en) + '">' + ic('volume') + '</button>' +
-        '<span><b>' + esc(e.en) + '</b><br><span>' + esc(e.es) + '</span></span></div>'
-      ).join('') +
+      paras(u.grammar.es) +
+      '<div class="ex-head">Ejemplos</div>' +
+      u.grammar.examples.map(exampleRow).join('') +
     '</div>' +
   '</div>' +
+
+  (u.grammar.more || []).map(m =>
+    '<div class="card">' +
+      '<div class="grammar alt">' +
+        '<h3>' + esc(m.title) + '</h3>' +
+        paras(m.es) +
+        '<div class="ex-head">Ejemplos</div>' +
+        m.examples.map(exampleRow).join('') +
+      '</div>' +
+    '</div>'
+  ).join('') +
+
+  (u.grammar.mistakes && u.grammar.mistakes.length
+    ? '<div class="card">' +
+        '<div class="card-title"><span style="color:var(--err)">' + ic('x') + '</span><h3>Errores típicos del hispanohablante</h3></div>' +
+        '<p class="small muted" style="margin-top:-4px">Estos son los que te delatan. Léelos ahora y los reconocerás cuando el coach te los marque.</p>' +
+        u.grammar.mistakes.map(m =>
+          '<div class="mistake">' +
+            '<div class="mistake-pair">' +
+              '<span class="bad">' + esc(m.bad) + '</span>' +
+              '<span class="arrow">' + ic('right') + '</span>' +
+              '<span class="good">' + esc(m.good) + '</span>' +
+              '<button class="spk" data-act="say" data-text="' + esc(m.good) + '" aria-label="Escuchar la forma correcta">' + ic('volume') + '</button>' +
+            '</div>' +
+            '<div class="tiny muted">' + esc(m.es) + '</div>' +
+          '</div>'
+        ).join('') +
+      '</div>'
+    : '') +
 
   '<div class="card">' +
     '<div class="card-title"><h3>Vocabulario</h3><span class="pill">' + u.vocab.length + ' palabras</span>' +

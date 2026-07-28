@@ -11,9 +11,9 @@
 
 const LEVELS = [
   { id: 'A1', name: 'A1 · Principiante', xp: 0,    desc: 'Palabras y frases básicas del día a día.' },
-  { id: 'A2', name: 'A2 · Básico',       xp: 600,  desc: 'Rutinas, trabajo y situaciones cotidianas.' },
-  { id: 'B1', name: 'B1 · Intermedio',   xp: 1800, desc: 'Pasado, futuro, opiniones y conversación real.' },
-  { id: 'B2', name: 'B2 · Avanzado',     xp: 4000, desc: 'Hablar y entender con fluidez: negociar, presentar, debatir.' }
+  { id: 'A2', name: 'A2 · Básico',       xp: 450,  desc: 'Rutinas, trabajo, viajes y situaciones cotidianas.' },
+  { id: 'B1', name: 'B1 · Intermedio',   xp: 1300, desc: 'Pasado, futuro, opiniones y conversación real.' },
+  { id: 'B2', name: 'B2 · Avanzado',     xp: 2800, desc: 'Hablar y entender con fluidez: negociar, presentar, debatir.' }
 ];
 
 const UNITS = [
@@ -21,14 +21,49 @@ const UNITS = [
 /* ══════════════════ A1 ══════════════════ */
 {
   id: 'a1-1', level: 'A1', title: 'Saludos y presentaciones',
-  goal: 'Saludar, presentarte y despedirte con naturalidad.',
+  goal: 'Saludar, presentarte, despedirte y sostener el primer minuto de una conversación.',
   grammar: {
-    title: 'El verbo to be (ser/estar) — primera mirada',
-    es: 'En inglés SIEMPRE hay que decir el sujeto (I, you, he...). No se dice "Am Diego", se dice "I am Diego". En el habla real casi siempre se contrae: I am → I’m, you are → you’re.',
+    title: 'El verbo TO BE: la primera pieza de todo',
+    es: 'TO BE significa SER y ESTAR a la vez. En inglés no se distingue: "I am tired" es "estoy cansado" y "I am an engineer" es "soy ingeniero". El mismo verbo.\n\n' +
+        'Tiene tres formas en presente: AM solo con I · IS con he, she, it · ARE con you, we, they. No hay más.\n\n' +
+        'Y aquí viene la regla que más cuesta al hispanohablante: en inglés SIEMPRE hay que decir el sujeto. En español dices "Soy Diego" y se entiende quién. En inglés "Am Diego" no existe: tiene que ser "I am Diego". Nunca omitas I, you, he, she, we, they.\n\n' +
+        'En el habla real casi nadie dice las formas completas. Se contraen: I am → I’m · you are → you’re · he is → he’s · it is → it’s. Si dices todo completo suenas a robot, así que acostúmbrate a la contracción desde hoy.',
     examples: [
       { en: "I'm Diego.", es: 'Soy Diego.' },
       { en: "You're my teacher.", es: 'Tú eres mi profesor.' },
-      { en: "It's nice to meet you.", es: 'Es un gusto conocerte.' }
+      { en: "She's from Peru.", es: 'Ella es de Perú.' },
+      { en: "It's nice to meet you.", es: 'Es un gusto conocerte.' },
+      { en: "We're ready.", es: 'Estamos listos.' }
+    ],
+    more: [
+      {
+        title: 'Los pronombres personales',
+        es: 'I (yo) · you (tú / usted / ustedes) · he (él) · she (ella) · it (ello, para cosas y animales) · we (nosotros) · they (ellos/ellas).\n\n' +
+            'Dos cosas que sorprenden: YOU sirve para tú, usted, vosotros y ustedes — el inglés no distingue. Y I se escribe SIEMPRE con mayúscula, esté donde esté en la frase.\n\n' +
+            'IT es la que no existe en español. Se usa para objetos, animales y situaciones: "It’s Monday", "It’s cold", "Where is my phone? — It’s on the table".',
+        examples: [
+          { en: "I think it's a good price.", es: 'Creo que es un buen precio.' },
+          { en: "They are our suppliers.", es: 'Ellos son nuestros proveedores.' },
+          { en: "It's Monday today.", es: 'Hoy es lunes.' }
+        ]
+      },
+      {
+        title: 'A / AN: el artículo indefinido',
+        es: 'A y AN significan lo mismo (un, una). Se usa AN cuando la palabra siguiente empieza por SONIDO de vocal: an engineer, an hour, an apple. Se usa A en los demás casos: a manager, a university (suena "yu"), a client.\n\n' +
+            'Ojo con las profesiones: en inglés SIEMPRE llevan artículo. En español dices "Soy gerente"; en inglés hay que decir "I am A manager". Omitirlo es uno de los errores más marcados.',
+        examples: [
+          { en: "I'm a sales manager.", es: 'Soy gerente de ventas.' },
+          { en: "She's an engineer.", es: 'Ella es ingeniera.' },
+          { en: "It's a good idea.", es: 'Es una buena idea.' }
+        ]
+      }
+    ],
+    mistakes: [
+      { bad: 'Am Diego.', good: "I'm Diego.", es: 'Nunca se omite el sujeto en inglés.' },
+      { bad: 'I am engineer.', good: "I'm an engineer.", es: 'Las profesiones llevan a/an.' },
+      { bad: 'i think so.', good: 'I think so.', es: 'El pronombre I va siempre en mayúscula.' },
+      { bad: 'Nice to meet you too much.', good: 'Nice to meet you too.', es: '"Too" al final es "también"; "too much" es "demasiado".' },
+      { bad: 'How are you? — I am good, thanks you.', good: "How are you? — I'm good, thank you.", es: 'Es "thank you" o "thanks", nunca "thanks you".' }
     ]
   },
   vocab: [
@@ -37,106 +72,233 @@ const UNITS = [
     { en: 'good morning', es: 'buenos días' },
     { en: 'good afternoon', es: 'buenas tardes' },
     { en: 'good evening', es: 'buenas noches (al llegar)' },
+    { en: 'good night', es: 'buenas noches (al irse a dormir)' },
     { en: 'goodbye', es: 'adiós' },
+    { en: 'bye', es: 'chao' },
+    { en: 'see you later', es: 'hasta luego' },
     { en: 'please', es: 'por favor' },
     { en: 'thank you', es: 'gracias' },
+    { en: "you're welcome", es: 'de nada' },
     { en: 'sorry', es: 'perdón / lo siento' },
     { en: 'excuse me', es: 'disculpe (para llamar la atención)' },
-    { en: 'name', es: 'nombre' },
     { en: 'yes', es: 'sí' },
     { en: 'no', es: 'no' },
-    { en: 'nice to meet you', es: 'encantado de conocerte' }
+    { en: 'name', es: 'nombre' },
+    { en: 'first name', es: 'nombre de pila' },
+    { en: 'last name', es: 'apellido' },
+    { en: 'nice to meet you', es: 'encantado de conocerte' },
+    { en: 'fine', es: 'bien' },
+    { en: 'and you?', es: '¿y tú?' },
+    { en: 'Mr.', es: 'señor' },
+    { en: 'Ms.', es: 'señora / señorita' },
+    { en: 'welcome', es: 'bienvenido' },
+    { en: 'have a nice day', es: 'que tengas buen día' }
   ],
   phrases: [
     { en: "Hello, my name is Diego.", es: 'Hola, me llamo Diego.' },
     { en: "What's your name?", es: '¿Cómo te llamas?' },
     { en: "Nice to meet you.", es: 'Encantado de conocerte.' },
+    { en: "Nice to meet you too.", es: 'Encantado yo también.' },
     { en: "How are you?", es: '¿Cómo estás?' },
     { en: "I'm fine, thank you. And you?", es: 'Estoy bien, gracias. ¿Y tú?' },
-    { en: "See you tomorrow.", es: 'Nos vemos mañana.' }
+    { en: "Sorry, could you repeat that?", es: 'Perdón, ¿podría repetirlo?' },
+    { en: "Sorry, I don't understand.", es: 'Perdón, no entiendo.' },
+    { en: "How do you spell that?", es: '¿Cómo se escribe eso?' },
+    { en: "See you tomorrow.", es: 'Nos vemos mañana.' },
+    { en: "Have a nice day.", es: 'Que tengas buen día.' },
+    { en: "It was nice talking to you.", es: 'Fue un gusto hablar contigo.' }
   ],
   exercises: [
     { t: 'mc', q: '¿Cómo saludas a un cliente a las 9 de la mañana?', opts: ['Good night', 'Good morning', 'Good evening'], a: 1,
-      why: '"Good morning" se usa desde que amanece hasta el mediodía. "Good night" solo sirve para despedirse antes de dormir.' },
+      why: '"Good morning" va desde que amanece hasta el mediodía. "Good night" solo sirve para despedirse antes de dormir.' },
     { t: 'fill', q: "Hello, ___ name is Ana.", a: ['my'],
-      why: '"My" = mi. En inglés el posesivo va siempre antes del sustantivo: my name, my job, my client.' },
+      why: '"My" = mi. El posesivo va siempre antes del sustantivo: my name, my job, my client.' },
+    { t: 'mc', q: 'Elige la frase correcta.', opts: ['I am engineer', "I'm an engineer", 'I am a engineer'], a: 1,
+      why: 'Las profesiones llevan artículo, y "engineer" empieza con sonido vocálico, así que es AN.' },
     { t: 'tr', q: 'Encantado de conocerte.', a: ['nice to meet you', 'pleased to meet you', "it's nice to meet you"],
-      why: 'La forma estándar y más usada es "Nice to meet you". No se traduce literal "enchanted".' },
+      why: 'La forma estándar es "Nice to meet you". No se traduce literal "enchanted".' },
     { t: 'order', words: ['How', 'are', 'you', 'today?'], a: 'How are you today?',
-      why: 'En las preguntas con palabra interrogativa el orden es: How + are + you. El verbo va antes del sujeto.' },
+      why: 'En preguntas con palabra interrogativa el orden es: How + are + you. El verbo va antes del sujeto.' },
     { t: 'listen', audio: "Good afternoon. How are you?", opts: ['Buenas tardes. ¿Cómo estás?', 'Buenas noches. ¿Qué haces?', 'Buenos días. ¿Dónde estás?'], a: 0,
-      why: '"Afternoon" es la tarde. Fíjate en la diferencia con "evening" (noche temprana) y "morning" (mañana).' },
+      why: '"Afternoon" es la tarde. Distínguelo de "evening" (noche temprana) y "morning" (mañana).' },
     { t: 'mc', q: 'Chocas con alguien en el pasillo. ¿Qué dices?', opts: ['Excuse me', "I'm sorry", 'Please'], a: 1,
-      why: '"Sorry" pide disculpas por algo que ya pasó. "Excuse me" sirve para interrumpir o pedir paso ANTES.' },
-    { t: 'tr', q: 'Gracias. Nos vemos mañana.', a: ['thank you see you tomorrow', 'thanks see you tomorrow', 'thank you. see you tomorrow.'],
-      why: '"See you tomorrow" es la despedida natural. Decir "until tomorrow" suena a traducción.' }
+      why: '"Sorry" pide disculpas por algo ya ocurrido. "Excuse me" sirve para interrumpir o pedir paso ANTES.' },
+    { t: 'fill', q: "___ is my colleague, Ana.", a: ['she'],
+      why: 'SHE para una mujer. Recuerda que "it" solo se usa para cosas y animales, nunca para personas.' },
+    { t: 'tr', q: 'Perdón, ¿podría repetirlo?', a: ['sorry could you repeat that', 'sorry, could you repeat that', 'excuse me could you repeat that'],
+      why: 'Frase salvavidas: apréndela de memoria, la vas a usar mil veces.' },
+    { t: 'order', words: ['It', 'was', 'nice', 'talking', 'to', 'you.'], a: 'It was nice talking to you.',
+      why: 'Cierre profesional estándar. Fíjate en el "It" inicial: en inglés no se puede omitir.' },
+    { t: 'listen', audio: "Hi, I'm Sarah. Nice to meet you.", opts: ['Hola, soy Sarah. Encantada de conocerte.', 'Hola, ¿eres Sarah? Un gusto.', 'Adiós Sarah, fue un gusto.'], a: 0,
+      why: '"I’m" es la contracción de "I am". En el habla rápida casi se pierde: escucha el ritmo, no cada letra.' }
   ]
 },
 
 {
   id: 'a1-2', level: 'A1', title: 'Información personal',
-  goal: 'Decir de dónde eres, dónde vives y a qué te dedicas.',
+  goal: 'Decir de dónde eres, dónde vives, a qué te dedicas, y preguntar lo mismo.',
   grammar: {
-    title: 'To be completo + preguntas y negaciones',
-    es: 'I am / you are / he-she-it is / we are / they are. Para preguntar, mueve el verbo al frente: "Are you from Spain?". Para negar, añade not: "I’m not from Spain".',
+    title: 'TO BE completo: preguntas y negaciones',
+    es: 'Ya sabes afirmar con to be. Ahora las otras dos formas.\n\n' +
+        'PARA PREGUNTAR mueves el verbo delante del sujeto. "You are from Ecuador" → "Are you from Ecuador?". Eso es todo: se da la vuelta. No se añade nada.\n\n' +
+        'PARA NEGAR pones NOT justo después del verbo: "I am not from Spain". En el habla se contrae de dos maneras y las dos son correctas: "he isn’t" o "he’s not". Elige la que te salga.\n\n' +
+        'Y las respuestas cortas: en inglés no se responde solo "Yes" o "No" a secas, suena brusco. Se responde "Yes, I am" / "No, I’m not". Fíjate en el detalle: la afirmativa NUNCA se contrae. Se dice "Yes, I am", jamás "Yes, I’m".',
     examples: [
-      { en: "She's an engineer.", es: 'Ella es ingeniera.' },
       { en: "Are you from Ecuador?", es: '¿Eres de Ecuador?' },
-      { en: "They aren't in the office today.", es: 'Ellos no están hoy en la oficina.' }
+      { en: "Yes, I am. / No, I'm not.", es: 'Sí, lo soy. / No, no lo soy.' },
+      { en: "She isn't in the office today.", es: 'Ella no está hoy en la oficina.' },
+      { en: "Where are you from?", es: '¿De dónde eres?' },
+      { en: "Is he the new manager?", es: '¿Es él el nuevo gerente?' }
+    ],
+    more: [
+      {
+        title: 'Las palabras interrogativas',
+        es: 'WHAT (qué) · WHERE (dónde) · WHO (quién) · WHEN (cuándo) · WHY (por qué) · HOW (cómo) · WHICH (cuál, entre opciones) · HOW MUCH (cuánto, incontable o precio) · HOW MANY (cuántos, contable).\n\n' +
+            'El orden es siempre el mismo: palabra interrogativa + verbo + sujeto. "Where are you from?", "What is your job?", "How many clients do you have?".\n\n' +
+            'Cuidado con la trampa de "from": en inglés la preposición se queda al final. "¿De dónde eres?" es "Where are you FROM?", no "From where are you?".',
+        examples: [
+          { en: "Where do you live?", es: '¿Dónde vives?' },
+          { en: "What do you do?", es: '¿A qué te dedicas?' },
+          { en: "How many people work here?", es: '¿Cuánta gente trabaja aquí?' }
+        ]
+      },
+      {
+        title: 'La edad y la nacionalidad: dos trampas clásicas',
+        es: 'LA EDAD va con TO BE, no con HAVE. En español "tienes" años; en inglés "eres" años: "I’m 40 years old". Decir "I have 40 years" es probablemente el error más reconocible de un hispanohablante.\n\n' +
+            'LAS NACIONALIDADES E IDIOMAS se escriben con MAYÚSCULA inicial siempre: Ecuadorian, Spanish, English, Colombian. En español van en minúscula, en inglés no.\n\n' +
+            'Y ojo con la diferencia: el país es Spain, el gentilicio es Spanish. Ecuador → Ecuadorian. The United States → American.',
+        examples: [
+          { en: "I'm thirty-eight years old.", es: 'Tengo treinta y ocho años.' },
+          { en: "She's Ecuadorian and she speaks Spanish and English.", es: 'Ella es ecuatoriana y habla español e inglés.' },
+          { en: "How old is your company?", es: '¿Qué antigüedad tiene tu empresa?' }
+        ]
+      }
+    ],
+    mistakes: [
+      { bad: 'I have 40 years.', good: "I'm 40 years old.", es: 'La edad va con TO BE.' },
+      { bad: 'From where are you?', good: 'Where are you from?', es: 'La preposición se queda al final.' },
+      { bad: 'I am ecuadorian.', good: "I'm Ecuadorian.", es: 'Nacionalidades siempre con mayúscula.' },
+      { bad: 'Yes, I’m.', good: 'Yes, I am.', es: 'La respuesta corta afirmativa nunca se contrae.' },
+      { bad: 'I live in Ecuador since 2010.', good: "I've lived in Ecuador since 2010.", es: 'Con "since" se usa present perfect (lo verás en B1).' }
     ]
   },
   vocab: [
     { en: 'country', es: 'país' },
     { en: 'city', es: 'ciudad' },
     { en: 'job', es: 'trabajo / puesto' },
+    { en: 'work', es: 'trabajo (en general)' },
     { en: 'company', es: 'empresa' },
-    { en: 'manager', es: 'gerente / jefe' },
+    { en: 'office', es: 'oficina' },
+    { en: 'boss', es: 'jefe' },
+    { en: 'manager', es: 'gerente' },
     { en: 'sales manager', es: 'gerente de ventas' },
+    { en: 'colleague', es: 'colega / compañero de trabajo' },
+    { en: 'team', es: 'equipo' },
     { en: 'engineer', es: 'ingeniero/a' },
     { en: 'teacher', es: 'profesor/a' },
     { en: 'student', es: 'estudiante' },
+    { en: 'driver', es: 'conductor' },
     { en: 'married', es: 'casado/a' },
     { en: 'single', es: 'soltero/a' },
+    { en: 'children', es: 'hijos' },
     { en: 'years old', es: 'años (de edad)' },
     { en: 'to live', es: 'vivir' },
-    { en: 'to work', es: 'trabajar' }
+    { en: 'to work', es: 'trabajar' },
+    { en: 'to speak', es: 'hablar (un idioma)' },
+    { en: 'Ecuadorian', es: 'ecuatoriano/a' },
+    { en: 'Spanish', es: 'español (idioma o gentilicio)' },
+    { en: 'English', es: 'inglés' },
+    { en: 'phone number', es: 'número de teléfono' },
+    { en: 'email address', es: 'correo electrónico' },
+    { en: 'business card', es: 'tarjeta de presentación' }
   ],
   phrases: [
     { en: "I'm from Ecuador.", es: 'Soy de Ecuador.' },
     { en: "I live in Cuenca.", es: 'Vivo en Cuenca.' },
     { en: "I work as a sales manager.", es: 'Trabajo como gerente de ventas.' },
-    { en: "I'm thirty-five years old.", es: 'Tengo treinta y cinco años.' },
+    { en: "I work for a foreign trade company.", es: 'Trabajo para una empresa de comercio exterior.' },
+    { en: "I'm thirty-eight years old.", es: 'Tengo treinta y ocho años.' },
+    { en: "I'm married and I have two children.", es: 'Estoy casado y tengo dos hijos.' },
     { en: "Where are you from?", es: '¿De dónde eres?' },
-    { en: "What do you do?", es: '¿A qué te dedicas?' }
+    { en: "What do you do?", es: '¿A qué te dedicas?' },
+    { en: "How long have you been there?", es: '¿Cuánto llevas ahí?' },
+    { en: "Here's my business card.", es: 'Aquí tiene mi tarjeta.' },
+    { en: "Can I have your email address?", es: '¿Me da su correo?' },
+    { en: "I speak Spanish and a little English.", es: 'Hablo español y un poco de inglés.' }
   ],
   exercises: [
     { t: 'mc', q: '¿Cómo dices "Tengo 40 años"?', opts: ['I have 40 years', "I'm 40 years old", 'I make 40 years'], a: 1,
-      why: 'La edad se dice con TO BE, no con "have". "I have 40 years" es el error clásico del hispanohablante.' },
+      why: 'La edad se dice con TO BE. "I have 40 years" es el error clásico del hispanohablante.' },
     { t: 'fill', q: "Where ___ you from?", a: ['are'],
-      why: 'Con "you" siempre va "are". Nunca "Where you from?" en inglés formal ni "Where is you".' },
+      why: 'Con "you" siempre va ARE. Y fíjate en que "from" se queda al final.' },
     { t: 'tr', q: 'Trabajo en una empresa de comercio exterior.', a: ['i work in a foreign trade company', 'i work for a foreign trade company', 'i work at a foreign trade company'],
-      why: 'Para empresas se usa "work for/at/in a company". "Foreign trade" = comercio exterior.' },
+      why: '"Foreign trade" = comercio exterior. Con empresas funcionan work for / at / in.' },
     { t: 'order', words: ['She', 'is', 'not', 'the', 'manager.'], a: 'She is not the manager.',
-      why: 'Negación con to be: sujeto + is + not. En el habla se contrae: "She isn’t the manager."' },
+      why: 'Negación con to be: sujeto + is + not. En el habla: "She isn’t the manager".' },
+    { t: 'mc', q: '¿Cuál es la respuesta corta correcta a "Are you the manager?"', opts: ["Yes, I'm.", 'Yes, I am.', 'Yes, I are.'], a: 1,
+      why: 'La respuesta corta afirmativa nunca se contrae: "Yes, I am".' },
     { t: 'listen', audio: "I'm a sales manager. I work for an export company.", opts: ['Soy gerente de ventas. Trabajo para una empresa exportadora.', 'Soy vendedor. Busco una empresa exportadora.', 'Fui gerente de ventas en una empresa exportadora.'], a: 0,
       why: '"I work" es presente. Si fuera pasado escucharías "I worked" o "I used to work".' },
     { t: 'mc', q: 'Un cliente pregunta "What do you do?". Está preguntando por...', opts: ['qué estás haciendo ahora', 'tu profesión', 'qué vas a hacer mañana'], a: 1,
-      why: '"What do you do?" = ¿a qué te dedicas? Si quisiera saber qué haces ahora diría "What are you doing?".' },
+      why: '"What do you do?" = ¿a qué te dedicas? Para lo que haces ahora sería "What are you doing?".' },
     { t: 'tr', q: '¿De qué ciudad eres?', a: ['what city are you from', 'which city are you from'],
-      why: 'La preposición "from" se queda al final de la pregunta. Es normal y correcto en inglés.' }
+      why: 'La preposición "from" al final: es normal y correcto en inglés.' },
+    { t: 'fill', q: "___ many people work in your team?", a: ['how'],
+      why: 'HOW MANY para cosas contables (personas, clientes, unidades). HOW MUCH para incontables y precios.' },
+    { t: 'order', words: ['I', 'work', 'for', 'a', 'company', 'in', 'Cuenca.'], a: 'I work for a company in Cuenca.',
+      why: '"Work for" + empresa, "in" + ciudad. Fíjate también en el artículo "a" antes de "company".' },
+    { t: 'listen', audio: "She's Ecuadorian, but she lives in Miami now.", opts: ['Ella es ecuatoriana, pero ahora vive en Miami.', 'Ella es de Miami, pero visita Ecuador.', 'Ella vivía en Miami cuando era ecuatoriana.'], a: 0,
+      why: '"But" marca el contraste. Escucha la -s de "lives": es tercera persona.' }
   ]
 },
 
 {
-  id: 'a1-3', level: 'A1', title: 'Números, días y horas',
-  goal: 'Decir la hora, agendar reuniones y hablar de precios.',
+  id: 'a1-3', level: 'A1', title: 'Números, horas y días',
+  goal: 'Decir la hora, agendar reuniones, manejar fechas y hablar de precios y cantidades.',
   grammar: {
-    title: 'Preposiciones de tiempo: at / on / in',
-    es: 'AT para horas (at 3 o’clock) · ON para días y fechas (on Monday, on May 3rd) · IN para meses, años y partes del día (in May, in 2026, in the morning).',
+    title: 'AT / ON / IN: las preposiciones de tiempo',
+    es: 'Tres preposiciones y tres usos. Memorízalos así, de lo pequeño a lo grande:\n\n' +
+        'AT para horas y momentos puntuales: at 3 o’clock, at noon, at midnight, at lunchtime, at the weekend (en inglés británico).\n\n' +
+        'ON para días y fechas: on Monday, on May 3rd, on Friday morning, on the weekend (en inglés americano).\n\n' +
+        'IN para períodos largos: meses (in May), años (in 2026), estaciones (in summer), y partes del día (in the morning, in the afternoon, in the evening). Excepción que hay que memorizar: AT night, no "in the night".\n\n' +
+        'Y una regla que ahorra errores: cuando aparece la palabra next, last, this o every, NO se usa preposición. Se dice "next Monday", no "on next Monday". "Last year", no "in last year".',
     examples: [
       { en: "The meeting is at ten o'clock.", es: 'La reunión es a las diez.' },
       { en: "I'll call you on Friday.", es: 'Te llamo el viernes.' },
-      { en: "We deliver in March.", es: 'Entregamos en marzo.' }
+      { en: "We deliver in March.", es: 'Entregamos en marzo.' },
+      { en: "I see him every Monday.", es: 'Lo veo todos los lunes.' },
+      { en: "Let's meet next week.", es: 'Reunámonos la próxima semana.' }
+    ],
+    more: [
+      {
+        title: 'Decir la hora: las dos maneras',
+        es: 'FORMA DIRECTA (la más fácil y muy usada): dices los números tal cual. 7:30 → "seven thirty". 9:15 → "nine fifteen". 10:05 → "ten oh five" (la cero se dice "oh").\n\n' +
+            'FORMA CLÁSICA: usas past (y) y to (menos). 7:30 → "half past seven". 9:15 → "quarter past nine". 10:45 → "quarter to eleven". Fíjate en que con TO se nombra la hora SIGUIENTE.\n\n' +
+            'Para el día se usa a.m. (mañana) y p.m. (tarde/noche), porque el reloj de 24 horas casi no se usa en inglés. "Las 15:00" es "3 p.m.".',
+        examples: [
+          { en: "It's half past nine.", es: 'Son las nueve y media.' },
+          { en: "The call is at a quarter to five.", es: 'La llamada es a las cinco menos cuarto.' },
+          { en: "We open at eight thirty a.m.", es: 'Abrimos a las ocho y media de la mañana.' }
+        ]
+      },
+      {
+        title: 'Números grandes, precios y porcentajes',
+        es: 'Los números grandes en inglés NO llevan "and" en el uso americano: 250 es "two hundred fifty". Y ojo: hundred, thousand y million nunca llevan -s cuando van con un número: "three thousand dollars", no "three thousands".\n\n' +
+            'Los decimales usan PUNTO, no coma: 12.5 se lee "twelve point five". Y los miles se separan con coma: 1,500.\n\n' +
+            'Para precios: "It’s twenty dollars" o "It costs twenty dollars". Para porcentajes: "ten percent" (una sola palabra en inglés americano).',
+        examples: [
+          { en: "The total is two thousand five hundred dollars.", es: 'El total es dos mil quinientos dólares.' },
+          { en: "We need five hundred units.", es: 'Necesitamos quinientas unidades.' },
+          { en: "Sales went up ten percent.", es: 'Las ventas subieron un diez por ciento.' }
+        ]
+      }
+    ],
+    mistakes: [
+      { bad: 'On next Monday.', good: 'Next Monday.', es: 'Con next/last/this/every no se usa preposición.' },
+      { bad: 'Three thousands dollars.', good: 'Three thousand dollars.', es: 'Thousand no lleva -s cuando va con número.' },
+      { bad: 'In the night.', good: 'At night.', es: 'Es la excepción: night va con AT.' },
+      { bad: 'What hour is it?', good: 'What time is it?', es: 'Se pregunta por el "time", no por la "hour".' },
+      { bad: 'The meeting is in Monday.', good: 'The meeting is on Monday.', es: 'Los días llevan ON.' }
     ]
   },
   vocab: [
@@ -145,51 +307,122 @@ const UNITS = [
     { en: 'Wednesday', es: 'miércoles' },
     { en: 'Thursday', es: 'jueves' },
     { en: 'Friday', es: 'viernes' },
+    { en: 'Saturday', es: 'sábado' },
+    { en: 'Sunday', es: 'domingo' },
     { en: 'weekend', es: 'fin de semana' },
     { en: 'today', es: 'hoy' },
     { en: 'tomorrow', es: 'mañana' },
     { en: 'yesterday', es: 'ayer' },
-    { en: 'hour', es: 'hora' },
+    { en: 'week', es: 'semana' },
+    { en: 'month', es: 'mes' },
+    { en: 'year', es: 'año' },
+    { en: 'hour', es: 'hora (duración)' },
+    { en: 'minute', es: 'minuto' },
+    { en: "o'clock", es: 'en punto' },
     { en: 'half past', es: 'y media' },
+    { en: 'quarter past', es: 'y cuarto' },
     { en: 'quarter to', es: 'menos cuarto' },
+    { en: 'early', es: 'temprano' },
+    { en: 'late', es: 'tarde' },
+    { en: 'on time', es: 'a tiempo' },
     { en: 'how much', es: 'cuánto (precio)' },
-    { en: 'thousand', es: 'mil' }
+    { en: 'how many', es: 'cuántos' },
+    { en: 'hundred', es: 'cien' },
+    { en: 'thousand', es: 'mil' },
+    { en: 'million', es: 'millón' },
+    { en: 'percent', es: 'por ciento' },
+    { en: 'free (available)', es: 'libre / disponible' }
   ],
   phrases: [
     { en: "What time is it?", es: '¿Qué hora es?' },
     { en: "It's half past nine.", es: 'Son las nueve y media.' },
     { en: "The meeting is on Monday at ten.", es: 'La reunión es el lunes a las diez.' },
+    { en: "Are you free on Thursday morning?", es: '¿Estás libre el jueves por la mañana?' },
+    { en: "I'm free after three.", es: 'Estoy libre después de las tres.' },
+    { en: "Sorry, I'm busy at that time.", es: 'Perdón, estoy ocupado a esa hora.' },
     { en: "How much is it?", es: '¿Cuánto cuesta?' },
     { en: "It's two thousand dollars.", es: 'Cuesta dos mil dólares.' },
-    { en: "I'm free after three.", es: 'Estoy libre después de las tres.' }
+    { en: "How many units do you need?", es: '¿Cuántas unidades necesita?' },
+    { en: "Let's say Friday at nine.", es: 'Digamos el viernes a las nueve.' },
+    { en: "I'll be there in ten minutes.", es: 'Llego en diez minutos.' },
+    { en: "Sorry I'm late.", es: 'Perdón por la demora.' }
   ],
   exercises: [
     { t: 'fill', q: "The call is ___ Tuesday.", a: ['on'],
-      why: 'Los días de la semana siempre llevan ON: on Monday, on Tuesday, on the weekend.' },
+      why: 'Los días de la semana siempre llevan ON: on Monday, on Tuesday.' },
     { t: 'fill', q: "Let's meet ___ 4 p.m.", a: ['at'],
-      why: 'Las horas exactas llevan AT: at 4 p.m., at noon, at midnight.' },
+      why: 'Las horas llevan AT: at 4 p.m., at noon, at midnight.' },
+    { t: 'mc', q: 'Elige la correcta.', opts: ['See you on next Monday', 'See you next Monday', 'See you in next Monday'], a: 1,
+      why: 'Con next, last, this y every NO se usa preposición.' },
     { t: 'mc', q: '¿Cómo se dice "las siete y media"?', opts: ["half past seven", "seven and half", "half to seven"], a: 0,
-      why: '"Half past + hora" = y media. También puedes decir simplemente "seven thirty".' },
+      why: '"Half past + hora". También vale simplemente "seven thirty".' },
     { t: 'tr', q: '¿Cuánto cuesta el envío?', a: ['how much is the shipping', 'how much is shipping', 'how much does the shipping cost'],
-      why: '"How much is...?" es la forma más natural y rápida para preguntar precios.' },
+      why: '"How much is...?" es la forma más rápida y natural de preguntar precios.' },
     { t: 'listen', audio: "The shipment arrives on Thursday at eight thirty.", opts: ['El envío llega el jueves a las ocho y media.', 'El envío salió el martes a las ocho y media.', 'El envío llega el jueves a las ocho y cuarto.'], a: 0,
-      why: 'Thursday (jueves) y Tuesday (martes) suenan parecido: Thursday empieza con el sonido "th".' },
+      why: 'Thursday y Tuesday suenan parecido: Thursday empieza con el sonido "th".' },
     { t: 'order', words: ['I', 'have', 'a', 'meeting', 'on', 'Friday', 'morning.'], a: 'I have a meeting on Friday morning.',
-      why: 'Cuando el día acompaña a la parte del día, se usa ON: on Friday morning (no "in the Friday morning").' }
+      why: 'Cuando el día acompaña a la parte del día se usa ON: on Friday morning.' },
+    { t: 'mc', q: '¿Cuál está bien escrito?', opts: ['Three thousands dollars', 'Three thousand dollars', 'Three thousand of dollars'], a: 1,
+      why: 'Hundred, thousand y million no llevan -s cuando van precedidos de un número.' },
+    { t: 'fill', q: "___ many units do you need?", a: ['how'],
+      why: 'HOW MANY para contables (units, clients). HOW MUCH para incontables y precios.' },
+    { t: 'tr', q: '¿Estás libre el jueves por la mañana?', a: ['are you free on thursday morning', 'are you free thursday morning'],
+      why: '"Free" aquí es "disponible", no "gratis". Para gratis se dice "free of charge".' },
+    { t: 'listen', audio: "Sorry, I'm busy at that time. How about four thirty?", opts: ['Perdón, estoy ocupado a esa hora. ¿Qué tal a las cuatro y media?', 'Perdón, estoy ocupado. Nos vemos a las cuatro.', 'Perdón por llegar tarde. Eran las cuatro y media.'], a: 0,
+      why: '"How about...?" es la forma más natural de proponer una alternativa.' }
   ]
 },
 
 /* ══════════════════ A2 ══════════════════ */
 {
   id: 'a2-4', level: 'A2', title: 'Presente simple: tu rutina',
-  goal: 'Contar lo que haces todos los días y con qué frecuencia.',
+  goal: 'Contar lo que haces cada día, con qué frecuencia, y preguntárselo a otro.',
   grammar: {
-    title: 'Presente simple: la -s de la tercera persona',
-    es: 'Con he / she / it el verbo lleva -s: "He works". Para preguntar y negar usas do/does y el verbo vuelve a su forma base: "Does he work?", "He doesn’t work". Error típico: "Does he works?" ❌',
+    title: 'Presente simple: la temida -s de la tercera persona',
+    es: 'El presente simple sirve para rutinas, hábitos y verdades generales: lo que haces normalmente, no lo que estás haciendo ahora mismo.\n\n' +
+        'La forma es el verbo tal cual… salvo con he, she, it, donde hay que añadir -s: I work / he workS. Es la única terminación del presente en inglés, y aun así es donde más se falla.\n\n' +
+        'Reglas de esa -s: la mayoría solo añade -s (works, sells, calls). Si el verbo acaba en -o, -ch, -sh, -ss, -x se añade -ES (goes, watches, finishes). Si acaba en consonante + y, la y se convierte en -IES (study → studies, but play → plays porque lleva vocal antes).\n\n' +
+        'PARA PREGUNTAR Y NEGAR entra el auxiliar DO / DOES, y aquí está la clave: cuando aparece do o does, el verbo principal PIERDE la -s. Se dice "Does he work?" y "He doesn’t work", nunca "Does he works?". La -s ya está en el "does".',
     examples: [
       { en: "I check my email every morning.", es: 'Reviso mi correo cada mañana.' },
       { en: "She travels to Quito once a month.", es: 'Ella viaja a Quito una vez al mes.' },
-      { en: "Do you work on Saturdays?", es: '¿Trabajas los sábados?' }
+      { en: "Do you work on Saturdays?", es: '¿Trabajas los sábados?' },
+      { en: "He doesn't answer the phone after six.", es: 'Él no contesta el teléfono después de las seis.' },
+      { en: "Our office closes at five.", es: 'Nuestra oficina cierra a las cinco.' }
+    ],
+    more: [
+      {
+        title: 'Los adverbios de frecuencia y dónde colocarlos',
+        es: 'De más a menos: always (siempre) · usually (normalmente) · often (a menudo) · sometimes (a veces) · rarely (rara vez) · never (nunca).\n\n' +
+            'La posición es fija y es lo que más se equivoca: van ANTES del verbo principal ("I always check my email") pero DESPUÉS del verbo to be ("I am always busy"). Esa es toda la regla.\n\n' +
+            'Never ya es negativo por sí solo: se dice "I never work on Sundays", jamás "I don’t never work".\n\n' +
+            'Para expresiones más largas (once a week, twice a month, every day) la posición normal es al final de la frase.',
+        examples: [
+          { en: "I usually start work at eight.", es: 'Normalmente empiezo a trabajar a las ocho.' },
+          { en: "He's always late for meetings.", es: 'Él siempre llega tarde a las reuniones.' },
+          { en: "We visit that client twice a month.", es: 'Visitamos a ese cliente dos veces al mes.' }
+        ]
+      },
+      {
+        title: 'Presente simple vs. presente continuo',
+        es: 'Son dos presentes distintos y el español los mezcla.\n\n' +
+            'PRESENTE SIMPLE = rutina, lo habitual. "I work in Cuenca" (es mi trabajo, siempre).\n' +
+            'PRESENTE CONTINUO (am/is/are + verbo-ING) = lo que ocurre AHORA MISMO o en esta temporada. "I’m working from home this week" (esta semana, no siempre).\n\n' +
+            'Truco práctico: si en español puedes decir "estoy + gerundio", usa el continuo. Si dirías el presente a secas, usa el simple.\n\n' +
+            'Excepción importante: hay verbos que casi nunca van en continuo porque no son acciones sino estados: know, want, need, like, love, understand, believe, have (cuando es poseer). Se dice "I need it now", no "I’m needing it".',
+        examples: [
+          { en: "I work in sales. Right now I'm preparing a quotation.", es: 'Trabajo en ventas. Ahora mismo estoy preparando una cotización.' },
+          { en: "She's visiting clients this week.", es: 'Ella está visitando clientes esta semana.' },
+          { en: "I need the report today.", es: 'Necesito el informe hoy.' }
+        ]
+      }
+    ],
+    mistakes: [
+      { bad: 'Does he works here?', good: 'Does he work here?', es: 'Con does, el verbo va sin -s.' },
+      { bad: "He don't work on Fridays.", good: "He doesn't work on Fridays.", es: 'Con he/she/it el auxiliar es does, no do.' },
+      { bad: 'I always am busy.', good: "I'm always busy.", es: 'Los adverbios de frecuencia van después de to be.' },
+      { bad: "I don't never work on Sundays.", good: 'I never work on Sundays.', es: 'Never ya es negativo, no se dobla.' },
+      { bad: "I'm needing the invoice.", good: 'I need the invoice.', es: 'Need es un verbo de estado: no va en continuo.' }
     ]
   },
   vocab: [
@@ -197,53 +430,119 @@ const UNITS = [
     { en: 'usually', es: 'normalmente' },
     { en: 'often', es: 'a menudo' },
     { en: 'sometimes', es: 'a veces' },
+    { en: 'rarely', es: 'rara vez' },
     { en: 'never', es: 'nunca' },
+    { en: 'every day', es: 'todos los días' },
+    { en: 'once a week', es: 'una vez por semana' },
+    { en: 'twice a month', es: 'dos veces al mes' },
     { en: 'to wake up', es: 'despertarse' },
+    { en: 'to get up', es: 'levantarse' },
     { en: 'to start', es: 'empezar' },
     { en: 'to finish', es: 'terminar' },
     { en: 'to drive', es: 'conducir / manejar' },
     { en: 'to check', es: 'revisar' },
     { en: 'to answer', es: 'responder' },
+    { en: 'to call', es: 'llamar' },
     { en: 'to send', es: 'enviar' },
+    { en: 'to visit', es: 'visitar' },
     { en: 'to have lunch', es: 'almorzar' },
-    { en: 'every day', es: 'todos los días' }
+    { en: 'to go home', es: 'irse a casa' },
+    { en: 'to travel', es: 'viajar' },
+    { en: 'busy', es: 'ocupado' },
+    { en: 'free time', es: 'tiempo libre' },
+    { en: 'schedule', es: 'horario / agenda' },
+    { en: 'routine', es: 'rutina' },
+    { en: 'early', es: 'temprano' },
+    { en: 'usually / normally', es: 'normalmente' }
   ],
   phrases: [
     { en: "I usually start work at eight.", es: 'Normalmente empiezo a trabajar a las ocho.' },
     { en: "I check my email first thing in the morning.", es: 'Reviso el correo lo primero de la mañana.' },
-    { en: "She doesn't work on Sundays.", es: 'Ella no trabaja los domingos.' },
-    { en: "How often do you visit clients?", es: '¿Con qué frecuencia visitas clientes?' },
     { en: "I visit clients twice a week.", es: 'Visito clientes dos veces por semana.' },
-    { en: "I have lunch at one.", es: 'Almuerzo a la una.' }
+    { en: "She doesn't work on Sundays.", es: 'Ella no trabaja los domingos.' },
+    { en: "How often do you visit your clients?", es: '¿Con qué frecuencia visitas a tus clientes?' },
+    { en: "What time do you usually finish?", es: '¿A qué hora sueles terminar?' },
+    { en: "It depends on the day.", es: 'Depende del día.' },
+    { en: "I'm quite busy this week.", es: 'Estoy bastante ocupado esta semana.' },
+    { en: "Right now I'm preparing a quotation.", es: 'Ahora mismo estoy preparando una cotización.' },
+    { en: "I don't have much free time.", es: 'No tengo mucho tiempo libre.' },
+    { en: "I have lunch around one.", es: 'Almuerzo alrededor de la una.' },
+    { en: "My schedule is full today.", es: 'Tengo la agenda llena hoy.' }
   ],
   exercises: [
     { t: 'mc', q: 'Elige la frase correcta.', opts: ['He work in Guayaquil', 'He works in Guayaquil', 'He does work in Guayaquil'], a: 1,
       why: 'Con he/she/it el verbo lleva -s en presente simple afirmativo.' },
     { t: 'fill', q: "___ she speak English?", a: ['does'],
-      why: 'Preguntas con he/she/it usan DOES, y el verbo se queda sin -s: "Does she speak?".' },
+      why: 'Preguntas con he/she/it usan DOES, y el verbo se queda sin -s.' },
+    { t: 'mc', q: '¿Cuál está bien?', opts: ["He doesn't works here", "He don't work here", "He doesn't work here"], a: 2,
+      why: 'Con he/she/it es "doesn’t", y después el verbo va en forma base.' },
     { t: 'tr', q: 'Normalmente reviso el correo a las ocho.', a: ['i usually check my email at eight', 'i usually check the email at eight', "i usually check my emails at eight"],
-      why: 'Los adverbios de frecuencia (usually, always, never) van ANTES del verbo principal.' },
+      why: 'Los adverbios de frecuencia van ANTES del verbo principal.' },
     { t: 'order', words: ['I', 'never', 'answer', 'calls', 'after', 'seven.'], a: 'I never answer calls after seven.',
       why: '"Never" ya es negativo: no se dice "I don’t never answer".' },
+    { t: 'mc', q: '¿Dónde va "always" en "I am busy"?', opts: ['Always I am busy', "I'm always busy", 'I am busy always'], a: 1,
+      why: 'Después del verbo to be. Antes solo va cuando hay otro verbo principal.' },
     { t: 'listen', audio: "She usually sends the report on Friday afternoon.", opts: ['Ella suele enviar el informe el viernes por la tarde.', 'Ella envió el informe el viernes por la tarde.', 'Ella nunca envía el informe los viernes.'], a: 0,
-      why: '"Sends" (con -s) es presente habitual. "Sent" sería pasado.' },
+      why: '"Sends" con -s es presente habitual. "Sent" sería pasado.' },
     { t: 'mc', q: '¿Cuál significa "a veces"?', opts: ['often', 'sometimes', 'always'], a: 1,
-      why: 'Escala de frecuencia: never < rarely < sometimes < often < usually < always.' },
+      why: 'Escala: never < rarely < sometimes < often < usually < always.' },
     { t: 'tr', q: '¿Con qué frecuencia viajas por trabajo?', a: ['how often do you travel for work', 'how often do you travel for business'],
-      why: '"How often" es la pregunta estándar de frecuencia. "For work" o "for business" ambas funcionan.' }
+      why: '"How often" es la pregunta estándar de frecuencia.' },
+    { t: 'fill', q: "Right now I ___ preparing the quotation.", a: ['am', "'m"],
+      why: 'Acción de este momento: presente continuo (am/is/are + -ing).' },
+    { t: 'listen', audio: "I don't usually work on Saturdays, but this week I'm working every day.", opts: ['No suelo trabajar los sábados, pero esta semana estoy trabajando todos los días.', 'Nunca trabajo los sábados ni ningún otro día.', 'Trabajo los sábados, pero esta semana descanso.'], a: 0,
+      why: 'La frase mezcla los dos presentes: el simple para lo habitual y el continuo para esta semana.' }
   ]
 },
 
 {
   id: 'a2-5', level: 'A2', title: 'En el trabajo: clientes y pedidos',
-  goal: 'Manejar el vocabulario esencial de ventas y comercio exterior.',
+  goal: 'Manejar el vocabulario esencial de ventas y comercio exterior, y pedir cosas con cortesía.',
   grammar: {
-    title: 'Can / Could para pedir con cortesía',
-    es: 'CAN es directo y neutro; COULD es más suave y educado. En negocios, "Could you...?" suena profesional. Añade "please" y suena aún mejor. Después de can/could el verbo va en forma base, sin "to".',
+    title: 'CAN y COULD: pedir, ofrecer y poder',
+    es: 'CAN significa poder: capacidad ("I can speak English"), permiso ("Can I use your phone?") y posibilidad ("We can deliver on Friday").\n\n' +
+        'COULD es su versión suave. Literalmente es el pasado de can, pero en la práctica se usa sobre todo para pedir con más cortesía. En negocios, "Could you send me...?" suena claramente más profesional que "Can you send me...?".\n\n' +
+        'Después de can y could el verbo va SIEMPRE en forma base, sin "to" y sin -s: "She can help", nunca "She can to help" ni "She cans".\n\n' +
+        'Para negar: can’t (cannot) y couldn’t. Y para preguntar solo hay que darle la vuelta: "Can you...?", "Could we...?". No lleva do ni does.\n\n' +
+        'Escala de cortesía, de menos a más: "Send me the price" (orden seca, evítala) → "Can you send me the price?" → "Could you send me the price, please?" → "Would you mind sending me the price?". En correos y llamadas de trabajo, quédate del tercer nivel en adelante.',
     examples: [
       { en: "Could you send me a quotation, please?", es: '¿Podría enviarme una cotización, por favor?' },
       { en: "Can we schedule a meeting?", es: '¿Podemos agendar una reunión?' },
-      { en: "I can offer you a small discount.", es: 'Puedo ofrecerle un pequeño descuento.' }
+      { en: "I can offer you a small discount.", es: 'Puedo ofrecerle un pequeño descuento.' },
+      { en: "We can't deliver before Friday.", es: 'No podemos entregar antes del viernes.' },
+      { en: "Could you repeat that, please?", es: '¿Podría repetirlo, por favor?' }
+    ],
+    more: [
+      {
+        title: 'WOULD LIKE: querer sin sonar brusco',
+        es: 'En inglés "I want" suena exigente, casi infantil, en un contexto profesional. La fórmula educada es I WOULD LIKE (normalmente contraída: I’d like).\n\n' +
+            '"I’d like a quotation" = quisiera una cotización. "I’d like to visit your factory" = me gustaría visitar su fábrica. Fíjate: si le sigue un verbo, ese verbo lleva TO.\n\n' +
+            'Para ofrecer se usa la pregunta "Would you like...?": "Would you like a coffee?", "Would you like me to send the details?".',
+        examples: [
+          { en: "I'd like to place an order.", es: 'Quisiera hacer un pedido.' },
+          { en: "Would you like a copy of the invoice?", es: '¿Quiere una copia de la factura?' },
+          { en: "We'd like to see a sample first.", es: 'Nos gustaría ver una muestra primero.' }
+        ]
+      },
+      {
+        title: 'THERE IS / THERE ARE: hay',
+        es: 'El "hay" español se dice con there is (singular) o there are (plural). "There is a problem with the order" / "There are three options".\n\n' +
+            'Negativo: there isn’t / there aren’t. Pregunta: "Is there...?" / "Are there...?".\n\n' +
+            'En pasado: there was / there were. "There was a delay last month".\n\n' +
+            'Error clásico: traducir "hay" como "have". "Have a problem" significa "tengo un problema", no "hay un problema".',
+        examples: [
+          { en: "There is a problem with the shipment.", es: 'Hay un problema con el envío.' },
+          { en: "Are there any other options?", es: '¿Hay otras opciones?' },
+          { en: "There aren't enough units in stock.", es: 'No hay suficientes unidades en inventario.' }
+        ]
+      }
+    ],
+    mistakes: [
+      { bad: 'Can you to send me the price?', good: 'Can you send me the price?', es: 'Después de can/could el verbo va sin "to".' },
+      { bad: 'She cans help you.', good: 'She can help you.', es: 'Can nunca lleva -s.' },
+      { bad: 'I want a discount.', good: "I'd like a discount.", es: '"I want" suena exigente en negocios.' },
+      { bad: 'Have a problem with the order.', good: 'There is a problem with the order.', es: '"Hay" se dice there is/there are.' },
+      { bad: 'We need it until Friday.', good: 'We need it by Friday.', es: 'BY es "a más tardar"; UNTIL es "hasta" (duración).' }
     ]
   },
   vocab: [
@@ -252,9 +551,12 @@ const UNITS = [
     { en: 'supplier', es: 'proveedor' },
     { en: 'quotation (quote)', es: 'cotización' },
     { en: 'price', es: 'precio' },
+    { en: 'price list', es: 'lista de precios' },
     { en: 'discount', es: 'descuento' },
+    { en: 'order', es: 'pedido' },
     { en: 'purchase order', es: 'orden de compra' },
     { en: 'invoice', es: 'factura' },
+    { en: 'payment', es: 'pago' },
     { en: 'delivery', es: 'entrega' },
     { en: 'shipment', es: 'envío / embarque' },
     { en: 'deadline', es: 'fecha límite' },
@@ -262,45 +564,346 @@ const UNITS = [
     { en: 'target', es: 'meta / objetivo' },
     { en: 'sales', es: 'ventas' },
     { en: 'budget', es: 'presupuesto' },
-    { en: 'stock', es: 'inventario / existencias' }
+    { en: 'stock', es: 'inventario / existencias' },
+    { en: 'sample', es: 'muestra' },
+    { en: 'unit', es: 'unidad' },
+    { en: 'quantity', es: 'cantidad' },
+    { en: 'warehouse', es: 'bodega / almacén' },
+    { en: 'to place an order', es: 'hacer un pedido' },
+    { en: 'to confirm', es: 'confirmar' },
+    { en: 'to check', es: 'verificar' },
+    { en: 'available', es: 'disponible' },
+    { en: 'in stock', es: 'en existencia' },
+    { en: 'out of stock', es: 'agotado' },
+    { en: 'by (a date)', es: 'para (a más tardar)' }
   ],
   phrases: [
     { en: "Could you send me a quotation?", es: '¿Podría enviarme una cotización?' },
+    { en: "I'd like to place an order.", es: 'Quisiera hacer un pedido.' },
     { en: "I'll follow up with you tomorrow.", es: 'Le doy seguimiento mañana.' },
     { en: "We need it by Friday.", es: 'Lo necesitamos para el viernes.' },
     { en: "What's your best price?", es: '¿Cuál es su mejor precio?' },
     { en: "Let me check and get back to you.", es: 'Déjeme revisar y le respondo.' },
-    { en: "The order is ready for shipment.", es: 'El pedido está listo para el envío.' }
+    { en: "Is it available right now?", es: '¿Está disponible ahora mismo?' },
+    { en: "I'm afraid it's out of stock.", es: 'Me temo que está agotado.' },
+    { en: "The order is ready for shipment.", es: 'El pedido está listo para el envío.' },
+    { en: "There is a problem with the delivery.", es: 'Hay un problema con la entrega.' },
+    { en: "Could you confirm the quantity?", es: '¿Podría confirmar la cantidad?' },
+    { en: "Can we meet next week to discuss it?", es: '¿Podemos reunirnos la próxima semana para verlo?' }
   ],
   exercises: [
     { t: 'mc', q: '¿Cuál es la forma MÁS cortés de pedir el precio?', opts: ['Send me the price.', 'Could you send me your price list, please?', 'I want the price now.'], a: 1,
       why: '"Could you...please?" es el registro estándar en correos y llamadas de negocios.' },
     { t: 'fill', q: "We need the goods ___ Friday at the latest.", a: ['by'],
-      why: 'BY = "a más tardar / para". "Until Friday" significaría que la acción dura hasta el viernes.' },
+      why: 'BY = "a más tardar". "Until Friday" significaría que la acción dura hasta el viernes.' },
+    { t: 'mc', q: 'Elige la correcta.', opts: ['Can you to help me?', 'Can you help me?', 'Can you helping me?'], a: 1,
+      why: 'Después de can/could el verbo va en forma base, sin "to" y sin -ing.' },
     { t: 'tr', q: 'Le daré seguimiento la próxima semana.', a: ["i'll follow up next week", 'i will follow up next week', "i'll follow up with you next week"],
       why: '"Follow up" es el phrasal verb exacto para dar seguimiento comercial.' },
     { t: 'order', words: ['Can', 'you', 'confirm', 'the', 'purchase', 'order?'], a: 'Can you confirm the purchase order?',
-      why: 'Después de can/could el verbo va en base: confirm (no "to confirm", no "confirms").' },
+      why: 'Después de can el verbo va en base: confirm, no "to confirm" ni "confirms".' },
+    { t: 'mc', q: '¿Cómo dices "Hay un problema con el pedido"?', opts: ['Have a problem with the order', 'There is a problem with the order', 'It has a problem with the order'], a: 1,
+      why: 'El "hay" español es there is / there are, nunca "have".' },
     { t: 'listen', audio: "The supplier says the shipment will be delayed by two weeks.", opts: ['El proveedor dice que el envío se retrasará dos semanas.', 'El proveedor dice que el envío llega en dos semanas.', 'El cliente dice que el pedido se canceló.'], a: 0,
-      why: '"Delayed" = retrasado. Ojo: "supplier" (proveedor) vs "customer" (cliente).' },
+      why: '"Delayed" es retrasado. Ojo: supplier (proveedor) vs. customer (cliente).' },
     { t: 'mc', q: '"Invoice" significa...', opts: ['cotización', 'factura', 'inventario'], a: 1,
       why: 'Quotation = cotización (antes de vender). Invoice = factura (después de vender).' },
     { t: 'tr', q: 'Necesito una cotización para quinientas unidades.', a: ['i need a quotation for five hundred units', 'i need a quote for five hundred units', 'i need a quotation for 500 units'],
-      why: 'En el día a día "quote" es la forma corta y muy usada de "quotation".' }
+      why: 'En el día a día "quote" es la forma corta y muy usada de "quotation".' },
+    { t: 'fill', q: "I'd ___ to see a sample first.", a: ['like'],
+      why: '"I’d like to + verbo" = quisiera. Más profesional que "I want".' },
+    { t: 'listen', audio: "I'm afraid that model is out of stock, but we could offer an alternative.", opts: ['Me temo que ese modelo está agotado, pero podríamos ofrecer una alternativa.', 'Ese modelo está disponible y podemos enviarlo hoy.', 'Ese modelo se agotó y no hay nada que hacer.'], a: 0,
+      why: '"I’m afraid" suaviza la mala noticia y "we could" abre la puerta a una solución.' }
+  ]
+},
+
+{
+  id: 'a2-6', level: 'A2', title: 'Describir y comparar productos',
+  goal: 'Describir un producto, compararlo con otro y defender por qué el tuyo conviene.',
+  grammar: {
+    title: 'Comparativos y superlativos',
+    es: 'Para comparar dos cosas hay dos caminos, y el que uses depende de la LONGITUD del adjetivo.\n\n' +
+        'ADJETIVOS CORTOS (una sílaba, o dos acabadas en -y): añade -ER + THAN. cheap → cheaper than · fast → faster than · easy → easier than. Si acaba en consonante-vocal-consonante se dobla la última letra: big → bigger.\n\n' +
+        'ADJETIVOS LARGOS (dos sílabas o más): MORE + adjetivo + THAN. more expensive than · more reliable than · more efficient than. Nunca las dos cosas a la vez: "more cheaper" no existe.\n\n' +
+        'SUPERLATIVOS (el más de todos): THE + -EST para cortos (the cheapest, the fastest) y THE MOST para largos (the most expensive, the most reliable).\n\n' +
+        'IRREGULARES que hay que memorizar: good → better → the best · bad → worse → the worst · far → further → the furthest.\n\n' +
+        'Y para decir que dos cosas son iguales: AS + adjetivo + AS. "This model is as good as that one".',
+    examples: [
+      { en: "This model is cheaper than the other one.", es: 'Este modelo es más barato que el otro.' },
+      { en: "Their service is more reliable than ours.", es: 'Su servicio es más confiable que el nuestro.' },
+      { en: "It's the best price on the market.", es: 'Es el mejor precio del mercado.' },
+      { en: "This option is as good as that one.", es: 'Esta opción es tan buena como aquella.' },
+      { en: "Delivery is faster from our warehouse.", es: 'La entrega es más rápida desde nuestra bodega.' }
+    ],
+    more: [
+      {
+        title: 'Orden de los adjetivos y una diferencia clave con el español',
+        es: 'En inglés el adjetivo va SIEMPRE antes del sustantivo: "a good price", no "a price good". Y no cambia nunca: no tiene plural ni femenino. Se dice "two good prices", jamás "two goods prices".\n\n' +
+            'Cuando hay varios adjetivos el orden natural es: opinión → tamaño → edad → forma → color → origen → material. "A great new German machine". No hace falta memorizarlo entero, pero la opinión va primero.\n\n' +
+            'Ojo con VERY y TOO: very es "muy" (neutro) y too es "demasiado" (negativo). "It’s very expensive" (es muy caro) es distinto de "It’s too expensive" (es demasiado caro, no lo compro).',
+        examples: [
+          { en: "We offer high quality products.", es: 'Ofrecemos productos de alta calidad.' },
+          { en: "It's a very competitive price.", es: 'Es un precio muy competitivo.' },
+          { en: "That's too expensive for our budget.", es: 'Eso es demasiado caro para nuestro presupuesto.' }
+        ]
+      }
+    ],
+    mistakes: [
+      { bad: 'more cheaper', good: 'cheaper', es: 'No se combinan -er y more.' },
+      { bad: 'the most cheap', good: 'the cheapest', es: 'Cheap es corto: lleva -est.' },
+      { bad: 'more better', good: 'better', es: 'Better ya es comparativo.' },
+      { bad: 'two goods options', good: 'two good options', es: 'Los adjetivos en inglés no tienen plural.' },
+      { bad: 'a price competitive', good: 'a competitive price', es: 'El adjetivo va antes del sustantivo.' }
+    ]
+  },
+  vocab: [
+    { en: 'quality', es: 'calidad' },
+    { en: 'size', es: 'tamaño' },
+    { en: 'weight', es: 'peso' },
+    { en: 'colour / color', es: 'color' },
+    { en: 'material', es: 'material' },
+    { en: 'brand', es: 'marca' },
+    { en: 'model', es: 'modelo' },
+    { en: 'feature', es: 'característica' },
+    { en: 'cheap', es: 'barato' },
+    { en: 'expensive', es: 'caro' },
+    { en: 'reliable', es: 'confiable' },
+    { en: 'strong', es: 'resistente / fuerte' },
+    { en: 'light', es: 'ligero' },
+    { en: 'heavy', es: 'pesado' },
+    { en: 'fast', es: 'rápido' },
+    { en: 'slow', es: 'lento' },
+    { en: 'easy', es: 'fácil' },
+    { en: 'difficult', es: 'difícil' },
+    { en: 'better', es: 'mejor' },
+    { en: 'worse', es: 'peor' },
+    { en: 'the best', es: 'el mejor' },
+    { en: 'competitive', es: 'competitivo' },
+    { en: 'high quality', es: 'de alta calidad' },
+    { en: 'value for money', es: 'relación calidad-precio' },
+    { en: 'warranty', es: 'garantía' },
+    { en: 'to compare', es: 'comparar' },
+    { en: 'to offer', es: 'ofrecer' },
+    { en: 'to recommend', es: 'recomendar' },
+    { en: 'advantage', es: 'ventaja' },
+    { en: 'difference', es: 'diferencia' }
+  ],
+  phrases: [
+    { en: "This model is cheaper than that one.", es: 'Este modelo es más barato que aquel.' },
+    { en: "What's the difference between these two?", es: '¿Cuál es la diferencia entre estos dos?' },
+    { en: "It has a two-year warranty.", es: 'Tiene dos años de garantía.' },
+    { en: "It's the best value for money.", es: 'Es la mejor relación calidad-precio.' },
+    { en: "Our main advantage is delivery time.", es: 'Nuestra principal ventaja es el tiempo de entrega.' },
+    { en: "I'd recommend the second option.", es: 'Yo recomendaría la segunda opción.' },
+    { en: "It's very competitive for this quality.", es: 'Es muy competitivo para esta calidad.' },
+    { en: "That's too expensive for our budget.", es: 'Eso es demasiado caro para nuestro presupuesto.' },
+    { en: "How does it compare with the other brand?", es: '¿Cómo se compara con la otra marca?' },
+    { en: "This one is lighter and easier to install.", es: 'Este es más ligero y más fácil de instalar.' },
+    { en: "They're almost the same price.", es: 'Cuestan casi lo mismo.' },
+    { en: "What size do you need?", es: '¿Qué tamaño necesita?' }
+  ],
+  exercises: [
+    { t: 'mc', q: '¿Cuál está bien?', opts: ['This one is more cheap', 'This one is cheaper', 'This one is more cheaper'], a: 1,
+      why: '"Cheap" es corto: lleva -er. Y nunca se combina con "more".' },
+    { t: 'fill', q: "Their delivery is ___ reliable than ours.", a: ['more'],
+      why: '"Reliable" es largo (tres sílabas): se usa MORE + adjetivo + than.' },
+    { t: 'mc', q: 'El superlativo de "good" es...', opts: ['the goodest', 'the best', 'the most good'], a: 1,
+      why: 'Good → better → the best. Es irregular, hay que memorizarlo.' },
+    { t: 'tr', q: 'Es el mejor precio del mercado.', a: ["it's the best price on the market", 'it is the best price on the market', "it's the best price in the market"],
+      why: 'Se dice "on the market" (en el mercado, a la venta).' },
+    { t: 'order', words: ['This', 'model', 'is', 'lighter', 'than', 'the', 'other', 'one.'], a: 'This model is lighter than the other one.',
+      why: 'Estructura fija: sujeto + be + comparativo + than + comparado.' },
+    { t: 'mc', q: '"That’s too expensive" significa...', opts: ['es muy caro pero aceptable', 'es demasiado caro, no me sirve', 'es el más caro'], a: 1,
+      why: 'TOO tiene carga negativa: pasa del límite. VERY sería neutro.' },
+    { t: 'fill', q: "This option is as good ___ that one.", a: ['as'],
+      why: 'Estructura de igualdad: as + adjetivo + as.' },
+    { t: 'tr', q: 'Ofrecemos productos de alta calidad.', a: ['we offer high quality products', 'we offer high-quality products'],
+      why: 'El adjetivo va antes del sustantivo y nunca lleva plural.' },
+    { t: 'listen', audio: "This model is more expensive, but it has a longer warranty.", opts: ['Este modelo es más caro, pero tiene una garantía más larga.', 'Este modelo es más barato y la garantía es corta.', 'Este modelo cuesta igual pero dura menos.'], a: 0,
+      why: 'Fíjate en los dos comparativos en la misma frase: uno con "more" y otro con "-er".' },
+    { t: 'mc', q: '¿Cuál es correcta?', opts: ['two goods options', 'two good options', 'two option goods'], a: 1,
+      why: 'Los adjetivos en inglés no cambian: ni plural ni género.' },
+    { t: 'listen', audio: "What's the difference between these two models?", opts: ['¿Cuál es la diferencia entre estos dos modelos?', '¿Cuál de los dos modelos prefiere?', '¿Estos dos modelos son diferentes?'], a: 0,
+      why: '"The difference between A and B" es la estructura fija para comparar.' }
+  ]
+},
+
+{
+  id: 'a2-7', level: 'A2', title: 'Viajar por trabajo',
+  goal: 'Sobrevivir solo en un viaje de negocios: aeropuerto, hotel, taxi y restaurante.',
+  grammar: {
+    title: 'Pedir cosas y entender indicaciones',
+    es: 'Viajando vas a necesitar tres estructuras, y con ellas se resuelve casi todo.\n\n' +
+        'PEDIR ALGO: "Could I have...?" o "I’d like...". "Could I have the bill, please?", "I’d like a table for two". Ambas son educadas y sirven en hotel, restaurante y taxi.\n\n' +
+        'PREGUNTAR DÓNDE ESTÁ ALGO: "Where is the...?" o, más natural aún, "Excuse me, where can I find...?". Y para saber si algo existe: "Is there a pharmacy near here?".\n\n' +
+        'PEDIR PERMISO O AYUDA: "Can I...?" para ti mismo ("Can I pay by card?") y "Could you...?" para lo que hace el otro ("Could you call me a taxi?").\n\n' +
+        'Detalle que salva conversaciones: cuando no entiendas, no asientas. Di "Sorry, could you say that again more slowly?". Nadie se molesta y evitas problemas.',
+    examples: [
+      { en: "Could I have the bill, please?", es: 'La cuenta, por favor.' },
+      { en: "Excuse me, where can I find a taxi?", es: 'Disculpe, ¿dónde puedo encontrar un taxi?' },
+      { en: "Is there a pharmacy near here?", es: '¿Hay una farmacia cerca?' },
+      { en: "Can I pay by card?", es: '¿Puedo pagar con tarjeta?' },
+      { en: "Sorry, could you say that again more slowly?", es: 'Perdón, ¿podría repetirlo más despacio?' }
+    ],
+    more: [
+      {
+        title: 'Preposiciones de lugar y movimiento',
+        es: 'IN dentro de un espacio cerrado (in the office, in the car, in Cuenca) · ON sobre una superficie o en una línea (on the table, on the second floor, on the plane) · AT en un punto concreto (at the airport, at the hotel, at gate 12).\n\n' +
+            'Para moverse: TO indica destino (I’m going TO the airport). Excepción a memorizar: "go home", sin to.\n\n' +
+            'Para ubicar: near (cerca de), next to (al lado de), in front of (delante de), behind (detrás de), between (entre dos), opposite (enfrente de).',
+        examples: [
+          { en: "I'm at the airport, at gate 12.", es: 'Estoy en el aeropuerto, en la puerta 12.' },
+          { en: "The hotel is next to the station.", es: 'El hotel está al lado de la estación.' },
+          { en: "I'm going to the office now.", es: 'Voy a la oficina ahora.' }
+        ]
+      },
+      {
+        title: 'Falsos amigos que te van a traicionar',
+        es: 'Estas palabras se parecen al español pero significan otra cosa. Son las que más malentendidos causan:\n\n' +
+            'ACTUALLY = en realidad (no "actualmente", que es currently).\n' +
+            'ASSIST = ayudar (no "asistir a un evento", que es attend).\n' +
+            'CARPET = alfombra (no "carpeta", que es folder).\n' +
+            'EMBARRASSED = avergonzado (no "embarazada", que es pregnant).\n' +
+            'SENSIBLE = sensato (no "sensible", que es sensitive).\n' +
+            'EVENTUALLY = finalmente (no "eventualmente", que es occasionally).\n' +
+            'EXIT = salida (no "éxito", que es success).\n' +
+            'SUPPORT = apoyar (no "soportar/aguantar", que es put up with).',
+        examples: [
+          { en: "Actually, the flight leaves at six.", es: 'En realidad, el vuelo sale a las seis.' },
+          { en: "I'd like to attend the trade fair.", es: 'Me gustaría asistir a la feria.' },
+          { en: "Eventually we found the hotel.", es: 'Finalmente encontramos el hotel.' }
+        ]
+      }
+    ],
+    mistakes: [
+      { bad: "I'm going to home.", good: "I'm going home.", es: '"Home" no lleva "to".' },
+      { bad: 'I want the bill.', good: 'Could I have the bill, please?', es: '"I want" suena brusco pidiendo servicio.' },
+      { bad: 'I assist to the meeting.', good: 'I attend the meeting.', es: 'Assist es ayudar; asistir a algo es attend.' },
+      { bad: 'Actually I work in Cuenca.', good: 'Currently I work in Cuenca.', es: 'Actually es "en realidad", no "actualmente".' },
+      { bad: "How is the way to the hotel?", good: "How do I get to the hotel?", es: 'Fórmula fija para pedir indicaciones.' }
+    ]
+  },
+  vocab: [
+    { en: 'flight', es: 'vuelo' },
+    { en: 'gate', es: 'puerta de embarque' },
+    { en: 'boarding pass', es: 'pase de abordar' },
+    { en: 'luggage', es: 'equipaje' },
+    { en: 'suitcase', es: 'maleta' },
+    { en: 'carry-on', es: 'equipaje de mano' },
+    { en: 'to check in', es: 'registrarse' },
+    { en: 'departure', es: 'salida' },
+    { en: 'arrival', es: 'llegada' },
+    { en: 'delayed', es: 'retrasado' },
+    { en: 'to board', es: 'abordar' },
+    { en: 'aisle seat', es: 'asiento de pasillo' },
+    { en: 'window seat', es: 'asiento de ventana' },
+    { en: 'customs', es: 'aduana' },
+    { en: 'passport', es: 'pasaporte' },
+    { en: 'hotel booking', es: 'reserva de hotel' },
+    { en: 'room key', es: 'llave de la habitación' },
+    { en: 'check-out time', es: 'hora de salida' },
+    { en: 'receipt', es: 'recibo' },
+    { en: 'the bill / the check', es: 'la cuenta' },
+    { en: 'to book', es: 'reservar' },
+    { en: 'to pay by card', es: 'pagar con tarjeta' },
+    { en: 'cash', es: 'efectivo' },
+    { en: 'near here', es: 'cerca de aquí' },
+    { en: 'next to', es: 'al lado de' },
+    { en: 'straight ahead', es: 'todo recto' },
+    { en: 'turn left', es: 'gira a la izquierda' },
+    { en: 'turn right', es: 'gira a la derecha' },
+    { en: 'How do I get to...?', es: '¿Cómo llego a...?' },
+    { en: 'It takes ten minutes', es: 'Toma diez minutos' }
+  ],
+  phrases: [
+    { en: "I have a reservation under Barros.", es: 'Tengo una reserva a nombre de Barros.' },
+    { en: "Could I have a window seat, please?", es: '¿Me da un asiento de ventana, por favor?' },
+    { en: "Is the flight on time?", es: '¿El vuelo sale a tiempo?' },
+    { en: "Where is the baggage claim?", es: '¿Dónde está la entrega de equipaje?' },
+    { en: "I'm here on business.", es: 'Vengo por negocios.' },
+    { en: "How do I get to the city centre?", es: '¿Cómo llego al centro?' },
+    { en: "Could you take me to this address?", es: '¿Podría llevarme a esta dirección?' },
+    { en: "How long does it take?", es: '¿Cuánto tarda?' },
+    { en: "A table for two, please.", es: 'Una mesa para dos, por favor.' },
+    { en: "Could I have the bill, please?", es: 'La cuenta, por favor.' },
+    { en: "Can I pay by card?", es: '¿Puedo pagar con tarjeta?' },
+    { en: "Could I have a receipt, please?", es: '¿Me da un recibo, por favor?' }
+  ],
+  exercises: [
+    { t: 'mc', q: 'En el restaurante quieres la cuenta. ¿Qué dices?', opts: ['I want the bill.', 'Could I have the bill, please?', 'Give me the bill.'], a: 1,
+      why: 'Con servicio siempre "Could I have...?". "I want" suena a exigencia.' },
+    { t: 'fill', q: "I'm ___ the airport, at gate 12.", a: ['at'],
+      why: 'AT para puntos concretos: at the airport, at the hotel, at gate 12.' },
+    { t: 'tr', q: '¿Cómo llego al centro?', a: ['how do i get to the city centre', 'how do i get to the city center', 'how do i get downtown'],
+      why: '"How do I get to...?" es la fórmula fija. En EE. UU. se dice "downtown".' },
+    { t: 'mc', q: '"Actually" significa...', opts: ['actualmente', 'en realidad', 'eventualmente'], a: 1,
+      why: 'Falso amigo clásico. "Actualmente" es currently.' },
+    { t: 'order', words: ['Is', 'there', 'a', 'pharmacy', 'near', 'here?'], a: 'Is there a pharmacy near here?',
+      why: 'Para preguntar si algo existe: "Is there a...?".' },
+    { t: 'mc', q: '¿Cuál es correcta?', opts: ["I'm going to home", "I'm going home", "I'm going at home"], a: 1,
+      why: '"Home" es la excepción: nunca lleva preposición con verbos de movimiento.' },
+    { t: 'listen', audio: "Your flight is delayed by forty minutes. Boarding starts at gate fifteen.", opts: ['Su vuelo está retrasado cuarenta minutos. El embarque es por la puerta quince.', 'Su vuelo sale en cuarenta minutos por la puerta cincuenta.', 'Su vuelo se canceló y el embarque cambió de puerta.'], a: 0,
+      why: 'Ojo con fifteen (15) y fifty (50): la diferencia está en la sílaba acentuada.' },
+    { t: 'fill', q: "The hotel is ___ to the station.", a: ['next'],
+      why: '"Next to" = al lado de. No confundir con "near" (cerca de).' },
+    { t: 'tr', q: 'Tengo una reserva a nombre de Barros.', a: ['i have a reservation under barros', 'i have a booking under barros', 'i have a reservation under the name barros'],
+      why: 'Se dice "under" + apellido para las reservas.' },
+    { t: 'mc', q: 'Quieres asistir a la feria comercial. ¿Cuál es correcta?', opts: ['I want to assist to the trade fair', "I'd like to attend the trade fair", 'I like to assist the trade fair'], a: 1,
+      why: 'Asistir a un evento es ATTEND. "Assist" es ayudar.' },
+    { t: 'listen', audio: "Go straight ahead and turn left after the bank. It takes about ten minutes.", opts: ['Siga recto y gire a la izquierda después del banco. Toma unos diez minutos.', 'Gire a la derecha antes del banco y camine diez minutos.', 'El banco está a diez minutos a la izquierda.'], a: 0,
+      why: '"It takes" es la forma de decir cuánto tiempo lleva algo.' }
   ]
 },
 
 /* ══════════════════ B1 ══════════════════ */
 {
   id: 'b1-6', level: 'B1', title: 'Hablar del pasado',
-  goal: 'Contar lo que pasó: reuniones, ventas, viajes.',
+  goal: 'Contar lo que pasó: una reunión, una venta, un viaje, un problema.',
   grammar: {
-    title: 'Pasado simple: regulares e irregulares',
-    es: 'Regulares: verbo + -ed (called, visited). Irregulares hay que memorizarlos (go→went, make→made, sell→sold). En preguntas y negaciones usas DID y el verbo vuelve a la base: "Did you call?", "I didn’t call". Error típico: "I didn’t called" ❌',
+    title: 'Pasado simple: regulares, irregulares y el auxiliar DID',
+    es: 'El pasado simple es para acciones terminadas en un momento concreto del pasado. Si puedes decir cuándo pasó, va aquí.\n\n' +
+        'REGULARES: verbo + -ED. call → called · visit → visited · deliver → delivered. Si acaba en -e solo se añade -d (arrive → arrived). Si acaba en consonante + y, se convierte en -IED (try → tried).\n\n' +
+        'LA PRONUNCIACIÓN DE -ED tiene tres sonidos y casi nadie los enseña: /t/ después de sonido sordo (worked, asked, finished) · /d/ después de sonido sonoro (called, arrived, delivered) · /ɪd/ solo después de T o D (wanted, needed, decided). Solo en este último caso se añade una sílaba. Decir "work-ed" con dos sílabas es un error muy audible.\n\n' +
+        'IRREGULARES: no siguen regla y hay que memorizarlos. Los que más vas a usar: go→went, make→made, sell→sold, buy→bought, send→sent, meet→met, take→took, give→gave, say→said, get→got, have→had, do→did, come→came, see→saw, pay→paid, put→put, cost→cost.\n\n' +
+        'PREGUNTAS Y NEGACIONES con DID, y aquí está el punto crítico: cuando aparece did o didn’t, el verbo VUELVE A SU FORMA BASE. Se dice "Did you send it?" y "I didn’t send it", jamás "Did you sent" ni "I didn’t sent". El pasado ya está marcado en el "did".',
     examples: [
       { en: "I met the client last Tuesday.", es: 'Me reuní con el cliente el martes pasado.' },
       { en: "We didn't receive the payment.", es: 'No recibimos el pago.' },
-      { en: "How did the meeting go?", es: '¿Cómo fue la reunión?' }
+      { en: "How did the meeting go?", es: '¿Cómo fue la reunión?' },
+      { en: "They sold three hundred units last month.", es: 'Vendieron trescientas unidades el mes pasado.' },
+      { en: "Did you call the supplier?", es: '¿Llamaste al proveedor?' }
+    ],
+    more: [
+      {
+        title: 'Pasado continuo: lo que estaba pasando',
+        es: 'WAS / WERE + verbo-ING describe una acción en curso en un momento del pasado: "I was driving to the office".\n\n' +
+            'Su uso más útil es combinarlo con el pasado simple: la acción larga va en continuo y la que la interrumpe va en simple. "I WAS DRIVING when the client CALLED" — estaba conduciendo (fondo) cuando llamó (interrupción).\n\n' +
+            'Las palabras clave que los conectan son WHEN (cuando, para la acción corta) y WHILE (mientras, para la larga).',
+        examples: [
+          { en: "I was driving when the client called.", es: 'Iba conduciendo cuando llamó el cliente.' },
+          { en: "While we were negotiating, the price went up.", es: 'Mientras negociábamos, el precio subió.' },
+          { en: "What were you doing at six?", es: '¿Qué estabas haciendo a las seis?' }
+        ]
+      },
+      {
+        title: 'USED TO: lo que antes hacías y ya no',
+        es: 'USED TO + verbo base sirve para hábitos del pasado que ya no existen. "I used to work in Quito" = antes trabajaba en Quito (ya no).\n\n' +
+            'No tiene equivalente exacto en español; se traduce por el imperfecto o por "solía". Es muy útil para contar tu trayectoria en una entrevista.\n\n' +
+            'En negativo e interrogativo pierde la -d: "I didn’t use to travel much", "Did you use to work there?".\n\n' +
+            'Cuidado, no lo confundas con "to be used to + -ing", que significa "estar acostumbrado a": "I’m used to travelling" = estoy acostumbrado a viajar.',
+        examples: [
+          { en: "I used to work in Quito.", es: 'Antes trabajaba en Quito.' },
+          { en: "We used to buy from a local supplier.", es: 'Antes comprábamos a un proveedor local.' },
+          { en: "I'm used to working under pressure.", es: 'Estoy acostumbrado a trabajar bajo presión.' }
+        ]
+      }
+    ],
+    mistakes: [
+      { bad: "I didn't sent the invoice.", good: "I didn't send the invoice.", es: 'Con didn’t el verbo vuelve a la forma base.' },
+      { bad: 'Did you went to the fair?', good: 'Did you go to the fair?', es: 'Con did, forma base.' },
+      { bad: 'The last week we sold 200 units.', good: 'Last week we sold 200 units.', es: '"Last week" no lleva artículo.' },
+      { bad: 'Ago three days.', good: 'Three days ago.', es: '"Ago" va siempre al final.' },
+      { bad: 'How was go the meeting?', good: 'How did the meeting go?', es: 'Con "go" se usa did, no was.' }
     ]
   },
   vocab: [
@@ -312,11 +915,28 @@ const UNITS = [
     { en: 'met (meet)', es: 'me reuní (reunirse)' },
     { en: 'took (take)', es: 'tomé (tomar)' },
     { en: 'gave (give)', es: 'di (dar)' },
+    { en: 'said (say)', es: 'dije (decir)' },
+    { en: 'got (get)', es: 'obtuve (conseguir)' },
+    { en: 'paid (pay)', es: 'pagué (pagar)' },
+    { en: 'saw (see)', es: 'vi (ver)' },
+    { en: 'came (come)', es: 'vine (venir)' },
+    { en: 'had (have)', es: 'tuve (tener)' },
     { en: 'last week', es: 'la semana pasada' },
+    { en: 'last month', es: 'el mes pasado' },
     { en: 'ago', es: 'hace (tiempo)' },
     { en: 'then', es: 'entonces / luego' },
+    { en: 'after that', es: 'después de eso' },
     { en: 'finally', es: 'finalmente' },
-    { en: 'to close a deal', es: 'cerrar un trato' }
+    { en: 'at first', es: 'al principio' },
+    { en: 'in the end', es: 'al final' },
+    { en: 'to close a deal', es: 'cerrar un trato' },
+    { en: 'to lose (lost)', es: 'perder' },
+    { en: 'to win (won)', es: 'ganar' },
+    { en: 'to grow (grew)', es: 'crecer' },
+    { en: 'to happen', es: 'suceder' },
+    { en: 'used to', es: 'solía / antes hacía' },
+    { en: 'while', es: 'mientras' },
+    { en: 'result', es: 'resultado' }
   ],
   phrases: [
     { en: "I met the client last Tuesday.", es: 'Me reuní con el cliente el martes pasado.' },
@@ -324,36 +944,92 @@ const UNITS = [
     { en: "They didn't confirm the order.", es: 'No confirmaron el pedido.' },
     { en: "How was the meeting?", es: '¿Cómo estuvo la reunión?' },
     { en: "It went really well.", es: 'Salió muy bien.' },
-    { en: "We closed the deal on Friday.", es: 'Cerramos el trato el viernes.' }
+    { en: "At first they said no, but in the end they agreed.", es: 'Al principio dijeron que no, pero al final aceptaron.' },
+    { en: "We closed the deal on Friday.", es: 'Cerramos el trato el viernes.' },
+    { en: "What happened with the shipment?", es: '¿Qué pasó con el envío?' },
+    { en: "I was driving when he called.", es: 'Iba conduciendo cuando llamó.' },
+    { en: "I used to work in Quito.", es: 'Antes trabajaba en Quito.' },
+    { en: "Sales grew fifteen percent last year.", es: 'Las ventas crecieron un quince por ciento el año pasado.' },
+    { en: "We lost that client to the competition.", es: 'Perdimos ese cliente frente a la competencia.' }
   ],
   exercises: [
     { t: 'mc', q: 'Elige la frase correcta.', opts: ["I didn't sent the invoice", "I didn't send the invoice", "I didn't sended the invoice"], a: 1,
-      why: 'Con DIDN’T el verbo vuelve a su forma base: send. El pasado ya lo marca "didn’t".' },
+      why: 'Con DIDN’T el verbo vuelve a su forma base: send.' },
     { t: 'fill', q: "We ___ the contract three weeks ago.", a: ['signed'],
       why: '"Sign" es regular: signed. "Ago" siempre exige pasado simple.' },
     { t: 'tr', q: 'Visité al cliente la semana pasada.', a: ['i visited the client last week', 'i visited the customer last week'],
-      why: '"Last week" (sin "the"): no se dice "the last week" para referirse a la semana pasada.' },
+      why: '"Last week" sin artículo: no se dice "the last week".' },
     { t: 'order', words: ['Did', 'they', 'confirm', 'the', 'order', 'yesterday?'], a: 'Did they confirm the order yesterday?',
-      why: 'Pregunta en pasado: Did + sujeto + verbo base. Nunca "Did they confirmed".' },
-    { t: 'listen', audio: "We sold two hundred units last month, but we didn't reach the target.", opts: ['Vendimos doscientas unidades el mes pasado, pero no alcanzamos la meta.', 'Vendemos doscientas unidades al mes y alcanzamos la meta.', 'Vendimos doscientas unidades el mes pasado y superamos la meta.'], a: 0,
+      why: 'Did + sujeto + verbo base. Nunca "Did they confirmed".' },
+    { t: 'mc', q: '¿En cuál de estos la -ed añade una sílaba?', opts: ['worked', 'called', 'needed'], a: 2,
+      why: 'Solo después de T o D la -ed suena /ɪd/: nee-ded. "Worked" y "called" son una sola sílaba.' },
+    { t: 'listen', audio: "We sold two hundred units last month, but we didn't reach the target.", opts: ['Vendimos doscientas unidades el mes pasado, pero no alcanzamos la meta.', 'Vendemos doscientas unidades al mes y alcanzamos la meta.', 'Vendimos doscientas unidades y superamos la meta.'], a: 0,
       why: '"Sold" es el pasado irregular de "sell". "Reach the target" = alcanzar la meta.' },
     { t: 'mc', q: '¿Cómo preguntas "¿Cómo te fue en la reunión?"', opts: ['How was the meeting?', 'How is the meeting?', 'How the meeting was?'], a: 0,
-      why: 'Con to be en pasado no se usa "did": How was...? El verbo va antes del sujeto.' },
+      why: 'Con to be en pasado no se usa did: How was...? El verbo va antes del sujeto.' },
     { t: 'tr', q: 'Hablamos con el proveedor hace tres días.', a: ['we talked to the supplier three days ago', 'we spoke to the supplier three days ago', 'we spoke with the supplier three days ago'],
-      why: '"Ago" va SIEMPRE al final: three days ago, no "ago three days".' }
+      why: '"Ago" va SIEMPRE al final: three days ago.' },
+    { t: 'fill', q: "I ___ driving when the client called.", a: ['was'],
+      why: 'Pasado continuo para la acción en curso: was/were + -ing.' },
+    { t: 'mc', q: '"I used to work in Quito" significa...', opts: ['suelo trabajar en Quito', 'antes trabajaba en Quito, ya no', 'estoy acostumbrado a trabajar en Quito'], a: 1,
+      why: '"Used to" = hábito pasado que terminó. "Be used to" sería estar acostumbrado.' },
+    { t: 'order', words: ['At', 'first', 'they', 'said', 'no,', 'but', 'they', 'agreed', 'later.'], a: 'At first they said no, but they agreed later.',
+      why: 'Los conectores de secuencia (at first, then, later, in the end) ordenan un relato.' },
+    { t: 'listen', audio: "While we were negotiating, the supplier raised the price.", opts: ['Mientras negociábamos, el proveedor subió el precio.', 'Negociamos después de que el proveedor subiera el precio.', 'El proveedor bajó el precio durante la negociación.'], a: 0,
+      why: 'WHILE + pasado continuo para el fondo, y la acción que interrumpe en pasado simple.' }
   ]
 },
 
 {
   id: 'b1-7', level: 'B1', title: 'Planes y futuro',
-  goal: 'Hablar de planes, agendar y comprometerte a algo.',
+  goal: 'Hablar de planes, agendar, comprometerte y hacer previsiones.',
   grammar: {
-    title: 'Will vs. going to vs. presente continuo',
-    es: 'GOING TO = plan ya decidido ("I’m going to visit the client"). WILL = decisión en el momento o promesa ("I’ll send it right now"). PRESENTE CONTINUO = cita ya agendada ("I’m meeting him at 3").',
+    title: 'Los tres futuros y cuándo usa cada uno un nativo',
+    es: 'El inglés no tiene un futuro, tiene tres, y elegir mal te delata más que un error de vocabulario.\n\n' +
+        'GOING TO = plan ya decidido antes de hablar. Ya lo tenías pensado. "I’m going to visit the client on Monday" (ya lo decidí, está en mi agenda). También se usa para predicciones con evidencia visible: "Look at those numbers — we’re going to miss the target".\n\n' +
+        'WILL = decisión que tomas EN ESTE INSTANTE, promesa, ofrecimiento o predicción sin evidencia. El cliente pregunta algo y respondes "I’ll check it right now" — lo decides al hablar. También: "I’ll send it today, I promise".\n\n' +
+        'PRESENTE CONTINUO = cita ya agendada con otra persona, con hora y lugar. "I’m meeting the supplier at three". Es lo que más usan los nativos para la agenda, y casi nadie lo enseña.\n\n' +
+        'Regla práctica para tu día a día: si está en tu calendario, presente continuo. Si es un plan tuyo sin hora fija, going to. Si lo decides mientras hablas, will.',
     examples: [
       { en: "I'm going to visit the client on Monday.", es: 'Voy a visitar al cliente el lunes.' },
-      { en: "I'll send you the details today.", es: 'Te envío los detalles hoy.' },
-      { en: "We're launching the product in May.", es: 'Lanzamos el producto en mayo.' }
+      { en: "I'll send you the details right now.", es: 'Le envío los detalles ahora mismo.' },
+      { en: "We're meeting the supplier at three.", es: 'Nos reunimos con el proveedor a las tres.' },
+      { en: "I think prices will go up next year.", es: 'Creo que los precios subirán el año que viene.' },
+      { en: "Don't worry, I'll take care of it.", es: 'No se preocupe, yo me encargo.' }
+    ],
+    more: [
+      {
+        title: 'El futuro después de WHEN, IF, AFTER y BEFORE',
+        es: 'Regla que rompe la intuición del hispanohablante: después de when, if, as soon as, after, before y until NO se usa will, aunque estés hablando del futuro. Se usa presente.\n\n' +
+            '"I’ll call you WHEN I ARRIVE" (no "when I will arrive"). "We’ll ship it AS SOON AS WE RECEIVE the payment" (no "as soon as we will receive").\n\n' +
+            'El futuro solo aparece en la otra mitad de la frase. Es exactamente el mismo mecanismo que en los condicionales.',
+        examples: [
+          { en: "I'll call you when I arrive.", es: 'Te llamo cuando llegue.' },
+          { en: "We'll ship it as soon as we receive the payment.", es: 'Lo enviamos en cuanto recibamos el pago.' },
+          { en: "Let me know before you send it.", es: 'Avísame antes de enviarlo.' }
+        ]
+      },
+      {
+        title: 'Grados de certeza',
+        es: 'Rara vez algo es seguro al cien por cien, y el inglés tiene una escala clara para matizarlo.\n\n' +
+            'Seguro: "We will deliver on Friday" · "definitely".\n' +
+            'Probable: "We should deliver on Friday" · "probably" · "I expect to...".\n' +
+            'Posible: "We might deliver on Friday" · "may" · "It’s possible that...".\n' +
+            'Improbable: "We probably won’t make it" · "It’s unlikely".\n\n' +
+            'En negocios, prometer de menos y cumplir de más te da credibilidad. Usa "should" y "might" cuando no estés seguro: te evita quedar mal.',
+        examples: [
+          { en: "The shipment should arrive on Tuesday.", es: 'El envío debería llegar el martes.' },
+          { en: "We might need an extra week.", es: 'Puede que necesitemos una semana más.' },
+          { en: "It's unlikely that the price will change.", es: 'Es poco probable que el precio cambie.' }
+        ]
+      }
+    ],
+    mistakes: [
+      { bad: "I'll call you when I will arrive.", good: "I'll call you when I arrive.", es: 'Después de when no se usa will.' },
+      { bad: 'I will to send it.', good: "I'll send it.", es: 'Después de will el verbo va en base, sin "to".' },
+      { bad: "I'm going to send it right now (decidido al hablar).", good: "I'll send it right now.", es: 'Decisión del momento: will.' },
+      { bad: 'We will meet him at 3 (ya agendado).', good: "We're meeting him at 3.", es: 'Cita agendada: presente continuo.' },
+      { bad: 'Maybe I will can go.', good: 'Maybe I will be able to go.', es: 'Dos modales no van juntos: will + can no existe.' }
     ]
   },
   vocab: [
@@ -361,65 +1037,159 @@ const UNITS = [
     { en: 'to arrange', es: 'organizar / coordinar' },
     { en: 'to confirm', es: 'confirmar' },
     { en: 'to postpone', es: 'posponer' },
+    { en: 'to reschedule', es: 'reprogramar' },
     { en: 'to cancel', es: 'cancelar' },
     { en: 'to launch', es: 'lanzar' },
+    { en: 'to plan', es: 'planificar' },
+    { en: 'to expect', es: 'esperar / prever' },
     { en: 'forecast', es: 'pronóstico / proyección' },
     { en: 'lead time', es: 'tiempo de entrega' },
     { en: 'next quarter', es: 'el próximo trimestre' },
+    { en: 'deadline', es: 'fecha límite' },
     { en: 'soon', es: 'pronto' },
     { en: 'as soon as possible', es: 'lo antes posible' },
-    { en: 'in advance', es: 'con anticipación' }
+    { en: 'in advance', es: 'con anticipación' },
+    { en: 'available', es: 'disponible' },
+    { en: 'probably', es: 'probablemente' },
+    { en: 'definitely', es: 'sin duda' },
+    { en: 'might / may', es: 'puede que' },
+    { en: 'should', es: 'debería' },
+    { en: 'unlikely', es: 'poco probable' },
+    { en: 'to take care of', es: 'encargarse de' },
+    { en: 'to look forward to', es: 'esperar con ganas' },
+    { en: 'agenda', es: 'orden del día' },
+    { en: 'upcoming', es: 'próximo' },
+    { en: 'trade fair', es: 'feria comercial' },
+    { en: 'launch date', es: 'fecha de lanzamiento' }
   ],
   phrases: [
     { en: "I'm going to visit the client on Monday.", es: 'Voy a visitar al cliente el lunes.' },
     { en: "I'll get back to you as soon as possible.", es: 'Le respondo lo antes posible.' },
-    { en: "Are you going to attend the meeting?", es: '¿Vas a asistir a la reunión?' },
+    { en: "Are you going to attend the trade fair?", es: '¿Vas a asistir a la feria?' },
     { en: "Let's postpone it until next week.", es: 'Pospongámoslo hasta la próxima semana.' },
     { en: "We're meeting the supplier at three.", es: 'Nos reunimos con el proveedor a las tres.' },
-    { en: "I'll take care of it.", es: 'Yo me encargo.' }
+    { en: "I'll take care of it.", es: 'Yo me encargo.' },
+    { en: "The shipment should arrive on Tuesday.", es: 'El envío debería llegar el martes.' },
+    { en: "We might need an extra week.", es: 'Puede que necesitemos una semana más.' },
+    { en: "I'll call you when I arrive.", es: 'Te llamo cuando llegue.' },
+    { en: "Could we reschedule for Thursday?", es: '¿Podríamos reprogramar para el jueves?' },
+    { en: "I look forward to hearing from you.", es: 'Quedo a la espera de su respuesta.' },
+    { en: "We're launching the new line in May.", es: 'Lanzamos la nueva línea en mayo.' }
   ],
   exercises: [
-    { t: 'mc', q: 'El cliente pregunta algo y tú decides responder ahora mismo. ¿Qué dices?', opts: ["I'm going to check it", "I'll check it right now", "I check it now"], a: 1,
-      why: 'WILL para decisiones espontáneas del momento. GOING TO es para planes ya pensados antes.' },
+    { t: 'mc', q: 'El cliente pregunta algo y decides responder ahora mismo. ¿Qué dices?', opts: ["I'm going to check it", "I'll check it right now", "I check it now"], a: 1,
+      why: 'WILL para decisiones espontáneas. GOING TO es para planes ya pensados.' },
     { t: 'fill', q: "We ___ going to launch the new line in June.", a: ['are'],
       why: 'La estructura es: be + going to + verbo. Con "we" el verbo be es "are".' },
+    { t: 'mc', q: 'Tienes la reunión agendada a las 3 con hora y lugar. ¿Cuál suena más nativo?', opts: ["I will meet him at 3", "I'm meeting him at 3", "I meet him at 3"], a: 1,
+      why: 'Presente continuo para citas agendadas. Es lo que más usan los nativos.' },
     { t: 'tr', q: 'Te enviaré la factura hoy mismo.', a: ["i'll send you the invoice today", 'i will send you the invoice today', "i'll send the invoice today"],
-      why: 'La promesa inmediata se hace con WILL, no con "going to".' },
+      why: 'La promesa inmediata se hace con WILL.' },
     { t: 'order', words: ['Are', 'you', 'going', 'to', 'attend', 'the', 'trade', 'fair?'], a: 'Are you going to attend the trade fair?',
-      why: 'Pregunta con going to: Are + sujeto + going to + verbo. "Trade fair" = feria comercial.' },
-    { t: 'listen', audio: "I'm meeting the supplier tomorrow, so I'll confirm the lead time after that.", opts: ['Me reúno mañana con el proveedor, así que confirmaré el tiempo de entrega después.', 'Me reuní ayer con el proveedor y confirmé el tiempo de entrega.', 'Voy a llamar al proveedor para cancelar la entrega.'], a: 0,
-      why: 'Presente continuo ("I’m meeting") para una cita agendada + will para lo que decides ahora.' },
+      why: 'Pregunta con going to: Are + sujeto + going to + verbo.' },
+    { t: 'mc', q: 'Elige la correcta.', opts: ["I'll call you when I will arrive", "I'll call you when I arrive", 'I call you when I will arrive'], a: 1,
+      why: 'Después de WHEN no se usa will, aunque hables del futuro.' },
+    { t: 'fill', q: "We'll ship it as soon as we ___ the payment.", a: ['receive', 'get'],
+      why: 'Tras "as soon as" va presente, nunca will.' },
+    { t: 'listen', audio: "I'm meeting the supplier tomorrow, so I'll confirm the lead time after that.", opts: ['Me reúno mañana con el proveedor, así que confirmaré el plazo después.', 'Me reuní ayer con el proveedor y confirmé el plazo.', 'Voy a llamar al proveedor para cancelar la entrega.'], a: 0,
+      why: 'Presente continuo para la cita agendada + will para lo que decides ahora.' },
     { t: 'mc', q: '"Lead time" significa...', opts: ['tiempo de entrega', 'hora punta', 'tiempo libre'], a: 0,
-      why: 'Es un término clave en comercio exterior: el tiempo desde el pedido hasta la entrega.' }
+      why: 'Término clave en comercio exterior: desde el pedido hasta la entrega.' },
+    { t: 'tr', q: 'Puede que necesitemos una semana más.', a: ['we might need an extra week', 'we may need an extra week', 'we might need one more week'],
+      why: 'MIGHT expresa posibilidad. Después va verbo base, sin "to".' },
+    { t: 'order', words: ['I', 'look', 'forward', 'to', 'hearing', 'from', 'you.'], a: 'I look forward to hearing from you.',
+      why: 'Cierre estándar de correo formal. Ojo: tras "look forward to" va -ING, no infinitivo.' },
+    { t: 'listen', audio: "The shipment should arrive on Tuesday, but we might need an extra day for customs.", opts: ['El envío debería llegar el martes, pero puede que necesitemos un día más para la aduana.', 'El envío llegará el martes sin problemas de aduana.', 'El envío llegó el martes tras un día en aduana.'], a: 0,
+      why: 'SHOULD (probable) y MIGHT (posible): dos grados de certeza en la misma frase.' }
   ]
 },
 
 {
-  id: 'b1-8', level: 'B1', title: 'Present perfect: experiencias',
-  goal: 'Hablar de tu experiencia y de resultados que siguen vigentes.',
+  id: 'b1-8', level: 'B1', title: 'Present perfect: experiencia y resultados',
+  goal: 'Hablar de tu experiencia y de resultados que siguen vigentes hoy.',
   grammar: {
-    title: 'Present perfect vs. pasado simple',
-    es: 'PRESENT PERFECT (have/has + participio) para experiencias sin fecha y para cosas que siguen conectadas con el presente: "I’ve worked here for five years" (sigo aquí). PASADO SIMPLE cuando dices CUÁNDO: "I worked there in 2019". Si aparece una fecha concreta, usa pasado simple.',
+    title: 'Present perfect: el tiempo que el español no tiene igual',
+    es: 'Se forma con HAVE / HAS + participio pasado (worked, sent, been, done). Y es el tiempo que más problemas da, porque en español lo traducimos igual que el pasado simple pero en inglés NO son intercambiables.\n\n' +
+        'PRESENT PERFECT se usa cuando el momento exacto no importa o no se dice:\n' +
+        '· Experiencias de vida: "I’ve worked with Asian suppliers" (alguna vez, no importa cuándo).\n' +
+        '· Algo que empezó en el pasado y SIGUE: "I’ve worked here for five years" (sigo aquí).\n' +
+        '· Pasado reciente con efecto en el presente: "I’ve just sent the invoice" (ya está enviada).\n\n' +
+        'PASADO SIMPLE en cuanto dices CUÁNDO: "I worked there in 2019", "I sent it yesterday". Si aparece yesterday, last week, in 2019, ago, o cualquier fecha, es pasado simple. Sin excepción.\n\n' +
+        'Prueba infalible: si puedes añadir "¿cuándo?" y la respuesta está en la frase, usa pasado simple. Si no, present perfect.\n\n' +
+        'FOR vs. SINCE: FOR + duración (for five years, for two months). SINCE + punto de inicio (since 2019, since March, since I joined). "I’ve been here for five years" = "I’ve been here since 2019".',
     examples: [
       { en: "I've worked here for five years.", es: 'Llevo cinco años trabajando aquí.' },
       { en: "Have you ever been to the US?", es: '¿Has estado alguna vez en EE. UU.?' },
-      { en: "We haven't received the payment yet.", es: 'Todavía no hemos recibido el pago.' }
+      { en: "We haven't received the payment yet.", es: 'Todavía no hemos recibido el pago.' },
+      { en: "I've just sent you the invoice.", es: 'Acabo de enviarte la factura.' },
+      { en: "I worked in Quito in 2019.", es: 'Trabajé en Quito en 2019.' }
+    ],
+    more: [
+      {
+        title: 'JUST, ALREADY, YET, EVER, NEVER: dónde van',
+        es: 'Estas cinco palabras acompañan casi siempre al present perfect, y cada una tiene su sitio fijo.\n\n' +
+            'JUST (acabar de) va entre have y el participio: "I’ve just sent it".\n' +
+            'ALREADY (ya, antes de lo esperado) también en medio: "They’ve already approved it".\n' +
+            'YET (todavía / ya) va al FINAL, y solo en negativas y preguntas: "We haven’t signed it yet", "Have you sent it yet?".\n' +
+            'EVER (alguna vez) va en medio, solo en preguntas: "Have you ever worked with them?".\n' +
+            'NEVER (nunca) va en medio y ya es negativo: "I’ve never been to China" — no lleva "not".',
+        examples: [
+          { en: "I've just spoken to the client.", es: 'Acabo de hablar con el cliente.' },
+          { en: "They've already approved the quotation.", es: 'Ya aprobaron la cotización.' },
+          { en: "We haven't signed the contract yet.", es: 'Todavía no hemos firmado el contrato.' }
+        ]
+      },
+      {
+        title: 'Present perfect continuo y hablar de cifras',
+        es: 'HAVE BEEN + verbo-ING pone el foco en la duración de la actividad: "I’ve been working on this proposal all week". Con verbos de estado (know, be) no se usa: se dice "I’ve known him for years", no "I’ve been knowing".\n\n' +
+            'Para resultados y cifras, el present perfect es el tiempo natural del informe de gestión: "Sales HAVE INCREASED by 12%", "We HAVE REDUCED costs".\n\n' +
+            'Vocabulario de variación: increase / go up / rise (subir) · decrease / go down / drop / fall (bajar) · remain stable (mantenerse) · reach (alcanzar). Y la preposición: BY para el cambio (increased BY 10%), TO para el destino (increased TO 500 units).',
+        examples: [
+          { en: "Sales have increased by twelve percent.", es: 'Las ventas han aumentado un doce por ciento.' },
+          { en: "I've been working on this proposal all week.", es: 'Llevo toda la semana con esta propuesta.' },
+          { en: "Costs have gone down since January.", es: 'Los costos han bajado desde enero.' }
+        ]
+      }
+    ],
+    mistakes: [
+      { bad: 'I work here since 2019.', good: "I've worked here since 2019.", es: 'Con since se usa present perfect.' },
+      { bad: "I've sent it yesterday.", good: 'I sent it yesterday.', es: 'Con "yesterday" va pasado simple.' },
+      { bad: "I've worked here since five years.", good: "I've worked here for five years.", es: 'FOR + duración, SINCE + punto de inicio.' },
+      { bad: 'Have you already sent it yet?', good: 'Have you sent it yet?', es: 'Yet va al final en preguntas; already no se mezcla ahí.' },
+      { bad: "I haven't never been to China.", good: "I've never been to China.", es: 'Never ya es negativo.' }
     ]
   },
   vocab: [
     { en: 'ever', es: 'alguna vez' },
     { en: 'never', es: 'nunca' },
     { en: 'already', es: 'ya' },
-    { en: 'yet', es: 'todavía / ya (en preguntas y negativas)' },
+    { en: 'yet', es: 'todavía / ya' },
     { en: 'just', es: 'acabar de' },
-    { en: 'since', es: 'desde (un punto en el tiempo)' },
-    { en: 'for', es: 'durante (un período)' },
+    { en: 'since', es: 'desde' },
+    { en: 'for', es: 'durante' },
+    { en: 'so far', es: 'hasta ahora' },
+    { en: 'lately', es: 'últimamente' },
     { en: 'experience', es: 'experiencia' },
     { en: 'to achieve', es: 'lograr' },
     { en: 'to increase', es: 'aumentar' },
+    { en: 'to decrease', es: 'disminuir' },
+    { en: 'to go up', es: 'subir' },
+    { en: 'to go down', es: 'bajar' },
+    { en: 'to drop', es: 'caer' },
+    { en: 'to rise', es: 'subir' },
     { en: 'to improve', es: 'mejorar' },
     { en: 'to reach', es: 'alcanzar' },
-    { en: 'growth', es: 'crecimiento' }
+    { en: 'to remain stable', es: 'mantenerse estable' },
+    { en: 'growth', es: 'crecimiento' },
+    { en: 'coverage', es: 'cobertura' },
+    { en: 'performance', es: 'desempeño' },
+    { en: 'figures', es: 'cifras' },
+    { en: 'been (be)', es: 'estado / sido' },
+    { en: 'done (do)', es: 'hecho' },
+    { en: 'seen (see)', es: 'visto' },
+    { en: 'taken (take)', es: 'tomado' },
+    { en: 'written (write)', es: 'escrito' },
+    { en: 'spoken (speak)', es: 'hablado' }
   ],
   phrases: [
     { en: "I've worked in sales for ten years.", es: 'Llevo diez años trabajando en ventas.' },
@@ -427,49 +1197,124 @@ const UNITS = [
     { en: "We haven't received the payment yet.", es: 'Todavía no hemos recibido el pago.' },
     { en: "I've just sent you the invoice.", es: 'Acabo de enviarte la factura.' },
     { en: "Sales have increased by ten percent.", es: 'Las ventas han aumentado un diez por ciento.' },
-    { en: "I've been with the company since 2019.", es: 'Estoy en la empresa desde 2019.' }
+    { en: "I've been with the company since 2019.", es: 'Estoy en la empresa desde 2019.' },
+    { en: "They've already approved the quotation.", es: 'Ya aprobaron la cotización.' },
+    { en: "I've never had a problem with them.", es: 'Nunca he tenido un problema con ellos.' },
+    { en: "How long have you been in this role?", es: '¿Cuánto llevas en este puesto?' },
+    { en: "So far the results have been good.", es: 'Hasta ahora los resultados han sido buenos.' },
+    { en: "Coverage has dropped since March.", es: 'La cobertura ha bajado desde marzo.' },
+    { en: "I've been working on this all week.", es: 'Llevo toda la semana con esto.' }
   ],
   exercises: [
-    { t: 'mc', q: 'Elige la correcta: llevas 5 años en la empresa y sigues ahí.', opts: ['I work here since five years', "I've worked here for five years", 'I worked here for five years'], a: 1,
-      why: 'Present perfect + FOR (duración). "Since" se usa con un punto de inicio: since 2019.' },
+    { t: 'mc', q: 'Llevas 5 años en la empresa y sigues ahí. Elige la correcta.', opts: ['I work here since five years', "I've worked here for five years", 'I worked here for five years'], a: 1,
+      why: 'Present perfect + FOR (duración). Since se usa con un punto de inicio.' },
     { t: 'fill', q: "We haven't signed the contract ___.", a: ['yet'],
-      why: 'YET va al final en frases negativas y preguntas = "todavía / aún".' },
+      why: 'YET va al final en frases negativas y preguntas.' },
     { t: 'fill', q: "I have worked here ___ 2019.", a: ['since'],
-      why: 'SINCE + momento concreto (2019, March, Monday). FOR + duración (five years, two months).' },
+      why: 'SINCE + momento concreto. FOR + duración.' },
+    { t: 'mc', q: '¿Cuál es correcta?', opts: ["I've sent it yesterday", 'I sent it yesterday', 'I have sent it yesterday'], a: 1,
+      why: 'Con "yesterday" el momento está dicho: pasado simple obligatorio.' },
     { t: 'tr', q: '¿Has visitado alguna vez la feria de Cantón?', a: ['have you ever visited the canton fair', 'have you ever been to the canton fair'],
-      why: 'EVER va entre el sujeto y el participio: "Have you ever visited...?"' },
+      why: 'EVER va entre el sujeto y el participio.' },
     { t: 'order', words: ['Sales', 'have', 'increased', 'by', 'fifteen', 'percent.'], a: 'Sales have increased by fifteen percent.',
-      why: 'Para porcentajes de cambio se usa BY: increased by 15%, dropped by 5%.' },
+      why: 'Para porcentajes de cambio se usa BY: increased by 15%.' },
+    { t: 'mc', q: '¿Dónde va "just"?', opts: ['I just have sent it', "I've just sent it", "I've sent it just"], a: 1,
+      why: 'JUST y ALREADY van entre have y el participio.' },
     { t: 'listen', audio: "I've just spoken to the customer and they've already approved the quotation.", opts: ['Acabo de hablar con el cliente y ya aprobaron la cotización.', 'Voy a hablar con el cliente para que apruebe la cotización.', 'Hablé con el cliente pero no aprobó la cotización.'], a: 0,
-      why: 'JUST = acabar de. ALREADY = ya. Ambos son señales típicas del present perfect.' }
+      why: 'JUST = acabar de. ALREADY = ya. Señales típicas del present perfect.' },
+    { t: 'tr', q: 'Nunca he tenido un problema con ellos.', a: ["i've never had a problem with them", 'i have never had a problem with them'],
+      why: 'NEVER ya es negativo: no se añade "not".' },
+    { t: 'fill', q: "Coverage has dropped ___ March.", a: ['since'],
+      why: 'March es un punto de inicio: SINCE.' },
+    { t: 'mc', q: '"Sales increased to 500 units" significa...', opts: ['aumentaron 500 unidades', 'llegaron a 500 unidades', 'bajaron a 500 unidades'], a: 1,
+      why: 'TO marca el destino; BY marcaría la magnitud del cambio.' },
+    { t: 'listen', audio: "How long have you been in this role? — For about three years now.", opts: ['¿Cuánto llevas en este puesto? — Unos tres años.', '¿Cuándo empezaste en este puesto? — Hace tres años exactos.', '¿Cuánto durará este puesto? — Unos tres años.'], a: 0,
+      why: '"How long have you...?" pregunta por duración, y se responde con FOR.' }
   ]
 },
 
 {
   id: 'b1-9', level: 'B1', title: 'Opiniones y acuerdos',
-  goal: 'Dar tu opinión, estar de acuerdo y discrepar con elegancia.',
+  goal: 'Dar tu opinión, estar de acuerdo, discrepar con elegancia y argumentar.',
   grammar: {
     title: 'Conectores para argumentar',
-    es: 'HOWEVER (sin embargo) y ALTHOUGH (aunque) unen ideas opuestas. Although va al inicio de una frase con sujeto y verbo; However va aparte, con coma: "However, ...". BECAUSE explica el motivo; SO introduce la consecuencia.',
+    es: 'Un argumento sólido no depende de palabras difíciles, sino de unir bien las ideas. Estos son los conectores que necesitas.\n\n' +
+        'CONTRASTE: however (sin embargo) va al inicio de una frase nueva y lleva coma detrás. Although / though (aunque) va al inicio de una oración con sujeto y verbo. But (pero) une dos partes dentro de la misma frase. Despite / in spite of (a pesar de) va seguido de sustantivo o -ing, nunca de una oración completa.\n\n' +
+        'CAUSA Y EFECTO: because (porque) introduce el motivo · so (así que) introduce la consecuencia · therefore (por lo tanto) es su versión formal · that’s why (por eso).\n\n' +
+        'AÑADIR: also, in addition, moreover, what’s more.\n\n' +
+        'El error más frecuente: usar "however" como si fuera "but" en mitad de la frase. Se dice "The price is good, BUT the lead time is long" o bien "The price is good. HOWEVER, the lead time is long". No las mezcles.',
     examples: [
       { en: "I like the price. However, the lead time is too long.", es: 'Me gusta el precio. Sin embargo, el plazo es muy largo.' },
       { en: "Although it's expensive, the quality is excellent.", es: 'Aunque es caro, la calidad es excelente.' },
-      { en: "The price went up, so we changed suppliers.", es: 'El precio subió, así que cambiamos de proveedor.' }
+      { en: "The price went up, so we changed suppliers.", es: 'El precio subió, así que cambiamos de proveedor.' },
+      { en: "Despite the delay, the client was happy.", es: 'A pesar del retraso, el cliente quedó contento.' },
+      { en: "We lost the order because our price was too high.", es: 'Perdimos el pedido porque nuestro precio era muy alto.' }
+    ],
+    more: [
+      {
+        title: 'Cómo discrepar sin romper la relación',
+        es: 'En inglés profesional el desacuerdo directo se percibe como agresivo. La fórmula que funciona tiene tres pasos: reconoce, discrepa suave, propón.\n\n' +
+            '1. RECONOCE: "I see your point" · "That’s a fair point" · "I understand where you’re coming from".\n' +
+            '2. DISCREPA SUAVE: "but I’m not sure that..." · "I’m afraid I see it differently" · "I’d look at it another way".\n' +
+            '3. PROPÓN: "What if we...?" · "How about...?" · "Would it work if...?".\n\n' +
+            'Evita "You are wrong" y "That’s not true": son correctas gramaticalmente pero cierran la conversación.\n\n' +
+            'Para acordar: "I completely agree" · "Exactly" · "That makes sense" · "Fair enough" (me parece razonable, muy usada y muy natural).',
+        examples: [
+          { en: "I see your point, but I'm not sure it would work here.", es: 'Entiendo tu punto, pero no sé si funcionaría aquí.' },
+          { en: "I'm afraid I see it differently.", es: 'Me temo que lo veo distinto.' },
+          { en: "That makes sense. What if we try it next quarter?", es: 'Tiene sentido. ¿Y si lo probamos el próximo trimestre?' }
+        ]
+      },
+      {
+        title: 'Verbos de opinión y la estructura THINK THAT',
+        es: 'I think / I believe / I feel / In my opinion / From my point of view / As far as I’m concerned.\n\n' +
+            'Detalle: se dice IN my opinion, no "for my opinion". Y FROM my point of view, no "in my point of view".\n\n' +
+            'La palabra THAT después de think es opcional y los nativos suelen omitirla: "I think (that) we should wait". Suena más natural sin ella.\n\n' +
+            'Para negar una opinión, el inglés mueve la negación al primer verbo: no se dice "I think we shouldn’t do it", se dice "I DON’T think we should do it". Se llama negación anticipada y es muy característico.',
+        examples: [
+          { en: "I don't think we should accept those terms.", es: 'No creo que debamos aceptar esas condiciones.' },
+          { en: "In my opinion, the price is too high.", es: 'En mi opinión, el precio es demasiado alto.' },
+          { en: "As far as I'm concerned, it's a good deal.", es: 'En lo que a mí respecta, es un buen trato.' }
+        ]
+      }
+    ],
+    mistakes: [
+      { bad: 'For my opinion...', good: 'In my opinion...', es: 'Es "in my opinion".' },
+      { bad: 'In my point of view...', good: 'From my point of view...', es: 'Es "from my point of view".' },
+      { bad: 'I think we should not accept.', good: "I don't think we should accept.", es: 'El inglés adelanta la negación.' },
+      { bad: 'The price is good, however the lead time is long.', good: 'The price is good. However, the lead time is long.', es: 'However inicia frase y lleva coma.' },
+      { bad: 'Despite of the delay...', good: 'Despite the delay... / In spite of the delay...', es: '"Despite" no lleva "of".' }
     ]
   },
   vocab: [
     { en: 'to agree', es: 'estar de acuerdo' },
     { en: 'to disagree', es: 'discrepar' },
     { en: 'to suggest', es: 'sugerir' },
+    { en: 'to argue', es: 'argumentar / discutir' },
     { en: 'opinion', es: 'opinión' },
     { en: 'point of view', es: 'punto de vista' },
     { en: 'however', es: 'sin embargo' },
     { en: 'although', es: 'aunque' },
+    { en: 'despite', es: 'a pesar de' },
+    { en: 'therefore', es: 'por lo tanto' },
+    { en: 'because', es: 'porque' },
+    { en: 'so', es: 'así que' },
+    { en: 'in addition', es: 'además' },
+    { en: 'on the other hand', es: 'por otro lado' },
     { en: 'actually', es: 'en realidad' },
     { en: 'to be honest', es: 'para ser sincero' },
     { en: 'it depends', es: 'depende' },
     { en: 'that makes sense', es: 'eso tiene sentido' },
-    { en: 'fair enough', es: 'me parece justo' }
+    { en: 'fair enough', es: 'me parece razonable' },
+    { en: 'a fair point', es: 'un buen argumento' },
+    { en: 'reason', es: 'razón' },
+    { en: 'advantage', es: 'ventaja' },
+    { en: 'disadvantage', es: 'desventaja' },
+    { en: 'risk', es: 'riesgo' },
+    { en: 'benefit', es: 'beneficio' },
+    { en: 'to consider', es: 'considerar' },
+    { en: 'to admit', es: 'admitir' },
+    { en: 'to point out', es: 'señalar' }
   ],
   phrases: [
     { en: "In my opinion, we should wait.", es: 'En mi opinión, deberíamos esperar.' },
@@ -477,84 +1322,223 @@ const UNITS = [
     { en: "I completely agree with you.", es: 'Estoy totalmente de acuerdo contigo.' },
     { en: "I'm afraid I don't agree.", es: 'Me temo que no estoy de acuerdo.' },
     { en: "What do you think about this proposal?", es: '¿Qué opinas de esta propuesta?' },
-    { en: "That makes sense to me.", es: 'Eso me hace sentido.' }
+    { en: "That makes sense to me.", es: 'Eso me hace sentido.' },
+    { en: "I don't think that's a good idea.", es: 'No creo que sea buena idea.' },
+    { en: "On the other hand, it could save us time.", es: 'Por otro lado, podría ahorrarnos tiempo.' },
+    { en: "To be honest, I have my doubts.", es: 'Para ser sincero, tengo mis dudas.' },
+    { en: "That's a fair point.", es: 'Es un buen argumento.' },
+    { en: "What if we try it for one quarter?", es: '¿Y si lo probamos un trimestre?' },
+    { en: "It depends on the payment terms.", es: 'Depende de las condiciones de pago.' }
   ],
   exercises: [
     { t: 'mc', q: '¿Cuál es la forma MÁS diplomática de discrepar?', opts: ["You're wrong.", "I'm afraid I see it differently.", "No, that's not true."], a: 1,
-      why: '"I’m afraid..." suaviza el desacuerdo. Es el recurso más útil en reuniones de negocios.' },
+      why: '"I’m afraid..." suaviza el desacuerdo. Es el recurso más útil en reuniones.' },
     { t: 'fill', q: "I like the offer. ___, the payment terms are difficult.", a: ['however'],
-      why: 'HOWEVER inicia una frase nueva y va seguido de coma. Une dos ideas contrarias.' },
+      why: 'HOWEVER inicia una frase nueva y va seguido de coma.' },
     { t: 'tr', q: 'En mi opinión, el precio es demasiado alto.', a: ['in my opinion the price is too high', 'in my opinion, the price is too high'],
-      why: 'Se dice "IN my opinion", no "for my opinion". Y "too high" (demasiado), no "very high".' },
+      why: 'Se dice "IN my opinion". Y "too high" (demasiado), no "very high".' },
     { t: 'order', words: ['I', 'see', 'your', 'point,', 'but', 'I', 'disagree.'], a: 'I see your point, but I disagree.',
-      why: 'Primero reconoces al otro, luego discrepas. Es la fórmula estándar del inglés profesional.' },
+      why: 'Primero reconoces, luego discrepas: la fórmula estándar del inglés profesional.' },
+    { t: 'mc', q: '¿Cuál es correcta?', opts: ["I think we shouldn't accept", "I don't think we should accept", "I think not we should accept"], a: 1,
+      why: 'El inglés adelanta la negación al primer verbo: "I don’t think...".' },
+    { t: 'fill', q: "___ the delay, the client was happy.", a: ['despite'],
+      why: 'DESPITE + sustantivo, sin "of". Si fuera oración completa sería "Although...".' },
     { t: 'listen', audio: "To be honest, I think we should look for another supplier.", opts: ['Para ser sincero, creo que deberíamos buscar otro proveedor.', 'Para ser sincero, creo que el proveedor tiene razón.', 'Honestamente, ya encontramos otro proveedor.'], a: 0,
-      why: '"To be honest" prepara al oyente para una opinión franca. "Should" = deberíamos.' },
+      why: '"To be honest" prepara al oyente para una opinión franca.' },
     { t: 'mc', q: '"Fair enough" se usa para...', opts: ['aceptar el argumento del otro', 'pedir un precio justo', 'decir que algo es suficiente'], a: 0,
-      why: 'Es una expresión muy natural: "de acuerdo, lo acepto / me parece razonable".' }
+      why: 'Es muy natural: "de acuerdo, lo acepto / me parece razonable".' },
+    { t: 'tr', q: 'Aunque es caro, la calidad es excelente.', a: ['although it is expensive the quality is excellent', "although it's expensive, the quality is excellent", 'though it is expensive the quality is excellent'],
+      why: 'ALTHOUGH va seguido de una oración con sujeto y verbo.' },
+    { t: 'fill', q: "That's a fair ___.", a: ['point'],
+      why: '"A fair point" = un buen argumento. Sirve para reconocer sin ceder.' },
+    { t: 'order', words: ['On', 'the', 'other', 'hand,', 'it', 'could', 'save', 'us', 'time.'], a: 'On the other hand, it could save us time.',
+      why: '"On the other hand" introduce el contrapeso de un argumento.' },
+    { t: 'listen', audio: "I see where you're coming from, but I'm not sure it would work in our market.", opts: ['Entiendo tu postura, pero no estoy seguro de que funcione en nuestro mercado.', 'No entiendo de dónde vienes ni si funciona el mercado.', 'Estoy de acuerdo en que funcionaría en nuestro mercado.'], a: 0,
+      why: '"I see where you’re coming from" es la forma más empática de reconocer antes de discrepar.' }
   ]
 },
 
 /* ══════════════════ B2 ══════════════════ */
 {
   id: 'b2-10', level: 'B2', title: 'Condicionales',
-  goal: 'Poner condiciones en una negociación y hablar de hipótesis.',
+  goal: 'Poner condiciones en una negociación, plantear hipótesis y valorar lo que pudo pasar.',
   grammar: {
-    title: 'Los tres condicionales que más vas a usar',
-    es: 'PRIMERO (real, futuro): If + presente, will → "If you order 500 units, we will offer a discount". SEGUNDO (hipotético): If + pasado, would → "If we had more time, we would test it". TERCERO (pasado imposible): If + had + participio, would have → "If we had known, we would have called". Nunca pongas WILL después de IF.',
+    title: 'Los condicionales: cuatro estructuras, un solo mecanismo',
+    es: 'Todo condicional tiene dos mitades: la condición (con IF) y el resultado. Lo que cambia es el tiempo verbal de cada mitad.\n\n' +
+        'CONDICIONAL CERO — verdades generales. If + presente, presente. "If you order over 500 units, the price DROPS". Se usa para políticas y reglas de la empresa.\n\n' +
+        'PRIMER CONDICIONAL — situación real y posible en el futuro. If + presente, WILL + verbo. "If you order 500 units, we WILL give you a discount". Este es el de las negociaciones reales.\n\n' +
+        'SEGUNDO CONDICIONAL — hipótesis, poco probable o imaginaria. If + pasado simple, WOULD + verbo. "If we HAD more time, we WOULD test it". Se usa mucho para suavizar: suena menos comprometido que el primero.\n\n' +
+        'TERCER CONDICIONAL — el pasado que no fue. If + had + participio, WOULD HAVE + participio. "If we HAD KNOWN, we WOULD HAVE called you". Sirve para explicar y para lamentar.\n\n' +
+        'LA REGLA DE ORO, la que más se rompe: después de IF nunca va WILL. "If you will order" no existe. El will vive siempre en la otra mitad de la frase.\n\n' +
+        'Y un detalle: la mitad con IF puede ir delante o detrás. Si va delante lleva coma; si va detrás, no. "If you pay upfront, we ship tomorrow" = "We ship tomorrow if you pay upfront".',
     examples: [
       { en: "If you order 500 units, we'll give you 10% off.", es: 'Si pide 500 unidades, le damos un 10% de descuento.' },
-      { en: "If I were you, I'd negotiate the terms.", es: 'Yo que tú, negociaría las condiciones.' },
-      { en: "Unless we receive the payment, we can't ship.", es: 'A menos que recibamos el pago, no podemos enviar.' }
+      { en: "If I were you, I'd negotiate the terms.", es: 'Yo que usted, negociaría las condiciones.' },
+      { en: "If we had known, we would have called you.", es: 'Si lo hubiéramos sabido, le habríamos llamado.' },
+      { en: "Unless we receive the payment, we can't ship.", es: 'A menos que recibamos el pago, no podemos enviar.' },
+      { en: "If you pay in advance, you get a better price.", es: 'Si paga por adelantado, obtiene un mejor precio.' }
+    ],
+    more: [
+      {
+        title: 'UNLESS, PROVIDED THAT, AS LONG AS, OTHERWISE',
+        es: 'Alternativas a IF que suenan más profesionales y aparecen mucho en contratos.\n\n' +
+            'UNLESS = si no / a menos que. Ya lleva el negativo dentro, así que el verbo va en afirmativo: "Unless they confirm today, we’ll cancel" (= If they don’t confirm...). Decir "unless they don’t confirm" es doble negación.\n\n' +
+            'PROVIDED THAT / AS LONG AS = siempre que, con la condición de que. "We can start production provided that you pay 30% upfront".\n\n' +
+            'OTHERWISE = de lo contrario. Va en frase aparte: "Please confirm today. Otherwise, we’ll release the stock".\n\n' +
+            'IN CASE = por si acaso. Ojo, no es lo mismo que "if": "Take an umbrella in case it rains" (por si llueve, preventivo) frente a "Take an umbrella if it rains" (solo si llueve).',
+        examples: [
+          { en: "Unless they confirm today, we'll cancel the order.", es: 'Si no confirman hoy, cancelaremos el pedido.' },
+          { en: "We can start provided that you pay 30% upfront.", es: 'Podemos empezar siempre que pague el 30% por adelantado.' },
+          { en: "Please confirm today. Otherwise, we'll release the stock.", es: 'Confirme hoy, por favor. De lo contrario, liberaremos el inventario.' }
+        ]
+      },
+      {
+        title: 'El segundo condicional como herramienta de negociación',
+        es: 'Este es un uso que casi nadie enseña y que cambia el resultado de una negociación.\n\n' +
+            'El primer condicional compromete: "If you order 500 units, we WILL give you 10%" — eso es una oferta firme.\n' +
+            'El segundo condicional explora sin comprometer: "If you ordered 500 units, we COULD look at a better price" — estás tanteando, no prometiendo.\n\n' +
+            'Los negociadores experimentados usan el segundo para lanzar globos sonda y solo pasan al primero cuando quieren cerrar. Aprender a alternarlos te da control sobre cuánto te comprometes.\n\n' +
+            'Y "If I were you" (no "If I was you") es la fórmula fija para dar consejos. El "were" es un resto del subjuntivo y se usa con todos los sujetos.',
+        examples: [
+          { en: "If you increased the volume, we could review the price.", es: 'Si aumentara el volumen, podríamos revisar el precio.' },
+          { en: "If I were you, I'd get it in writing.", es: 'Yo que usted, lo pediría por escrito.' },
+          { en: "What would you say if we offered 60-day terms?", es: '¿Qué diría si le ofreciéramos 60 días de plazo?' }
+        ]
+      }
+    ],
+    mistakes: [
+      { bad: 'If you will order more, we give a discount.', good: "If you order more, we'll give you a discount.", es: 'Después de IF nunca va will.' },
+      { bad: "Unless they don't confirm...", good: 'Unless they confirm...', es: 'Unless ya es negativo.' },
+      { bad: 'If I was you...', good: 'If I were you...', es: 'Fórmula fija con "were".' },
+      { bad: 'If we would have known...', good: 'If we had known...', es: 'En la parte del IF va "had", no "would have".' },
+      { bad: 'Despite of the price...', good: 'Despite the price...', es: 'Despite no lleva "of".' }
     ]
   },
   vocab: [
     { en: 'unless', es: 'a menos que' },
     { en: 'otherwise', es: 'de lo contrario' },
     { en: 'provided that', es: 'siempre que' },
+    { en: 'as long as', es: 'mientras / siempre que' },
     { en: 'in case', es: 'por si acaso' },
     { en: 'to depend on', es: 'depender de' },
     { en: 'to guarantee', es: 'garantizar' },
     { en: 'to commit', es: 'comprometerse' },
+    { en: 'commitment', es: 'compromiso' },
     { en: 'requirement', es: 'requisito' },
+    { en: 'condition', es: 'condición' },
     { en: 'upfront', es: 'por adelantado' },
+    { en: 'deposit', es: 'anticipo' },
     { en: 'flexible', es: 'flexible' },
-    { en: 'willing to', es: 'dispuesto a' }
+    { en: 'willing to', es: 'dispuesto a' },
+    { en: 'to release', es: 'liberar' },
+    { en: 'volume', es: 'volumen' },
+    { en: 'in writing', es: 'por escrito' },
+    { en: 'to review', es: 'revisar' },
+    { en: 'to consider', es: 'considerar' },
+    { en: 'exception', es: 'excepción' },
+    { en: 'penalty', es: 'penalización' },
+    { en: 'to breach', es: 'incumplir' },
+    { en: 'liability', es: 'responsabilidad' },
+    { en: 'binding', es: 'vinculante' },
+    { en: 'subject to', es: 'sujeto a' },
+    { en: 'to waive', es: 'renunciar a / eximir' },
+    { en: 'trade-off', es: 'contrapartida' }
   ],
   phrases: [
     { en: "If you increase the volume, we can improve the price.", es: 'Si aumenta el volumen, podemos mejorar el precio.' },
-    { en: "Unless we get the deposit, production won't start.", es: 'A menos que recibamos el anticipo, no empieza la producción.' },
-    { en: "If I were you, I'd confirm it in writing.", es: 'Yo que tú, lo confirmaría por escrito.' },
+    { en: "Unless we get the deposit, production won't start.", es: 'Si no recibimos el anticipo, no empieza la producción.' },
+    { en: "If I were you, I'd confirm it in writing.", es: 'Yo que usted, lo confirmaría por escrito.' },
     { en: "We'd be willing to review the terms.", es: 'Estaríamos dispuestos a revisar las condiciones.' },
     { en: "That depends on the payment terms.", es: 'Eso depende de las condiciones de pago.' },
-    { en: "Provided that you pay 30% upfront, we can start.", es: 'Siempre que pague el 30% por adelantado, podemos empezar.' }
+    { en: "Provided that you pay 30% upfront, we can start.", es: 'Siempre que pague el 30% por adelantado, podemos empezar.' },
+    { en: "If we had known earlier, we would have shipped it.", es: 'Si lo hubiéramos sabido antes, lo habríamos enviado.' },
+    { en: "This offer is subject to stock availability.", es: 'Esta oferta está sujeta a disponibilidad.' },
+    { en: "Please confirm today. Otherwise we'll release the stock.", es: 'Confirme hoy. De lo contrario liberaremos el inventario.' },
+    { en: "As long as the quality is the same, we're interested.", es: 'Mientras la calidad sea la misma, nos interesa.' },
+    { en: "What would you say if we offered 60-day terms?", es: '¿Qué diría si le ofreciéramos 60 días de plazo?' },
+    { en: "I'll take it in case we need it later.", es: 'Lo llevo por si lo necesitamos después.' }
   ],
   exercises: [
-    { t: 'mc', q: 'Elige la correcta.', opts: ['If you will order more, we give a discount', "If you order more, we'll give you a discount", "If you order more, we give discount"], a: 1,
-      why: 'Regla de oro: después de IF nunca va WILL. La condición va en presente y el resultado con will.' },
+    { t: 'mc', q: 'Elige la correcta.', opts: ['If you will order more, we give a discount', "If you order more, we'll give you a discount", 'If you order more, we give discount'], a: 1,
+      why: 'Regla de oro: después de IF nunca va WILL.' },
     { t: 'fill', q: "If I ___ you, I'd ask for a written confirmation.", a: ['were', 'was'],
-      why: 'La forma estándar es "If I were you" (subjuntivo). Es la fórmula fija para dar consejos.' },
+      why: 'La forma estándar es "If I were you": es la fórmula fija para dar consejos.' },
     { t: 'tr', q: 'Si tuviéramos más tiempo, revisaríamos el contrato.', a: ['if we had more time we would review the contract', "if we had more time, we'd review the contract", 'if we had more time, we would review the contract'],
-      why: 'Segundo condicional: If + pasado simple, would + verbo base. Es hipotético, no real.' },
+      why: 'Segundo condicional: If + pasado simple, would + verbo base.' },
     { t: 'order', words: ['Unless', 'they', 'confirm', 'today,', 'we', 'will', 'cancel', 'the', 'order.'], a: 'Unless they confirm today, we will cancel the order.',
-      why: 'UNLESS ya significa "si no", así que el verbo va en afirmativo: unless they confirm (no "unless they don’t confirm").' },
-    { t: 'listen', audio: "If you could give us better payment terms, we would be able to increase the volume.", opts: ['Si pudiera darnos mejores condiciones de pago, podríamos aumentar el volumen.', 'Si nos da mejores condiciones de pago, aumentamos el volumen ahora.', 'Aunque nos dio mejores condiciones, no aumentamos el volumen.'], a: 0,
-      why: '"Could / would" hacen la propuesta hipotética y por eso más suave y negociable.' },
+      why: 'UNLESS ya significa "si no": el verbo va en afirmativo.' },
+    { t: 'mc', q: '¿Cuál compromete MENOS en una negociación?', opts: ["If you order 500 units, we'll give you 10%", 'If you ordered 500 units, we could look at the price', 'We give 10% on 500 units'], a: 1,
+      why: 'El segundo condicional explora sin prometer. El primero es una oferta firme.' },
+    { t: 'fill', q: "If we ___ known earlier, we would have shipped it.", a: ['had'],
+      why: 'Tercer condicional: If + HAD + participio en la condición.' },
+    { t: 'listen', audio: "If you could give us better payment terms, we would be able to increase the volume.", opts: ['Si pudiera darnos mejores condiciones de pago, podríamos aumentar el volumen.', 'Si nos da mejores condiciones, aumentamos el volumen ahora.', 'Aunque nos dio mejores condiciones, no aumentamos el volumen.'], a: 0,
+      why: 'Could y would hacen la propuesta hipotética, y por eso más suave y negociable.' },
     { t: 'mc', q: '"Provided that" significa...', opts: ['aunque', 'siempre que / con la condición de que', 'proveído por'], a: 1,
-      why: 'Es un sinónimo formal de "if", muy común en contratos y condiciones comerciales.' }
+      why: 'Sinónimo formal de "if", muy común en contratos.' },
+    { t: 'tr', q: 'Esta oferta está sujeta a disponibilidad.', a: ['this offer is subject to availability', 'this offer is subject to stock availability'],
+      why: '"Subject to" es la fórmula estándar para condicionar una oferta.' },
+    { t: 'mc', q: '¿Cuál es correcta?', opts: ["Unless they don't confirm, we'll cancel", "Unless they confirm, we'll cancel", "Unless they will confirm, we'll cancel"], a: 1,
+      why: 'Doble error frecuente: unless no lleva negación ni will.' },
+    { t: 'order', words: ['We', 'can', 'start', 'as', 'long', 'as', 'you', 'pay', 'upfront.'], a: 'We can start as long as you pay upfront.',
+      why: '"As long as" introduce la condición y va seguido de presente.' },
+    { t: 'listen', audio: "Please confirm by Friday. Otherwise, we'll have to release the stock.", opts: ['Confirme antes del viernes. De lo contrario, tendremos que liberar el inventario.', 'Confirme el viernes y liberaremos el inventario.', 'Si confirma el viernes, guardaremos el inventario.'], a: 0,
+      why: 'OTHERWISE introduce la consecuencia de no cumplir la condición.' }
   ]
 },
 
 {
   id: 'b2-11', level: 'B2', title: 'Phrasal verbs y expresiones',
-  goal: 'Sonar natural con los verbos que los nativos usan todo el tiempo.',
+  goal: 'Sonar natural con los verbos y expresiones que los nativos usan todo el tiempo.',
   grammar: {
-    title: 'Phrasal verbs separables e inseparables',
-    es: 'Separables: el objeto puede ir en medio ("call the meeting off" / "call off the meeting"), pero si es pronombre DEBE ir en medio ("call it off" ✔, "call off it" ❌). Inseparables: nunca se separan ("look into the problem", nunca "look the problem into").',
+    title: 'Phrasal verbs: la parte del inglés que no se puede deducir',
+    es: 'Un phrasal verb es un verbo + una partícula (up, out, off, into...) cuyo significado no se deduce de las partes. "Look" es mirar, pero "look into" es investigar y "look after" es cuidar. Por eso hay que aprenderlos como bloques.\n\n' +
+        'SEPARABLES: el objeto puede ir en medio o al final. "Call OFF the meeting" = "Call the meeting OFF". PERO si el objeto es un pronombre (it, them, him) OBLIGATORIAMENTE va en medio: "Call it off" ✔ / "Call off it" ✘. Esta es la regla que más se falla.\n\n' +
+        'INSEPARABLES: nunca se parten. "Look into the problem" ✔ / "Look the problem into" ✘. También con pronombre: "look into it".\n\n' +
+        'No hay forma de saber cuál es cuál sin memorizarlo, pero hay un atajo práctico: los de tres palabras (get back to, come up with, look forward to, put up with) son SIEMPRE inseparables.\n\n' +
+        'Consejo de uso: en un correo muy formal a veces conviene el verbo latino (investigate en vez de look into, cancel en vez de call off) porque suena más serio. Pero hablando, los phrasal verbs son lo natural.',
     examples: [
-      { en: "Let me look into it and get back to you.", es: 'Déjame investigarlo y te respondo.' },
+      { en: "Let me look into it and get back to you.", es: 'Déjeme investigarlo y le respondo.' },
       { en: "They called the meeting off.", es: 'Cancelaron la reunión.' },
-      { en: "I'll keep you in the loop.", es: 'Te mantengo al tanto.' }
+      { en: "They called it off.", es: 'La cancelaron.' },
+      { en: "I'll keep you in the loop.", es: 'Le mantengo al tanto.' },
+      { en: "We ran out of stock last week.", es: 'Nos quedamos sin inventario la semana pasada.' }
+    ],
+    more: [
+      {
+        title: 'Los phrasal verbs de oficina que más vas a oír',
+        es: 'FOLLOW UP (on something) — dar seguimiento · CATCH UP (with someone) — ponerse al día · LOOK INTO — investigar · SORT OUT — resolver · BRING UP — sacar un tema · CALL OFF — cancelar · PUT OFF — posponer · RUN OUT OF — quedarse sin · COME UP WITH — idear · GET BACK TO — responder a alguien · FIGURE OUT — averiguar · CARRY OUT — llevar a cabo · TURN DOWN — rechazar · TAKE OVER — hacerse cargo · SET UP — montar, organizar · GO OVER — repasar · POINT OUT — señalar · BACK UP — respaldar.\n\n' +
+            'Fíjate en la diferencia entre PUT OFF (posponer, se hará más tarde) y CALL OFF (cancelar, no se hará).',
+        examples: [
+          { en: "Let's go over the numbers before the meeting.", es: 'Repasemos las cifras antes de la reunión.' },
+          { en: "They turned down our offer.", es: 'Rechazaron nuestra oferta.' },
+          { en: "Can you set up a call for Thursday?", es: '¿Puedes organizar una llamada para el jueves?' }
+        ]
+      },
+      {
+        title: 'Expresiones idiomáticas de negocios',
+        es: 'TOUCH BASE — contactar brevemente. "Let’s touch base next week".\n' +
+            'IN THE LOOP — al tanto. "Keep me in the loop".\n' +
+            'ON THE SAME PAGE — de acuerdo, alineados. "Let’s make sure we’re on the same page".\n' +
+            'A BALLPARK FIGURE — una cifra aproximada. "Can you give me a ballpark figure?".\n' +
+            'THE BOTTOM LINE — lo esencial, el resultado final. "The bottom line is we need it by Friday".\n' +
+            'TO CUT CORNERS — hacer las cosas a medias para ahorrar.\n' +
+            'TO BE ON TOP OF SOMETHING — tenerlo controlado.\n' +
+            'IT’S A LONG SHOT — es poco probable.\n' +
+            'LET’S PLAY IT BY EAR — vayamos viendo sobre la marcha.\n\n' +
+            'Con las expresiones, la regla es: úsalas cuando las entiendas del todo. Una expresión mal usada llama más la atención que una frase simple bien dicha.',
+        examples: [
+          { en: "Can you give me a ballpark figure?", es: '¿Me puede dar una cifra aproximada?' },
+          { en: "The bottom line is we need it by Friday.", es: 'Lo esencial es que lo necesitamos para el viernes.' },
+          { en: "Let's make sure we're on the same page.", es: 'Asegurémonos de que estamos alineados.' }
+        ]
+      }
+    ],
+    mistakes: [
+      { bad: 'Call off it.', good: 'Call it off.', es: 'Con pronombre, el objeto va SIEMPRE en medio.' },
+      { bad: 'Look the problem into.', good: 'Look into the problem.', es: '"Look into" es inseparable.' },
+      { bad: 'I will follow up you.', good: "I'll follow up with you.", es: 'Se dice "follow up with someone".' },
+      { bad: 'We ran out the stock.', good: 'We ran out of stock.', es: '"Run out OF" lleva siempre "of".' },
+      { bad: "I'm looking forward to hear from you.", good: "I'm looking forward to hearing from you.", es: 'Tras "look forward to" va -ING.' }
     ]
   },
   vocab: [
@@ -568,44 +1552,125 @@ const UNITS = [
     { en: 'to run out of', es: 'quedarse sin' },
     { en: 'to come up with', es: 'idear / proponer' },
     { en: 'to get back to', es: 'responder a alguien' },
+    { en: 'to figure out', es: 'averiguar / entender' },
+    { en: 'to carry out', es: 'llevar a cabo' },
+    { en: 'to turn down', es: 'rechazar' },
+    { en: 'to take over', es: 'hacerse cargo' },
+    { en: 'to set up', es: 'organizar / montar' },
+    { en: 'to go over', es: 'repasar' },
+    { en: 'to point out', es: 'señalar' },
+    { en: 'to back up', es: 'respaldar' },
     { en: 'to touch base', es: 'contactar brevemente' },
     { en: 'to keep in the loop', es: 'mantener al tanto' },
-    { en: 'to figure out', es: 'averiguar / entender' }
+    { en: 'on the same page', es: 'alineados / de acuerdo' },
+    { en: 'a ballpark figure', es: 'una cifra aproximada' },
+    { en: 'the bottom line', es: 'lo esencial' },
+    { en: 'to cut corners', es: 'hacer las cosas a medias' },
+    { en: 'to be on top of it', es: 'tenerlo controlado' },
+    { en: "it's a long shot", es: 'es poco probable' },
+    { en: 'to play it by ear', es: 'ver sobre la marcha' },
+    { en: 'to put up with', es: 'aguantar / soportar' }
   ],
   phrases: [
-    { en: "Let me look into it.", es: 'Déjame revisarlo.' },
+    { en: "Let me look into it.", es: 'Déjeme revisarlo.' },
     { en: "We ran out of stock last week.", es: 'Nos quedamos sin inventario la semana pasada.' },
     { en: "Can we touch base next Monday?", es: '¿Nos ponemos en contacto el próximo lunes?' },
-    { en: "I'll keep you in the loop.", es: 'Te mantengo al tanto.' },
+    { en: "I'll keep you in the loop.", es: 'Le mantengo al tanto.' },
     { en: "They called the meeting off.", es: 'Cancelaron la reunión.' },
-    { en: "We need to sort this out today.", es: 'Necesitamos resolver esto hoy.' }
+    { en: "We need to sort this out today.", es: 'Necesitamos resolver esto hoy.' },
+    { en: "Let's go over the numbers first.", es: 'Repasemos primero las cifras.' },
+    { en: "They turned down our proposal.", es: 'Rechazaron nuestra propuesta.' },
+    { en: "Can you give me a ballpark figure?", es: '¿Me da una cifra aproximada?' },
+    { en: "The bottom line is we need it by Friday.", es: 'Lo esencial es que lo necesitamos para el viernes.' },
+    { en: "I'll get back to you by the end of the day.", es: 'Le respondo antes de que acabe el día.' },
+    { en: "Let's make sure we're on the same page.", es: 'Asegurémonos de estar alineados.' }
   ],
   exercises: [
     { t: 'mc', q: 'Elige la forma correcta con pronombre.', opts: ['Call off it', 'Call it off', 'Off call it'], a: 1,
-      why: 'Con phrasal verbs separables, el pronombre SIEMPRE va en medio: call it off, put it off, sort it out.' },
+      why: 'Con phrasal verbs separables, el pronombre SIEMPRE va en medio.' },
     { t: 'fill', q: "We ran ___ of stock before the end of the month.", a: ['out'],
-      why: '"Run out of" = quedarse sin. Es inseparable: run out of stock, run out of time.' },
+      why: '"Run out of" = quedarse sin. Lleva siempre "of".' },
     { t: 'tr', q: 'Le doy seguimiento y le respondo mañana.', a: ["i'll follow up and get back to you tomorrow", 'i will follow up and get back to you tomorrow'],
-      why: '"Get back to you" es la forma natural de decir "le respondo / le contesto".' },
+      why: '"Get back to you" es la forma natural de decir "le respondo".' },
     { t: 'order', words: ['I', 'need', 'to', 'look', 'into', 'the', 'delay.'], a: 'I need to look into the delay.',
-      why: '"Look into" es inseparable: el objeto va siempre después del phrasal verb completo.' },
+      why: '"Look into" es inseparable: el objeto va después del bloque completo.' },
+    { t: 'mc', q: 'La reunión se hará más tarde, no se cancela. ¿Cuál usas?', opts: ['We called it off', 'We put it off', 'We turned it down'], a: 1,
+      why: 'PUT OFF = posponer. CALL OFF = cancelar. TURN DOWN = rechazar.' },
     { t: 'listen', audio: "Let's put the decision off until we come up with a better proposal.", opts: ['Pospongamos la decisión hasta que se nos ocurra una propuesta mejor.', 'Tomemos la decisión ahora con la propuesta que tenemos.', 'Cancelemos la decisión porque la propuesta es mala.'], a: 0,
-      why: '"Put off" = posponer · "Come up with" = idear, se nos ocurre.' },
+      why: '"Put off" = posponer · "Come up with" = idear.' },
     { t: 'mc', q: '"Touch base" significa...', opts: ['tocar la base', 'ponerse en contacto brevemente', 'llegar a un acuerdo'], a: 1,
-      why: 'Viene del béisbol. En negocios es una forma casual y muy común de proponer un contacto rápido.' }
+      why: 'Del béisbol. En negocios es proponer un contacto rápido.' },
+    { t: 'fill', q: "I'm looking forward to ___ from you.", a: ['hearing'],
+      why: 'Tras "look forward to" va -ING, no infinitivo. El "to" aquí es preposición.' },
+    { t: 'tr', q: '¿Me puede dar una cifra aproximada?', a: ['can you give me a ballpark figure', 'could you give me a ballpark figure'],
+      why: '"Ballpark figure" es la expresión estándar para una cifra orientativa.' },
+    { t: 'mc', q: '"The bottom line is..." introduce...', opts: ['un detalle menor', 'lo esencial del asunto', 'la última línea del contrato'], a: 1,
+      why: 'Sirve para cortar el rodeo e ir al punto clave.' },
+    { t: 'order', words: ['Can', 'you', 'set', 'up', 'a', 'call', 'for', 'Thursday?'], a: 'Can you set up a call for Thursday?',
+      why: '"Set up" = organizar, montar. Es separable: "set it up".' },
+    { t: 'listen', audio: "They turned down our offer, so we'll have to come up with something better.", opts: ['Rechazaron nuestra oferta, así que tendremos que idear algo mejor.', 'Aceptaron nuestra oferta y propondremos algo mejor.', 'Bajaron nuestra oferta para conseguir algo mejor.'], a: 0,
+      why: 'TURN DOWN = rechazar. Ojo: no significa "bajar" en este contexto.' }
   ]
 },
 
 {
   id: 'b2-12', level: 'B2', title: 'Negociar y presentar',
-  goal: 'Negociar precio y condiciones, y presentar con seguridad.',
+  goal: 'Negociar precio y condiciones, y presentar cifras con seguridad.',
   grammar: {
-    title: 'Lenguaje diplomático (hedging)',
-    es: 'En negocios el inglés suaviza casi todo. En vez de "The price is high" dices "The price is a bit higher than we expected". Recursos clave: a bit / slightly / I’m afraid / would / might / it seems. Suenan profesionales, no débiles.',
+    title: 'Lenguaje diplomático: cómo suavizar sin perder firmeza',
+    es: 'En inglés profesional casi nada se dice de forma directa. No es hipocresía: es la manera de mantener la relación mientras defiendes tu posición. A esto se le llama hedging.\n\n' +
+        'LAS HERRAMIENTAS:\n' +
+        '· Adverbios que rebajan: a bit, slightly, a little, somewhat. "That’s slightly above our budget" en lugar de "That’s expensive".\n' +
+        '· Verbos modales: would, could, might. "That would be difficult" en lugar de "That is impossible".\n' +
+        '· Introductores de mala noticia: "I’m afraid...", "Unfortunately...", "To be honest...".\n' +
+        '· Preguntas en vez de afirmaciones: "Would you consider...?" en lugar de "You should...".\n' +
+        '· Verbos de distancia: "It seems...", "It appears...", "I understand that...".\n\n' +
+        'LA ESTRUCTURA QUE MÁS FUNCIONA es cerrar una puerta y abrir otra en la misma frase: "I’m afraid we can’t go below that price, BUT we could improve the delivery time". Nunca dejes al otro sin salida.\n\n' +
+        'Y una advertencia: suavizar no es ceder. "I’m afraid that doesn’t work for us" es un NO rotundo dicho con educación. El contenido manda, la forma acompaña.',
     examples: [
       { en: "That's slightly above our budget.", es: 'Eso está un poco por encima de nuestro presupuesto.' },
       { en: "Would you consider a longer payment term?", es: '¿Consideraría un plazo de pago más largo?' },
-      { en: "I'm afraid we can't go below that price.", es: 'Me temo que no podemos bajar de ese precio.' }
+      { en: "I'm afraid we can't go below that price.", es: 'Me temo que no podemos bajar de ese precio.' },
+      { en: "That would be difficult for us.", es: 'Eso nos resultaría difícil.' },
+      { en: "It seems there's been a misunderstanding.", es: 'Parece que ha habido un malentendido.' }
+    ],
+    more: [
+      {
+        title: 'Presentar cifras y estructurar una intervención',
+        es: 'ABRIR: "Thanks for your time. Today I’d like to walk you through three points."\n' +
+            'SECUENCIAR: "First... / Then... / Finally..." o "To begin with... / Moving on to... / Lastly...".\n' +
+            'SEÑALAR DATOS: "As you can see here..." · "The figures show..." · "If we look at the numbers...".\n' +
+            'DESCRIBIR TENDENCIAS: "Sales rose sharply" (con fuerza) · "grew steadily" (de forma sostenida) · "dropped slightly" (un poco) · "remained flat" (sin cambios) · "peaked in June" (tocó máximo).\n' +
+            'CERRAR: "To sum up..." · "In short..." · "So, to recap...".\n' +
+            'INVITAR PREGUNTAS: "I’m happy to take any questions."\n\n' +
+            'Si te preguntan algo que no sabes: "That’s a good question. Let me look into it and get back to you." Es mucho mejor que improvisar.',
+        examples: [
+          { en: "Let me walk you through the numbers.", es: 'Déjeme explicarle las cifras.' },
+          { en: "Sales grew steadily in the first quarter.", es: 'Las ventas crecieron de forma sostenida en el primer trimestre.' },
+          { en: "To sum up, we have three options.", es: 'En resumen, tenemos tres opciones.' }
+        ]
+      },
+      {
+        title: 'Incoterms y condiciones: el vocabulario que no se improvisa',
+        es: 'EXW (Ex Works) — el comprador recoge en fábrica y asume todo.\n' +
+            'FOB (Free On Board) — el vendedor entrega a bordo del buque en el puerto de origen; ahí pasa el riesgo.\n' +
+            'CIF (Cost, Insurance and Freight) — el vendedor paga flete y seguro hasta el puerto de destino.\n' +
+            'DDP (Delivered Duty Paid) — el vendedor entrega en destino con todo pagado, incluidos aranceles.\n\n' +
+            'CONDICIONES DE PAGO: payment in advance (por adelantado) · net 30 / 60 (a 30 o 60 días) · letter of credit, L/C (carta de crédito) · partial payment (pago parcial) · balance on delivery (saldo contra entrega).\n\n' +
+            'En una negociación real, precio e Incoterm van juntos. "1,200 dollars" no significa nada sin saber si es FOB o CIF: pregúntalo siempre.',
+        examples: [
+          { en: "Is that price FOB or CIF?", es: '¿Ese precio es FOB o CIF?' },
+          { en: "We work with net 30 payment terms.", es: 'Trabajamos con pago a 30 días.' },
+          { en: "Would you accept a letter of credit?", es: '¿Aceptaría una carta de crédito?' }
+        ]
+      }
+    ],
+    mistakes: [
+      { bad: 'Your price is very expensive.', good: 'Your price is a bit higher than we expected.', es: 'Además, "price" es alto o bajo, no caro.' },
+      { bad: 'It is impossible.', good: "I'm afraid that would be difficult.", es: '"Impossible" cierra la negociación.' },
+      { bad: 'You must lower the price.', good: 'Would you be able to review the price?', es: '"Must" a un cliente suena a orden.' },
+      { bad: 'I am agree with the terms.', good: 'I agree with the terms.', es: '"Agree" ya es verbo.' },
+      { bad: 'We can make a discount.', good: 'We can offer a discount / give you a discount.', es: 'El descuento se ofrece o se da, no se "hace".' }
     ]
   },
   vocab: [
@@ -613,16 +1678,31 @@ const UNITS = [
     { en: 'terms and conditions', es: 'términos y condiciones' },
     { en: 'counteroffer', es: 'contraoferta' },
     { en: 'to compromise', es: 'llegar a un punto medio' },
+    { en: 'to meet halfway', es: 'partir la diferencia' },
     { en: 'margin', es: 'margen' },
     { en: 'volume', es: 'volumen' },
     { en: 'payment terms', es: 'condiciones de pago' },
+    { en: 'net 30', es: 'pago a 30 días' },
+    { en: 'letter of credit', es: 'carta de crédito' },
     { en: 'Incoterms', es: 'Incoterms' },
     { en: 'FOB', es: 'Free On Board (libre a bordo)' },
     { en: 'CIF', es: 'Cost, Insurance and Freight' },
+    { en: 'EXW', es: 'Ex Works (en fábrica)' },
     { en: 'customs', es: 'aduana' },
     { en: 'freight', es: 'flete' },
+    { en: 'duty', es: 'arancel' },
     { en: 'to walk through', es: 'explicar paso a paso' },
-    { en: 'to sum up', es: 'resumir' }
+    { en: 'to sum up', es: 'resumir' },
+    { en: 'slightly', es: 'ligeramente' },
+    { en: 'a bit', es: 'un poco' },
+    { en: 'to rise sharply', es: 'subir con fuerza' },
+    { en: 'to grow steadily', es: 'crecer de forma sostenida' },
+    { en: 'to remain flat', es: 'mantenerse sin cambios' },
+    { en: 'to peak', es: 'tocar máximo' },
+    { en: 'leverage', es: 'poder de negociación' },
+    { en: 'concession', es: 'concesión' },
+    { en: 'deal breaker', es: 'condición inaceptable' },
+    { en: 'win-win', es: 'beneficioso para ambos' }
   ],
   phrases: [
     { en: "We'd be willing to lower the price if you increase the volume.", es: 'Estaríamos dispuestos a bajar el precio si aumenta el volumen.' },
@@ -630,34 +1710,103 @@ const UNITS = [
     { en: "Would you consider 60-day payment terms?", es: '¿Consideraría un pago a 60 días?' },
     { en: "Let me walk you through the numbers.", es: 'Déjeme explicarle las cifras.' },
     { en: "To sum up, we have three options.", es: 'En resumen, tenemos tres opciones.' },
-    { en: "Can we meet halfway?", es: '¿Podemos llegar a un punto medio?' }
+    { en: "Can we meet halfway?", es: '¿Podemos partir la diferencia?' },
+    { en: "Is that price FOB or CIF?", es: '¿Ese precio es FOB o CIF?' },
+    { en: "I'm afraid that's a deal breaker for us.", es: 'Me temo que eso es inaceptable para nosotros.' },
+    { en: "That's a good question. Let me get back to you.", es: 'Buena pregunta. Déjeme responderle luego.' },
+    { en: "Sales grew steadily in the first quarter.", es: 'Las ventas crecieron de forma sostenida en el primer trimestre.' },
+    { en: "I think we can find a win-win here.", es: 'Creo que podemos encontrar algo bueno para ambos.' },
+    { en: "I'm happy to take any questions.", es: 'Con gusto respondo preguntas.' }
   ],
   exercises: [
     { t: 'mc', q: 'El precio es alto. ¿Cómo lo dices en una negociación profesional?', opts: ['Your price is very expensive.', "That's slightly above what we had in mind.", 'No, too much money.'], a: 1,
-      why: 'El hedging ("slightly", "what we had in mind") mantiene la relación y deja la puerta abierta a negociar.' },
+      why: 'El hedging mantiene la relación y deja la puerta abierta a negociar.' },
     { t: 'fill', q: "We'd be ___ to review the terms.", a: ['willing'],
-      why: '"Be willing to" = estar dispuesto a. Es una fórmula clave para ofrecer flexibilidad.' },
+      why: '"Be willing to" = estar dispuesto a. Fórmula clave para ofrecer flexibilidad.' },
     { t: 'tr', q: 'Déjeme explicarle las cifras.', a: ['let me walk you through the numbers', 'let me walk you through the figures'],
-      why: '"Walk someone through" = llevar a alguien paso a paso por algo. Muy usado en presentaciones.' },
+      why: '"Walk someone through" = llevar paso a paso. Muy usado en presentaciones.' },
     { t: 'order', words: ['Would', 'you', 'consider', 'a', 'longer', 'payment', 'term?'], a: 'Would you consider a longer payment term?',
-      why: '"Would you consider...?" es más suave que "Can you give me...?" y suele conseguir mejor respuesta.' },
-    { t: 'listen', audio: "I'm afraid we can't go below that price, but we could improve the delivery time.", opts: ['Me temo que no podemos bajar de ese precio, pero podríamos mejorar el plazo de entrega.', 'No podemos bajar el precio ni mejorar el plazo de entrega.', 'Podemos bajar el precio si mejora el plazo de entrega.'], a: 0,
-      why: 'Técnica clásica: cierras una puerta ("I’m afraid...") y abres otra ("but we could...").' },
+      why: '"Would you consider...?" consigue mejor respuesta que "Can you give me...?".' },
+    { t: 'mc', q: 'Quieres decir que algo es imposible sin cerrar la puerta. ¿Cuál eliges?', opts: ['That is impossible.', "I'm afraid that would be difficult.", 'No, we never do that.'], a: 1,
+      why: '"Impossible" corta la negociación; "would be difficult" invita a buscar alternativa.' },
+    { t: 'listen', audio: "I'm afraid we can't go below that price, but we could improve the delivery time.", opts: ['Me temo que no podemos bajar de ese precio, pero podríamos mejorar el plazo de entrega.', 'No podemos bajar el precio ni mejorar el plazo.', 'Podemos bajar el precio si mejora el plazo.'], a: 0,
+      why: 'Técnica clásica: cierras una puerta y abres otra en la misma frase.' },
     { t: 'mc', q: 'En FOB, el vendedor entrega la mercancía...', opts: ['en la puerta del comprador', 'a bordo del buque en el puerto de origen', 'en la aduana de destino'], a: 1,
-      why: 'FOB (Free On Board): el riesgo pasa al comprador una vez la carga está a bordo en el puerto de embarque.' }
+      why: 'FOB: el riesgo pasa al comprador una vez la carga está a bordo en el puerto de embarque.' },
+    { t: 'fill', q: "Sales grew ___ during the first quarter.", a: ['steadily'],
+      why: '"Steadily" = de forma sostenida. Vocabulario clave para presentar tendencias.' },
+    { t: 'tr', q: '¿Podemos partir la diferencia?', a: ['can we meet halfway', 'could we meet halfway'],
+      why: '"Meet halfway" es la expresión estándar para proponer un punto medio.' },
+    { t: 'mc', q: '"Net 30" significa...', opts: ['30% de descuento', 'pago a 30 días', '30 unidades mínimas'], a: 1,
+      why: 'Condición de pago habitual: el saldo se paga a los 30 días de la factura.' },
+    { t: 'order', words: ['To', 'sum', 'up,', 'we', 'have', 'three', 'options.'], a: 'To sum up, we have three options.',
+      why: '"To sum up" cierra una presentación y anuncia el resumen.' },
+    { t: 'listen', audio: "That's a good question. Let me look into it and get back to you tomorrow.", opts: ['Buena pregunta. Déjeme revisarlo y le respondo mañana.', 'Buena pregunta, pero no tengo la respuesta.', 'Es una pregunta difícil, búsquelo usted mismo.'], a: 0,
+      why: 'Fórmula profesional para ganar tiempo sin improvisar una respuesta.' }
   ]
 },
 
 {
   id: 'b2-13', level: 'B2', title: 'Entrevista y debate',
-  goal: 'Presentarte con impacto y defender tus ideas.',
+  goal: 'Presentarte con impacto, contar tus logros con cifras y defender tus ideas.',
   grammar: {
-    title: 'Mezclar tiempos con naturalidad (método STAR)',
-    es: 'En una entrevista mezclas tiempos sin darte cuenta: presente para lo que haces ahora ("I manage a team of eight"), present perfect para tu trayectoria ("I’ve worked in sales for ten years") y pasado simple para ejemplos concretos ("Last year we increased sales by 18%"). Estructura tus respuestas con STAR: Situation, Task, Action, Result.',
+    title: 'El método STAR y la mezcla natural de tiempos',
+    es: 'En una entrevista buena mezclas tiempos verbales sin darte cuenta, y hacerlo bien es lo que te hace sonar competente.\n\n' +
+        'PRESENTE para lo que haces ahora: "I manage a team of eight sales reps."\n' +
+        'PRESENT PERFECT para tu trayectoria: "I’ve been in foreign trade for over a decade."\n' +
+        'PASADO SIMPLE para ejemplos concretos: "Last year we increased coverage by 20%."\n' +
+        'CONDICIONAL para hipótesis: "If I joined your team, I would focus on..."\n\n' +
+        'EL MÉTODO STAR estructura cualquier respuesta de comportamiento en cuatro pasos:\n' +
+        '· Situation — el contexto. "When I took over the southern region..."\n' +
+        '· Task — tu responsabilidad. "My task was to recover portfolio coverage."\n' +
+        '· Action — lo que TÚ hiciste. "I redesigned the visit plan and retrained the team."\n' +
+        '· Result — el resultado, con número. "As a result, coverage went up 20% in three months."\n\n' +
+        'Dos errores típicos: quedarse en la situación y no llegar nunca a la acción, y hablar en "we" todo el tiempo. Di "I" cuando fue tuyo: el entrevistador quiere saber qué hiciste tú.\n\n' +
+        'Termina siempre con una cifra. "It went well" no dice nada; "we grew 18%" sí.',
     examples: [
       { en: "I currently manage a team of eight sales reps.", es: 'Actualmente dirijo un equipo de ocho vendedores.' },
       { en: "I've been in foreign trade for over a decade.", es: 'Llevo más de una década en comercio exterior.' },
-      { en: "As a result, we increased coverage by 20%.", es: 'Como resultado, aumentamos la cobertura un 20%.' }
+      { en: "My task was to recover portfolio coverage.", es: 'Mi tarea era recuperar la cobertura de cartera.' },
+      { en: "As a result, we increased coverage by twenty percent.", es: 'Como resultado, aumentamos la cobertura un veinte por ciento.' },
+      { en: "If I joined your team, I'd focus on the northern region.", es: 'Si me uniera a su equipo, me centraría en la región norte.' }
+    ],
+    more: [
+      {
+        title: 'Las preguntas que siempre caen y cómo responderlas',
+        es: '"TELL ME ABOUT YOURSELF" — no es tu biografía. Fórmula de 60 segundos: presente ("I’m a regional sales manager at...") + trayectoria ("I’ve spent ten years in foreign trade") + un logro con cifra + por qué estás aquí.\n\n' +
+            '"WHAT’S YOUR GREATEST STRENGTH?" — una fortaleza + un ejemplo que la demuestre. Sin ejemplo, no cuenta.\n\n' +
+            '"WHAT’S YOUR WEAKNESS?" — una debilidad real pero no letal, y qué haces al respecto. "I used to take on too much myself. I’ve learned to delegate and now I..."\n\n' +
+            '"WHY DO YOU WANT TO WORK HERE?" — habla de ellos, no de ti. Menciona algo concreto de la empresa.\n\n' +
+            '"WHERE DO YOU SEE YOURSELF IN FIVE YEARS?" — ambición realista alineada con el puesto.\n\n' +
+            'Y al final, ten TÚ preguntas preparadas: "What would success look like in the first six months?" es una excelente.',
+        examples: [
+          { en: "My biggest strength is building long-term client relationships.", es: 'Mi mayor fortaleza es construir relaciones a largo plazo.' },
+          { en: "I used to take on too much myself, but I've learned to delegate.", es: 'Antes me cargaba con demasiado, pero he aprendido a delegar.' },
+          { en: "What would success look like in the first six months?", es: '¿Cómo se vería el éxito en los primeros seis meses?' }
+        ]
+      },
+      {
+        title: 'Defender una postura en un debate',
+        es: 'PLANTEAR: "The way I see it..." · "My position is that..." · "I’d argue that...".\n' +
+            'APOYAR CON EVIDENCIA: "The figures back this up" · "In my experience..." · "For instance...".\n' +
+            'RECONOCER AL OTRO ANTES DE REBATIR: "That’s a valid concern, however..." · "I take your point, but...".\n' +
+            'REBATIR: "I’d question whether..." · "That assumes that..." · "There’s another way of looking at it".\n' +
+            'CONCEDER SIN PERDER: "You may be right about X, but the core issue is Y".\n' +
+            'CERRAR: "So my main point is..." · "That’s why I believe...".\n\n' +
+            'Una técnica muy potente: reformular al otro antes de responder. "So if I understand correctly, your concern is the lead time. Is that right?" Demuestra que escuchas y te da tiempo para pensar.',
+        examples: [
+          { en: "That's a valid concern, however the data suggests otherwise.", es: 'Es una preocupación válida, sin embargo los datos sugieren lo contrario.' },
+          { en: "So if I understand correctly, your concern is the lead time?", es: 'Entonces, si entiendo bien, su preocupación es el plazo de entrega.' },
+          { en: "I'd argue that the long-term benefit outweighs the cost.", es: 'Yo diría que el beneficio a largo plazo compensa el costo.' }
+        ]
+      }
+    ],
+    mistakes: [
+      { bad: 'I am working here since 2019.', good: "I've been working here since 2019.", es: 'Con since va present perfect.' },
+      { bad: 'I was responsible of the region.', good: 'I was responsible for the region.', es: 'Responsible FOR.' },
+      { bad: 'I have experience of ten years.', good: 'I have ten years of experience.', es: 'Orden fijo de la expresión.' },
+      { bad: 'My English is more or less.', good: "I'd say my English is intermediate but improving.", es: '"More or less" suena a excusa; sé concreto.' },
+      { bad: 'I am agree with your point.', good: 'I agree with your point.', es: 'Agree ya es verbo.' }
     ]
   },
   vocab: [
@@ -667,35 +1816,70 @@ const UNITS = [
     { en: 'responsibility', es: 'responsabilidad' },
     { en: 'achievement', es: 'logro' },
     { en: 'to lead', es: 'liderar' },
+    { en: 'to manage', es: 'gestionar / dirigir' },
     { en: 'to deliver', es: 'cumplir / entregar resultados' },
+    { en: 'to delegate', es: 'delegar' },
+    { en: 'to take over', es: 'hacerse cargo' },
     { en: 'stakeholder', es: 'parte interesada' },
     { en: 'KPI', es: 'indicador clave' },
     { en: 'turnover', es: 'facturación / rotación' },
     { en: 'to overcome', es: 'superar' },
     { en: 'track record', es: 'trayectoria comprobada' },
-    { en: 'to stand out', es: 'destacar' }
+    { en: 'to stand out', es: 'destacar' },
+    { en: 'previous role', es: 'puesto anterior' },
+    { en: 'background', es: 'formación / trayectoria' },
+    { en: 'skill', es: 'habilidad' },
+    { en: 'to be responsible for', es: 'ser responsable de' },
+    { en: 'to report to', es: 'reportar a' },
+    { en: 'headcount', es: 'plantilla' },
+    { en: 'to outweigh', es: 'compensar / pesar más que' },
+    { en: 'valid concern', es: 'preocupación válida' },
+    { en: 'evidence', es: 'evidencia' },
+    { en: 'to back up', es: 'respaldar' },
+    { en: 'to question', es: 'cuestionar' },
+    { en: 'assumption', es: 'suposición' },
+    { en: 'to reframe', es: 'replantear' },
+    { en: 'in my experience', es: 'en mi experiencia' }
   ],
   phrases: [
     { en: "My biggest strength is building long-term client relationships.", es: 'Mi mayor fortaleza es construir relaciones a largo plazo con los clientes.' },
     { en: "In my previous role, I was responsible for the whole southern region.", es: 'En mi puesto anterior, era responsable de toda la región sur.' },
     { en: "One challenge I faced was a drop in portfolio coverage.", es: 'Un reto que enfrenté fue una caída en la cobertura de cartera.' },
+    { en: "I redesigned the visit plan and retrained the team.", es: 'Rediseñé el plan de visitas y volví a capacitar al equipo.' },
     { en: "As a result, we grew sales by eighteen percent.", es: 'Como resultado, crecimos las ventas un dieciocho por ciento.' },
+    { en: "I have ten years of experience in foreign trade.", es: 'Tengo diez años de experiencia en comercio exterior.' },
+    { en: "I report directly to the commercial director.", es: 'Reporto directamente al director comercial.' },
     { en: "Where do you see yourself in five years?", es: '¿Dónde te ves en cinco años?' },
-    { en: "I'd say my track record speaks for itself.", es: 'Diría que mi trayectoria habla por sí sola.' }
+    { en: "I'd say my track record speaks for itself.", es: 'Diría que mi trayectoria habla por sí sola.' },
+    { en: "That's a valid concern, however the data suggests otherwise.", es: 'Es una preocupación válida, sin embargo los datos sugieren lo contrario.' },
+    { en: "So if I understand correctly, your concern is the lead time?", es: 'Si entiendo bien, ¿su preocupación es el plazo de entrega?' },
+    { en: "What would success look like in the first six months?", es: '¿Cómo se vería el éxito en los primeros seis meses?' }
   ],
   exercises: [
     { t: 'mc', q: '¿Cuál suena mejor en una entrevista?', opts: ['I am working here since 2019', "I've been working here since 2019", 'I work here since 2019'], a: 1,
-      why: 'Con SINCE se usa present perfect (continuous). "I am working since" es un error muy frecuente.' },
+      why: 'Con SINCE se usa present perfect. "I am working since" es un error muy frecuente.' },
     { t: 'fill', q: "In my previous role, I was ___ for a team of eight.", a: ['responsible'],
-      why: '"Be responsible FOR" (no "responsible of"). Es la preposición correcta.' },
+      why: '"Be responsible FOR", no "responsible of".' },
     { t: 'tr', q: 'Como resultado, aumentamos las ventas un veinte por ciento.', a: ['as a result we increased sales by twenty percent', 'as a result, we increased sales by twenty percent', 'as a result we grew sales by twenty percent'],
-      why: '"As a result" cierra una respuesta STAR con fuerza. Recuerda BY para el porcentaje.' },
+      why: '"As a result" cierra una respuesta STAR con fuerza. Y BY para el porcentaje.' },
     { t: 'order', words: ['What', 'would', 'you', 'say', 'is', 'your', 'main', 'strength?'], a: 'What would you say is your main strength?',
-      why: 'Pregunta indirecta: después de "What would you say" el orden vuelve a ser normal (is your...).' },
-    { t: 'listen', audio: "One challenge I faced was a drop in coverage, so I redesigned the visit plan and we recovered it in three months.", opts: ['Un reto que enfrenté fue una caída en la cobertura, así que rediseñé el plan de visitas y la recuperamos en tres meses.', 'Un reto fue el aumento de cobertura, por eso cambiamos el plan de visitas.', 'Enfrenté una caída en la cobertura y todavía no la recuperamos.'], a: 0,
-      why: 'Respuesta STAR completa: reto (challenge), acción (redesigned) y resultado (recovered).' },
+      why: 'Pregunta indirecta: después de "What would you say" el orden vuelve a ser normal.' },
+    { t: 'mc', q: 'En el método STAR, ¿qué falta en "Cuando tomé la región sur, la cobertura había caído. Rediseñé el plan de visitas."?', opts: ['la situación', 'la acción', 'el resultado'], a: 2,
+      why: 'Falta el Result con cifra. Sin número, la respuesta no convence.' },
+    { t: 'tr', q: 'Tengo diez años de experiencia en comercio exterior.', a: ['i have ten years of experience in foreign trade', "i've got ten years of experience in foreign trade"],
+      why: 'Orden fijo: "ten years of experience", no "experience of ten years".' },
+    { t: 'listen', audio: "One challenge I faced was a drop in coverage, so I redesigned the visit plan and we recovered it in three months.", opts: ['Un reto que enfrenté fue una caída en la cobertura, así que rediseñé el plan de visitas y la recuperamos en tres meses.', 'Un reto fue el aumento de cobertura, por eso cambiamos el plan.', 'Enfrenté una caída en la cobertura y todavía no la recuperamos.'], a: 0,
+      why: 'Respuesta STAR completa: reto, acción y resultado.' },
     { t: 'mc', q: '"Track record" significa...', opts: ['registro de pista', 'trayectoria comprobada', 'seguimiento de pedidos'], a: 1,
-      why: 'Es tu historial de resultados. "A proven track record" aparece en casi toda oferta de empleo.' }
+      why: 'Es tu historial de resultados. "A proven track record" aparece en casi toda oferta de empleo.' },
+    { t: 'fill', q: "That's a valid ___, however the data suggests otherwise.", a: ['concern', 'point'],
+      why: 'Reconocer antes de rebatir: "That’s a valid concern, however...".' },
+    { t: 'mc', q: '¿Cuál es la mejor forma de ganar tiempo y demostrar que escuchas?', opts: ["I don't understand.", 'So if I understand correctly, your concern is the price?', 'Repeat, please.'], a: 1,
+      why: 'Reformular al otro demuestra escucha activa y te da segundos para pensar.' },
+    { t: 'order', words: ['I', 'report', 'directly', 'to', 'the', 'commercial', 'director.'], a: 'I report directly to the commercial director.',
+      why: '"Report to" = reportar a. Muy usado al describir tu puesto.' },
+    { t: 'listen', audio: "I used to take on too much myself, but I've learned to delegate.", opts: ['Antes me cargaba con demasiado, pero he aprendido a delegar.', 'Suelo cargarme con demasiado y no sé delegar.', 'Aprendí a delegar porque me cargaban demasiado.'], a: 0,
+      why: 'Fórmula perfecta para la pregunta de la debilidad: el defecto en pasado, la solución en present perfect.' }
   ]
 }
 ];

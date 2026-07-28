@@ -328,10 +328,32 @@ input:focus, select:focus, textarea:focus { border-color: var(--brand); }
   background: var(--accent-soft); border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
   border-radius: var(--radius); padding: 15px;
 }
-.grammar h3 { color: var(--accent); font-size: .98rem; }
-.grammar .ex { display: flex; gap: 8px; align-items: baseline; padding: 5px 0; font-size: .9rem; }
+.grammar h3 { color: var(--accent); font-size: 1.02rem; }
+.grammar p { font-size: .93rem; line-height: 1.65; margin: 0 0 .85em; }
+.grammar p:last-of-type { margin-bottom: 0; }
+.grammar .ex { display: flex; gap: 9px; align-items: center; padding: 7px 0; font-size: .9rem; }
 .grammar .ex b { font-weight: 700; }
 .grammar .ex span { color: var(--text-dim); }
+.grammar .ex-head {
+  font-size: .72rem; font-weight: 800; text-transform: uppercase; letter-spacing: .06em;
+  color: var(--accent); margin: 16px 0 2px; padding-top: 12px;
+  border-top: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+}
+.grammar.alt { background: var(--brand-soft); border-color: color-mix(in srgb, var(--brand) 25%, transparent); }
+.grammar.alt h3, .grammar.alt .ex-head { color: var(--brand-ink); }
+.grammar.alt .ex-head { border-top-color: color-mix(in srgb, var(--brand) 25%, transparent); }
+[data-theme="dark"] .grammar.alt h3, [data-theme="dark"] .grammar.alt .ex-head { color: var(--brand); }
+
+/* ---- Errores típicos ---- */
+.mistake { padding: 11px 0; border-bottom: 1px solid var(--border); }
+.mistake:last-child { border-bottom: 0; padding-bottom: 0; }
+.mistake-pair { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: .92rem; margin-bottom: 4px; }
+.mistake .bad  { color: var(--err); text-decoration: line-through; text-decoration-thickness: 1px; }
+.mistake .good { color: var(--ok); font-weight: 700; }
+.mistake .arrow { color: var(--text-soft); display: inline-flex; }
+.mistake .arrow svg { width: 15px; height: 15px; }
+.mistake .spk { width: 28px; height: 28px; }
+.mistake .spk svg { width: 14px; height: 14px; }
 
 /* ---------- Ejercicios ---------- */
 .ex-progress { display: flex; gap: 4px; margin-bottom: 16px; }
