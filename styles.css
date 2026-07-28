@@ -471,6 +471,84 @@ input:focus, select:focus, textarea:focus { border-color: var(--brand); }
 @keyframes micpulse { 0%,100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--err) 55%, transparent); } 50% { box-shadow: 0 0 0 18px transparent; } }
 
 /* ---------- Repaso (SRS) ---------- */
+/* ---- Sesión diaria guiada ---- */
+.ses-lanzar {
+  display: flex; align-items: center; gap: 14px; width: 100%; text-align: left;
+  font-family: inherit; cursor: pointer; color: #fff;
+  background: linear-gradient(135deg, var(--brand), var(--brand-strong));
+  border: 0; border-radius: var(--radius); padding: 16px 18px; margin-bottom: 14px;
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--brand) 32%, transparent);
+  transition: transform .1s;
+}
+[data-theme="dark"] .ses-lanzar { color: #06231f; }
+.ses-lanzar:hover  { transform: translateY(-1px); }
+.ses-lanzar:active { transform: scale(.99); }
+.ses-lanzar-ico {
+  width: 44px; height: 44px; flex: none; border-radius: 12px;
+  background: rgba(255,255,255,.2); display: grid; place-items: center;
+}
+.ses-lanzar-ico svg { width: 22px; height: 22px; }
+.ses-lanzar-txt { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.ses-lanzar-txt b { font-size: 1.05rem; }
+.ses-lanzar-txt span { font-size: .82rem; opacity: .9; }
+.ses-lanzar .tile-go { color: currentColor; opacity: .8; }
+
+.ses-barra {
+  background: var(--surface); border: 1px solid var(--brand);
+  border-radius: var(--radius); padding: 12px 14px; margin-bottom: 16px;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand) 15%, transparent);
+}
+.ses-pasos { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 9px; }
+.ses-paso {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: .76rem; font-weight: 750; padding: 4px 10px; border-radius: 999px;
+  background: var(--surface-2); color: var(--text-soft);
+}
+.ses-paso svg { width: 13px; height: 13px; }
+.ses-paso.actual { background: var(--brand); color: #fff; }
+[data-theme="dark"] .ses-paso.actual { color: #06231f; }
+.ses-paso.hecho { background: var(--ok-soft); color: var(--ok); }
+.ses-flecha { color: var(--text-soft); display: inline-flex; }
+.ses-flecha svg { width: 13px; height: 13px; }
+.ses-info { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: .85rem; margin-bottom: 8px; }
+
+/* ---- Gráfica de progreso ---- */
+.grafica {
+  position: relative; display: flex; align-items: flex-end; gap: 4px;
+  height: 120px; padding: 4px 0 0;
+}
+.graf-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 4px; }
+.graf-col > i {
+  display: block; width: 100%; max-width: 26px; border-radius: 4px 4px 2px 2px;
+  background: var(--brand); transition: height .4s ease;
+}
+.graf-col > span { font-size: .64rem; color: var(--text-soft); font-weight: 700; }
+.graf-meta {
+  position: absolute; left: 0; right: 0; border-top: 1px dashed var(--border-strong);
+  pointer-events: none; margin-bottom: 18px;
+}
+.graf-meta span {
+  position: absolute; right: 0; top: -8px; font-size: .6rem; font-weight: 800;
+  color: var(--text-soft); background: var(--surface); padding: 0 4px; text-transform: uppercase;
+}
+
+/* ---- Pares mínimos ---- */
+.par-fila { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.par-btn {
+  appearance: none; font-family: inherit; cursor: pointer; text-align: center;
+  background: var(--surface-2); border: 1px solid var(--border); color: var(--text);
+  border-radius: var(--radius-sm); padding: 14px 10px;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+}
+.par-btn:hover { border-color: var(--brand); }
+.par-btn b { font-size: 1.15rem; letter-spacing: -.01em; }
+.par-btn span { font-size: .76rem; color: var(--text-dim); }
+.par-btn svg { width: 16px; height: 16px; color: var(--brand); margin-top: 4px; }
+.par-objetivo {
+  font-size: 2.1rem; font-weight: 800; letter-spacing: -.03em;
+  color: var(--brand); padding: 14px 0 8px;
+}
+
 /* ---- Pasos numerados (instrucciones de instalación) ---- */
 .pasos { margin: 0 0 12px; padding-left: 20px; font-size: .9rem; line-height: 1.6; }
 .pasos li { margin-bottom: 7px; }

@@ -38,6 +38,8 @@ const PATHS = {
   target:    '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/>',
   compass:   '<circle cx="12" cy="12" r="9"/><path d="m15 9-2 5-4 1 2-5z"/>',
   pen:       '<path d="M14 4l6 6L8 22H2v-6z"/><path d="m12 6 6 6"/>',
+  chart:     '<path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20H2"/>',
+  bolt:      '<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',
   sparkle:   '<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M18 15l.8 2.2L21 18l-2.2.8L18 21l-.8-2.2L15 18l2.2-.8z"/>',
   note:      '<path d="M5 3h11l4 4v14H5z"/><path d="M15 3v5h5"/><path d="M9 12h7M9 16h5"/>',
   trash:     '<path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M6 7l1 13h10l1-13"/><path d="M10 11v6M14 11v6"/>',
@@ -120,6 +122,8 @@ const DEFAULT_STATE = {
   customUnits: [], // unidades generadas con IA
   mistakes: [],    // libreta de errores: { id, date, wrong, right, note, tag, source }
   dialoguesDone: {}, // dialogueId -> { score, date }
+  historia: {},      // 'YYYY-MM-DD' -> { xp, palabras }
+  soundBest: {},     // id de sonido -> mejor porcentaje
   convTurns: 0,
   pronBest: 0,
   pronCount: 0,
@@ -211,6 +215,13 @@ function addXp(n, silent) {
   }
   S.xp += n;
   S.dailyXp += n;
+  // historial diario, para poder ver la evolución
+  if (!S.historia) S.historia = {};
+  const dia = S.historia[t] || (S.historia[t] = { xp: 0, palabras: 0 });
+  dia.xp += n;
+  dia.palabras = Object.keys(S.srs).length;
+  const dias = Object.keys(S.historia).sort();
+  if (dias.length > 400) delete S.historia[dias[0]];
   save();
   paintStats();
   if (!silent) toast('+' + n + ' XP', 'xp');
@@ -538,7 +549,7 @@ function render() {
   else if (V.tab === 'pron')       html = viewAudio();
   else if (V.tab === 'review')     html = viewReview();
   else if (V.tab === 'settings')   html = viewSettings();
-  root.innerHTML = '<div class="view">' + html + '</div>';
+  root.innerHTML = '<div class="view">' + Sesion.barra() + html + '</div>';
 
   const navTab = V.tab === 'create' ? 'lessons' : V.tab === 'mistakes' ? 'review' : V.tab;
   document.querySelectorAll('.navbtn').forEach(b => {
@@ -626,6 +637,159 @@ function viewSettingsPrevio() {
   '</div>';
 }
 
+/* ══════════════════ 9b. SESIÓN DIARIA GUIADA ══════════════════
+   Un solo botón que encadena repaso, lección y práctica hablada.
+   Quita la decisión de "¿y hoy qué hago?", que es lo que rompe la racha. */
+
+const Sesion = {
+  activa: false,
+  pasos: [],
+  i: 0,
+
+  planificar() {
+    const pasos = [];
+    const pendientes = dueCards().length;
+    if (pendientes) pasos.push({ tipo: 'review', meta: Math.min(10, pendientes), hechas: 0, titulo: 'Repaso', tab: 'review' });
+
+    const u = allUnits().find(x => !S.completed[x.id] && (x.custom || isLevelUnlocked(x.level)))
+           || allUnits().filter(x => x.custom || isLevelUnlocked(x.level)).slice(-1)[0];
+    if (u) pasos.push({ tipo: 'lesson', meta: 5, hechas: 0, titulo: 'Lección', tab: 'lessons', unitId: u.id, unitTitle: u.title });
+
+    if ((S.settings.apiKey || '').trim()) {
+      pasos.push({ tipo: 'talk', meta: 2, hechas: 0, titulo: 'Conversar', tab: 'talk' });
+    } else {
+      pasos.push({ tipo: 'listen', meta: 3, hechas: 0, titulo: 'Escuchar', tab: 'pron' });
+    }
+    return pasos;
+  },
+
+  empezar() {
+    Sesion.pasos = Sesion.planificar();
+    if (!Sesion.pasos.length) { toast('No hay nada pendiente. Elige tú qué practicar.'); return; }
+    Sesion.activa = true;
+    Sesion.i = 0;
+    Sesion.irAlPaso();
+  },
+
+  paso() { return Sesion.pasos[Sesion.i]; },
+
+  irAlPaso() {
+    const p = Sesion.paso();
+    if (!p) { render(); return; }
+    if (p.tipo === 'review') { V.reviewTab = 'vocab'; V.review = null; V.tab = 'review'; }
+    else if (p.tipo === 'lesson') {
+      V.tab = 'lessons'; V.unit = p.unitId;
+      V.lesson = { step: 'ex', i: 0, right: 0, answered: false, picked: null, correct: false, solution: '', typed: '' };
+    }
+    else if (p.tipo === 'talk') {
+      V.tab = 'talk';
+      const T = talkState();
+      T.mode = 'chat';
+      if (!T.scenario) {
+        const posibles = SCENARIOS.filter(s => LEVELS.findIndex(l => l.id === s.level) <= levelIndex());
+        const sc = (posibles.length ? posibles : SCENARIOS)[Math.floor(Math.random() * (posibles.length || SCENARIOS.length))];
+        T.scenario = sc.id;
+        T.msgs = [{ who: 'them', text: sc.opener, coach: '', hint: 'Responde con una frase completa.' }];
+        T.showHint = -1;
+      }
+    }
+    else if (p.tipo === 'listen') { V.tab = 'pron'; audioState().tab = 'dialogs'; }
+    window.scrollTo(0, 0);
+    render();
+  },
+
+  /* Lo llaman las acciones normales de la app cuando cuentan para el paso actual */
+  avanzar(tipo) {
+    if (!Sesion.activa) return;
+    const p = Sesion.paso();
+    if (!p || p.tipo !== tipo) return;
+    p.hechas++;
+    if (p.hechas >= p.meta) {
+      Sesion.i++;
+      if (Sesion.i >= Sesion.pasos.length) { Sesion.terminar(); return; }
+      const sig = Sesion.paso();
+      toast('Paso completado. Vamos con ' + sig.titulo + '.');
+      setTimeout(() => Sesion.irAlPaso(), 600);
+    }
+  },
+
+  terminar() {
+    Sesion.activa = false;
+    V.tab = 'home';
+    V.sesionResumen = { pasos: Sesion.pasos.slice(), fecha: todayKey() };
+    window.scrollTo(0, 0);
+    render();
+    addXp(20, true);
+    toast('Sesión completa. +20 XP de bonus');
+  },
+
+  cancelar() { Sesion.activa = false; render(); },
+
+  /* Barra de progreso que acompaña toda la sesión */
+  barra() {
+    if (!Sesion.activa) return '';
+    const p = Sesion.paso();
+    if (!p) return '';
+    return '<div class="ses-barra">' +
+      '<div class="ses-pasos">' +
+        Sesion.pasos.map((x, i) =>
+          '<span class="ses-paso' + (i < Sesion.i ? ' hecho' : i === Sesion.i ? ' actual' : '') + '">' +
+            (i < Sesion.i ? ic('check') : '') + esc(x.titulo) +
+          '</span>').join('<span class="ses-flecha">' + ic('right') + '</span>') +
+      '</div>' +
+      '<div class="ses-info">' +
+        '<span>' + esc(p.titulo) + ': <b>' + Math.min(p.hechas, p.meta) + ' de ' + p.meta + '</b></span>' +
+        '<button class="btn btn-ghost btn-sm" data-act="ses-salir">Salir</button>' +
+      '</div>' +
+      '<div class="bar accent"><i style="width:' + Math.round((Math.min(p.hechas, p.meta) / p.meta) * 100) + '%"></i></div>' +
+    '</div>';
+  }
+};
+
+/* ══════════════════ 9c. GRÁFICA DE PROGRESO ══════════════════ */
+function graficaProgreso(dias) {
+  dias = dias || 14;
+  const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+  const datos = [];
+  for (let i = dias - 1; i >= 0; i--) {
+    const d = new Date(hoy.getTime() - i * 86400000);
+    const clave = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    const reg = (S.historia || {})[clave];
+    datos.push({ clave, xp: reg ? reg.xp : 0, dia: d.getDay(), num: d.getDate() });
+  }
+  const total = datos.reduce((a, x) => a + x.xp, 0);
+  const activos = datos.filter(x => x.xp > 0).length;
+  if (!total) {
+    return '<div class="card home-wide">' +
+      '<div class="card-title"><span style="color:var(--brand)">' + ic('chart') + '</span><h3>Tu progreso</h3></div>' +
+      '<p class="small muted" style="margin:0">Aquí verás tu evolución día a día en cuanto empieces a practicar. Se irá dibujando sola.</p>' +
+    '</div>';
+  }
+  const max = Math.max.apply(null, datos.map(x => x.xp).concat([S.settings.dailyGoal || 50]));
+  const nombres = ['D', 'L', 'M', 'X', 'J', 'V', 'S'];
+  const meta = S.settings.dailyGoal || 50;
+
+  return '<div class="card home-wide">' +
+    '<div class="card-title"><span style="color:var(--brand)">' + ic('chart') + '</span><h3>Tu progreso</h3>' +
+      '<span class="pill" style="margin-left:auto">' + dias + ' días</span></div>' +
+    '<div class="grafica" role="img" aria-label="XP de los últimos ' + dias + ' días">' +
+      '<div class="graf-meta" style="bottom:' + Math.round((meta / max) * 100) + '%"><span>meta</span></div>' +
+      datos.map(x =>
+        '<div class="graf-col" title="' + x.clave + ': ' + x.xp + ' XP">' +
+          '<i style="height:' + (x.xp ? Math.max(4, Math.round((x.xp / max) * 100)) : 2) + '%' +
+            (x.xp >= meta ? ';background:var(--ok)' : '') + '"></i>' +
+          '<span>' + nombres[x.dia] + '</span>' +
+        '</div>').join('') +
+    '</div>' +
+    '<div class="stats-grid" style="margin-top:14px">' +
+      '<div class="stat-box"><div class="stat-num">' + total + '</div><div class="stat-lab">XP en ' + dias + ' días</div></div>' +
+      '<div class="stat-box"><div class="stat-num">' + activos + '</div><div class="stat-lab">Días practicados</div></div>' +
+      '<div class="stat-box"><div class="stat-num">' + Math.round(total / dias) + '</div><div class="stat-lab">Media diaria</div></div>' +
+      '<div class="stat-box"><div class="stat-num">' + Object.keys(S.srs).length + '</div><div class="stat-lab">Palabras</div></div>' +
+    '</div>' +
+  '</div>';
+}
+
 /* ══════════════════ 10. INICIO ══════════════════ */
 function viewHome() {
   const lv = currentLevel(), nx = nextLevel();
@@ -647,6 +811,22 @@ function viewHome() {
     : 'Te faltan <b>' + (goal - S.dailyXp) + ' XP</b> para cumplir la meta de hoy.') + '</p>' +
 
   '<div class="home-grid">' +
+
+  (V.sesionResumen && V.sesionResumen.fecha === todayKey()
+    ? '<div class="card home-wide center" style="border-color:var(--ok)">' +
+        '<div style="color:var(--ok)">' + ic('check', 'ic-lg') + '</div>' +
+        '<h2 style="margin:8px 0 4px">Sesión de hoy completada</h2>' +
+        '<p class="muted small">' + V.sesionResumen.pasos.map(p => p.titulo + ' (' + Math.min(p.hechas, p.meta) + ')').join(' · ') + '</p>' +
+        '<button class="btn btn-ghost btn-sm" data-act="ses-cerrar">De acuerdo</button>' +
+      '</div>'
+    : '<button class="ses-lanzar home-wide" data-act="ses-empezar">' +
+        '<span class="ses-lanzar-ico">' + ic('bolt') + '</span>' +
+        '<span class="ses-lanzar-txt">' +
+          '<b>Mis 10 minutos</b>' +
+          '<span>' + Sesion.planificar().map(p => p.titulo).join(' → ') + '. Sin decidir nada.</span>' +
+        '</span>' +
+        '<span class="tile-go">' + ic('right') + '</span>' +
+      '</button>') +
 
   '<div class="card home-wide">' +
     '<div class="row-between" style="margin-bottom:9px">' +
@@ -735,6 +915,8 @@ function viewHome() {
         '</div>' +
       '</div>'
     : '') +
+
+  graficaProgreso(14) +
 
   '<div class="btn-row home-wide" style="margin-bottom:20px">' +
     '<button class="btn btn-ghost" data-act="tab" data-tab="talk">' + ic('chat') + ' Conversar</button>' +
@@ -1285,6 +1467,7 @@ async function sendChat(text) {
   }
   T.busy = false;
   save();
+  Sesion.avanzar('talk');
   render();
 }
 
@@ -1465,9 +1648,11 @@ function viewAudio() {
   const A = audioState();
   const tabs = '<div class="tabs" role="tablist">' +
     '<button class="tab" role="tab" aria-selected="' + (A.tab === 'dialogs') + '" data-act="audio-tab" data-t="dialogs">' + ic('headphones') + ' Diálogos</button>' +
-    '<button class="tab" role="tab" aria-selected="' + (A.tab === 'pron') + '" data-act="audio-tab" data-t="pron">' + ic('mic') + ' Pronunciación</button>' +
+    '<button class="tab" role="tab" aria-selected="' + (A.tab === 'pron') + '" data-act="audio-tab" data-t="pron">' + ic('mic') + ' Pronunciar</button>' +
+    '<button class="tab" role="tab" aria-selected="' + (A.tab === 'sounds') + '" data-act="audio-tab" data-t="sounds">' + ic('ear') + ' Sonidos</button>' +
   '</div>';
-  if (A.tab === 'pron') return tabs + viewPron();
+  if (A.tab === 'pron')   return tabs + viewPron();
+  if (A.tab === 'sounds') return tabs + viewSounds();
   return tabs + (A.id ? viewDialogue() : viewDialogueList());
 }
 
@@ -1652,6 +1837,88 @@ function lcsMarks(target, heard) {
     else j--;
   }
   return { marks, score: t.length ? Math.round((marks.filter(Boolean).length / t.length) * 100) : 0 };
+}
+
+/* ---- Sonidos difíciles: pares mínimos ---- */
+function soundState() {
+  if (!V.sound) V.sound = { id: null, i: 0, objetivo: 0, rec: false, oido: '', ok: null, aciertos: 0, hechos: 0, err: '' };
+  return V.sound;
+}
+function soundById(id) { return SOUND_SETS.find(s => s.id === id); }
+
+function viewSounds() {
+  const G = soundState();
+
+  if (!G.id) {
+    return '<div class="card">' +
+      '<div class="card-title"><span style="color:var(--accent)">' + ic('ear') + '</span><h3>Sonidos difíciles</h3></div>' +
+      '<p class="small muted" style="margin-top:-4px">Ocho sonidos que el español no tiene o confunde. Cada uno se entrena con <b>pares mínimos</b>: dos palabras que solo se diferencian en ese sonido. Si el micrófono entiende la que tocaba, lo estás distinguiendo.</p>' +
+      '<div class="tile-list">' +
+        SOUND_SETS.map(s => {
+          const best = (S.soundBest || {})[s.id];
+          return '<button class="tile' + (best >= 80 ? ' done' : '') + '" data-act="open-sound" data-id="' + s.id + '">' +
+            '<span class="tile-ico">' + ic(best >= 80 ? 'check' : 'ear') + '</span>' +
+            '<span class="tile-body">' +
+              '<span class="tile-t">' + esc(s.titulo) + (best !== undefined ? ' <span class="pill">' + best + '%</span>' : '') + '</span>' +
+              '<span class="tile-d">' + esc(s.sonido) + '</span>' +
+            '</span>' +
+            '<span class="tile-go">' + ic('right') + '</span>' +
+          '</button>';
+        }).join('') +
+      '</div>' +
+      (!micSupported ? '<div class="notice warn" style="margin-top:14px"><b>Sin micrófono</b>Puedes leer las explicaciones y escuchar las palabras, pero no comprobar tu pronunciación. El micrófono funciona en Chrome, Edge y Safari.</div>' : '') +
+    '</div>';
+  }
+
+  const g = soundById(G.id);
+  const par = g.pares[G.i % g.pares.length];
+  const objetivo = G.objetivo === 0 ? par.a : par.b;
+  const otro = G.objetivo === 0 ? par.b : par.a;
+
+  return '' +
+  '<button class="back-link" data-act="close-sound">' + ic('left') + ' Sonidos</button>' +
+  '<div class="row-between"><h2 style="margin-bottom:2px">' + esc(g.titulo) + '</h2><span class="pill">' + esc(g.sonido) + '</span></div>' +
+
+  '<div class="card">' +
+    '<div class="grammar">' +
+      '<h3>Qué pasa aquí</h3>' +
+      paras(g.es) +
+      '<div class="ex-head">El truco</div>' +
+      '<p style="margin:0">' + esc(g.consejo) + '</p>' +
+    '</div>' +
+  '</div>' +
+
+  '<div class="card">' +
+    '<div class="card-title"><h3>Escucha la diferencia</h3><span class="pill" style="margin-left:auto">' + (G.i + 1) + ' / ' + g.pares.length + '</span></div>' +
+    '<div class="par-fila">' +
+      '<button class="par-btn" data-act="say-slow" data-text="' + esc(par.a) + '">' +
+        '<b>' + esc(par.a) + '</b><span>' + esc(par.aEs) + '</span>' + ic('volume') + '</button>' +
+      '<button class="par-btn" data-act="say-slow" data-text="' + esc(par.b) + '">' +
+        '<b>' + esc(par.b) + '</b><span>' + esc(par.bEs) + '</span>' + ic('volume') + '</button>' +
+    '</div>' +
+  '</div>' +
+
+  '<div class="card center">' +
+    '<div class="ex-kind">Ahora dilo tú</div>' +
+    '<div class="par-objetivo">' + esc(objetivo) + '</div>' +
+    '<p class="tiny muted" style="margin-top:-6px">No vale la otra: di exactamente esta.</p>' +
+    (G.ok !== null
+      ? '<div class="feedback ' + (G.ok ? 'ok' : 'no') + '" style="text-align:left">' +
+          '<b>' + (G.ok ? '¡Lo distinguió!' : 'No lo distinguió') + '</b>' +
+          (G.ok
+            ? 'El micrófono entendió <b>' + esc(objetivo) + '</b>. Ese sonido lo tienes.'
+            : 'Entendió <b>' + esc(G.oido || '—') + '</b>' + (norm(G.oido) === norm(otro) ? ', que es justo la otra palabra del par. ' : '. ') + esc(g.consejo)) +
+        '</div>' +
+        '<button class="btn btn-primary btn-block" style="margin-top:12px" data-act="sound-next" data-autofocus>' +
+          (G.hechos >= g.pares.length ? 'Ver resultado ' : 'Siguiente par ') + ic('right') + '</button>'
+      : (micSupported
+          ? '<button class="mic-btn' + (G.rec ? ' rec' : '') + '" data-act="sound-mic" aria-label="' + (G.rec ? 'Detener' : 'Grabar') + '">' + ic('mic') + '</button>' +
+            '<p class="tiny muted" style="margin-top:12px">' + (G.rec ? 'Escuchando…' : 'Toca y di la palabra') + '</p>'
+          : '<p class="small muted">Sin micrófono no puedo comprobarlo. Escucha las dos y repítelas en voz alta.</p>' +
+            '<button class="btn btn-ghost btn-block" data-act="sound-next">Siguiente par ' + ic('right') + '</button>')) +
+    (G.err ? '<div class="notice err" style="margin-top:12px">' + esc(G.err) + '</div>' : '') +
+    (G.hechos ? '<p class="tiny muted" style="margin:12px 0 0">Aciertos: ' + G.aciertos + ' de ' + G.hechos + '</p>' : '') +
+  '</div><div style="height:22px"></div>';
 }
 
 function viewPron() {
@@ -2108,6 +2375,7 @@ document.addEventListener('click', async (e) => {
     L.answered = true;
     if (L.correct) L.right++;
     addXp(L.correct ? 10 : 2, true);
+    Sesion.avanzar('lesson');
     render(); return;
   }
   if (act === 'pick' || act === 'unpick') {
@@ -2126,6 +2394,7 @@ document.addEventListener('click', async (e) => {
     L.answered = true;
     if (L.correct) L.right++;
     addXp(L.correct ? 10 : 2, true);
+    Sesion.avanzar('lesson');
     render(); return;
   }
   if (act === 'check-text') {
@@ -2140,6 +2409,7 @@ document.addEventListener('click', async (e) => {
     L.answered = true;
     if (L.correct) L.right++;
     addXp(L.correct ? 10 : 2, true);
+    Sesion.avanzar('lesson');
     render(); return;
   }
   if (act === 'next-ex') {
@@ -2233,6 +2503,7 @@ document.addEventListener('click', async (e) => {
     A.picked = Number(t.dataset.i);
     A.answered = true;
     if (A.picked === d.questions[A.qi].a) { A.right++; addXp(8, true); } else addXp(2, true);
+    Sesion.avanzar('listen');
     render(); return;
   }
   if (act === 'dlg-next-q') {
@@ -2259,6 +2530,59 @@ document.addEventListener('click', async (e) => {
     const A = audioState();
     A.stage = 'intro'; A.qi = 0; A.answered = false; A.picked = null; A.right = 0; A.plays = 0; A.dictResult = null; A.dictTyped = '';
     window.scrollTo(0, 0); render(); return;
+  }
+
+  /* --- sonidos difíciles --- */
+  if (act === 'open-sound') {
+    const G = soundState();
+    G.id = t.dataset.id; G.i = 0; G.objetivo = Math.random() < 0.5 ? 0 : 1;
+    G.ok = null; G.oido = ''; G.err = ''; G.aciertos = 0; G.hechos = 0;
+    window.scrollTo(0, 0); render(); return;
+  }
+  if (act === 'close-sound') { stopListening(); soundState().id = null; soundState().rec = false; window.scrollTo(0, 0); render(); return; }
+  if (act === 'sound-next') {
+    const G = soundState();
+    const g = soundById(G.id);
+    if (G.hechos >= g.pares.length) {
+      const pct = G.hechos ? Math.round((G.aciertos / G.hechos) * 100) : 0;
+      if (!S.soundBest) S.soundBest = {};
+      S.soundBest[g.id] = Math.max(pct, S.soundBest[g.id] || 0);
+      addXp(Math.max(5, Math.round(pct / 5)), true);
+      save();
+      toast(pct + '% en ' + g.titulo);
+      G.id = null;
+    } else {
+      G.i++; G.objetivo = Math.random() < 0.5 ? 0 : 1; G.ok = null; G.oido = ''; G.err = '';
+    }
+    window.scrollTo(0, 0); render(); return;
+  }
+  if (act === 'sound-mic') {
+    const G = soundState();
+    const g = soundById(G.id);
+    const par = g.pares[G.i % g.pares.length];
+    const objetivo = G.objetivo === 0 ? par.a : par.b;
+    const otro = G.objetivo === 0 ? par.b : par.a;
+    if (G.rec) { stopListening(); G.rec = false; render(); return; }
+    G.rec = true; G.err = ''; render();
+    recognizer = startListening(
+      txt => {
+        G.rec = false; recognizer = null; G.oido = txt;
+        const dicho = norm(txt).split(' ').filter(Boolean);
+        G.ok = dicho.indexOf(norm(objetivo)) >= 0 && dicho.indexOf(norm(otro)) < 0;
+        G.hechos++; if (G.ok) G.aciertos++;
+        addXp(G.ok ? 4 : 1, true);
+        save(); render();
+      },
+      () => { if (G.rec) { G.rec = false; render(); } },
+      err => {
+        G.rec = false; recognizer = null;
+        G.err = err === 'not-allowed' ? 'Necesitas permitir el micrófono en tu navegador.'
+              : err === 'no-speech' ? 'No se escuchó nada. Acércate e inténtalo otra vez.'
+              : 'No se pudo capturar el audio. Prueba de nuevo.';
+        render();
+      }
+    );
+    return;
   }
 
   /* --- pronunciación --- */
@@ -2328,6 +2652,7 @@ document.addEventListener('click', async (e) => {
     if (g === 0) R.queue.push(item);
     R.done++; R.i++; R.flipped = false; R.prodResult = null; R.prodTyped = '';
     addXp(item.dir === 'prod' ? (g === 0 ? 2 : 6) : 3, true);
+    Sesion.avanzar('review');
     save(); render(); return;
   }
   if (act === 'review-extra') {
@@ -2374,6 +2699,11 @@ document.addEventListener('click', async (e) => {
     toast('Copia de seguridad descargada');
     return;
   }
+  /* --- sesión guiada --- */
+  if (act === 'ses-empezar') { V.sesionResumen = null; Sesion.empezar(); return; }
+  if (act === 'ses-salir')   { Sesion.cancelar(); toast('Sesión cancelada. Sigue a tu ritmo.'); return; }
+  if (act === 'ses-cerrar')  { V.sesionResumen = null; render(); return; }
+
   /* --- asistente flotante --- */
   if (act === 'ask-open')  { Ask.abierto = true;  renderAsk(); return; }
   if (act === 'ask-close') { Ask.abierto = false; renderAsk(); return; }

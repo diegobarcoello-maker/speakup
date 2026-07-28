@@ -3061,6 +3061,154 @@ const DIALOGUES = [
 }
 ];
 
+/* ══════════════════ SONIDOS DIFÍCILES: PARES MÍNIMOS ══════════════════
+   Cada grupo ataca un sonido que el español no tiene o confunde.
+   Los pares mínimos son palabras que solo se diferencian en ese sonido:
+   si el reconocedor te entiende la que toca, lo estás distinguiendo.      */
+
+const SOUND_SETS = [
+  {
+    id: 'i-largo',
+    titulo: 'sheep / ship',
+    sonido: '/iː/ frente a /ɪ/',
+    es: 'El español solo tiene una "i". El inglés tiene dos y cambian el significado.\n\n' +
+        '/iː/ es larga y tensa, con la boca estirada como en una sonrisa: sheep, leave, feel.\n' +
+        '/ɪ/ es corta y relajada, la boca más abierta y suelta, a medio camino entre la i y la e española: ship, live, fill.\n\n' +
+        'El error típico es hacer las dos como la "i" española, que suena a /iː/. Resultado: dices "sheep" cuando quieres decir "ship".',
+    consejo: 'Para la corta, relaja la mandíbula y no estires los labios. Piensa en una "i" perezosa.',
+    pares: [
+      { a: 'sheep', b: 'ship',  aEs: 'oveja',    bEs: 'barco' },
+      { a: 'leave', b: 'live',  aEs: 'irse',     bEs: 'vivir' },
+      { a: 'feel',  b: 'fill',  aEs: 'sentir',   bEs: 'llenar' },
+      { a: 'seat',  b: 'sit',   aEs: 'asiento',  bEs: 'sentarse' },
+      { a: 'heat',  b: 'hit',   aEs: 'calor',    bEs: 'golpear' },
+      { a: 'each',  b: 'itch',  aEs: 'cada',     bEs: 'picor' }
+    ]
+  },
+  {
+    id: 'b-v',
+    titulo: 'berry / very',
+    sonido: '/b/ frente a /v/',
+    es: 'En español la b y la v suenan igual. En inglés no, y la diferencia es muy audible para un nativo.\n\n' +
+        '/b/ se hace juntando los dos labios y soltando el aire de golpe: berry, boat, best.\n' +
+        '/v/ se hace apoyando los dientes de arriba sobre el labio de abajo y dejando vibrar el aire, como una f sonora: very, vote, vest.\n\n' +
+        'Si pronuncias "very" con los dos labios, un nativo oye "berry". Es de los errores que más marcan el acento.',
+    consejo: 'Para la /v/, muérdete suavemente el labio inferior y no lo sueltes: el aire tiene que salir rozando.',
+    pares: [
+      { a: 'berry', b: 'very',  aEs: 'baya',      bEs: 'muy' },
+      { a: 'boat',  b: 'vote',  aEs: 'barco',     bEs: 'votar' },
+      { a: 'best',  b: 'vest',  aEs: 'el mejor',  bEs: 'chaleco' },
+      { a: 'ban',   b: 'van',   aEs: 'prohibir',  bEs: 'furgoneta' },
+      { a: 'curb',  b: 'curve', aEs: 'bordillo',  bEs: 'curva' },
+      { a: 'bury',  b: 'vary',  aEs: 'enterrar',  bEs: 'variar' }
+    ]
+  },
+  {
+    id: 's-inicial',
+    titulo: 'speak, no "espeak"',
+    sonido: '/s/ + consonante al empezar',
+    es: 'Ninguna palabra española empieza por s + consonante, así que instintivamente le ponemos una "e" delante: decimos "espeak", "estudent", "eSpain".\n\n' +
+        'En inglés esa "e" no existe y se oye muchísimo. Es probablemente el rasgo que más delata a un hispanohablante, más que cualquier error de gramática.\n\n' +
+        'La palabra tiene que empezar directamente con el zumbido de la s.',
+    consejo: 'Alarga la s antes de soltar la palabra: ssssspeak. Al principio exagérala; luego se acorta sola.',
+    pares: [
+      { a: 'speak',   b: 'peak',   aEs: 'hablar',      bEs: 'pico' },
+      { a: 'school',  b: 'cool',   aEs: 'escuela',     bEs: 'fresco' },
+      { a: 'student', b: 'tudent', aEs: 'estudiante',  bEs: '(no existe)' },
+      { a: 'Spain',   b: 'pain',   aEs: 'España',      bEs: 'dolor' },
+      { a: 'street',  b: 'treat',  aEs: 'calle',       bEs: 'convidar' },
+      { a: 'sport',   b: 'port',   aEs: 'deporte',     bEs: 'puerto' }
+    ]
+  },
+  {
+    id: 'th',
+    titulo: 'think / sink',
+    sonido: 'la /θ/ del inglés (th)',
+    es: 'La "th" de think, three, thanks se hace con la lengua ASOMANDO entre los dientes y soltando aire, sin voz.\n\n' +
+        'Es parecida a la z de España, pero no igual: la lengua sale más. Y si eres de Latinoamérica, no la tienes en absoluto.\n\n' +
+        'El error típico es sustituirla por s ("sink" en vez de "think") o por t ("tree" en vez de "three").',
+    consejo: 'Saca la punta de la lengua entre los dientes y sopla. Si no notas el aire en la lengua, no la estás haciendo.',
+    pares: [
+      { a: 'think', b: 'sink',  aEs: 'pensar',     bEs: 'fregadero' },
+      { a: 'thin',  b: 'sin',   aEs: 'delgado',    bEs: 'pecado' },
+      { a: 'three', b: 'tree',  aEs: 'tres',       bEs: 'árbol' },
+      { a: 'thank', b: 'tank',  aEs: 'agradecer',  bEs: 'tanque' },
+      { a: 'mouth', b: 'mouse', aEs: 'boca',       bEs: 'ratón' },
+      { a: 'path',  b: 'pass',  aEs: 'sendero',    bEs: 'pasar' }
+    ]
+  },
+  {
+    id: 'sh-ch',
+    titulo: 'ship / chip',
+    sonido: '/ʃ/ frente a /tʃ/',
+    es: 'El español tiene la "ch" (/tʃ/) pero no la "sh" (/ʃ/), así que tendemos a convertir todas las sh en ch: decimos "chip" cuando queremos decir "ship".\n\n' +
+        '/tʃ/ empieza con un golpe seco de la lengua contra el paladar: chip, chair, cheap.\n' +
+        '/ʃ/ es continua, sin golpe: es el sonido de mandar callar, shhh. Ship, share, sheep.',
+    consejo: 'Si puedes alargarlo sin cortar (shhhhh), es /ʃ/. Si tiene un golpe al empezar, es /tʃ/.',
+    pares: [
+      { a: 'ship',  b: 'chip',  aEs: 'barco',     bEs: 'ficha / papa frita' },
+      { a: 'share', b: 'chair', aEs: 'compartir', bEs: 'silla' },
+      { a: 'sheep', b: 'cheap', aEs: 'oveja',     bEs: 'barato' },
+      { a: 'shoes', b: 'choose', aEs: 'zapatos',  bEs: 'elegir' },
+      { a: 'wash',  b: 'watch', aEs: 'lavar',     bEs: 'mirar / reloj' },
+      { a: 'shop',  b: 'chop',  aEs: 'tienda',    bEs: 'cortar' }
+    ]
+  },
+  {
+    id: 'h',
+    titulo: 'hair / air',
+    sonido: 'la h aspirada',
+    es: 'En español la h es muda. En inglés se pronuncia: es un soplo de aire, como cuando empañas un cristal.\n\n' +
+        'Si no la haces, "hair" se convierte en "air" y "hold" en "old". Cambia la palabra entera.\n\n' +
+        'Cuidado también con lo contrario: no hay que aspirar donde no toca. En "hour" y "honest" la h es muda de verdad.',
+    consejo: 'Pon la mano delante de la boca: al decir "hat" tienes que notar el aire. Al decir "at", no.',
+    pares: [
+      { a: 'hair',  b: 'air',   aEs: 'pelo',      bEs: 'aire' },
+      { a: 'hold',  b: 'old',   aEs: 'sostener',  bEs: 'viejo' },
+      { a: 'hate',  b: 'eight', aEs: 'odiar',     bEs: 'ocho' },
+      { a: 'heart', b: 'art',   aEs: 'corazón',   bEs: 'arte' },
+      { a: 'high',  b: 'eye',   aEs: 'alto',      bEs: 'ojo' },
+      { a: 'hill',  b: 'ill',   aEs: 'colina',    bEs: 'enfermo' }
+    ]
+  },
+  {
+    id: 'ae-e',
+    titulo: 'bad / bed',
+    sonido: '/æ/ frente a /e/',
+    es: 'La /æ/ de bad, man, cat no existe en español: es un sonido entre la a y la e, con la boca bastante abierta y la lengua baja.\n\n' +
+        'Como no la tenemos, la convertimos en "e" y entonces "bad" suena "bed", "man" suena "men".\n\n' +
+        'En negocios importa: "I have a bad feeling" y "I have a bed feeling" no dicen lo mismo.',
+    consejo: 'Abre más la boca de lo que te parece necesario, como si el médico te fuera a mirar la garganta.',
+    pares: [
+      { a: 'bad',  b: 'bed',  aEs: 'malo',     bEs: 'cama' },
+      { a: 'man',  b: 'men',  aEs: 'hombre',   bEs: 'hombres' },
+      { a: 'sad',  b: 'said', aEs: 'triste',   bEs: 'dijo' },
+      { a: 'and',  b: 'end',  aEs: 'y',        bEs: 'final' },
+      { a: 'bat',  b: 'bet',  aEs: 'bate',     bEs: 'apuesta' },
+      { a: 'track', b: 'trek', aEs: 'pista',   bEs: 'caminata' }
+    ]
+  },
+  {
+    id: 'ed',
+    titulo: 'worked / wanted',
+    sonido: 'la terminación -ed del pasado',
+    es: 'La -ed del pasado tiene tres sonidos y solo UNO añade sílaba. Casi nadie lo enseña y se nota mucho.\n\n' +
+        '/t/ tras sonido sordo: worked, asked, finished, stopped. Se dice "workt", una sílaba.\n' +
+        '/d/ tras sonido sonoro: called, arrived, delivered, signed. Una sílaba también.\n' +
+        '/ɪd/ SOLO tras t o d: wanted, needed, decided, started. Aquí sí se añade una sílaba.\n\n' +
+        'Decir "work-ed" con dos sílabas es un error muy audible, y lo cometemos casi todos al principio.',
+    consejo: 'Regla práctica: si el verbo ya acaba en t o d, añade sílaba. Si no, la -ed se pega sin más.',
+    pares: [
+      { a: 'wanted',  b: 'worked',   aEs: 'quería (2 sílabas + ed)', bEs: 'trabajé (sin sílaba extra)' },
+      { a: 'needed',  b: 'called',   aEs: 'necesitaba',              bEs: 'llamé' },
+      { a: 'started', b: 'stopped',  aEs: 'empecé',                  bEs: 'paré' },
+      { a: 'decided', b: 'signed',   aEs: 'decidí',                  bEs: 'firmé' },
+      { a: 'waited',  b: 'asked',    aEs: 'esperé',                  bEs: 'pregunté' },
+      { a: 'added',   b: 'shipped',  aEs: 'añadí',                   bEs: 'envié' }
+    ]
+  }
+];
+
 /* Frases para el módulo de pronunciación, por nivel */
 const PRONUNCIATION_SETS = {
   A1: [
