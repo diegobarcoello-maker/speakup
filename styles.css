@@ -25,6 +25,7 @@
   --text-dim:  #5c6570;
   --text-soft: #7b848f;
 
+  --arranque:  #08403c;   /* el mismo color del splash del sistema */
   --radius:    14px;
   --radius-sm: 9px;
   --radius-lg: 22px;
@@ -60,6 +61,26 @@
 }
 
 * { box-sizing: border-box; }
+
+/* ---------- Pantalla de arranque propia ----------
+   Android 12+ no muestra el nombre en su splash, así que lo ponemos aquí.
+   Arranca con el mismo color, de modo que se lee como una sola pantalla. */
+.arranque {
+  position: fixed; inset: 0; z-index: 200;
+  background: var(--arranque); color: #fff;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  transition: opacity .38s ease, visibility .38s;
+}
+.arranque img {
+  width: 96px; height: 96px; border-radius: 24px; margin-bottom: 18px;
+  box-shadow: 0 12px 34px rgba(0,0,0,.28);
+  animation: arranca .55s cubic-bezier(.2,.8,.3,1);
+}
+.arranque b { font-size: 1.55rem; font-weight: 800; letter-spacing: -.02em; }
+.arranque span { font-size: .9rem; color: rgba(255,255,255,.72); }
+@keyframes arranca { from { opacity: 0; transform: scale(.88); } to { opacity: 1; transform: none; } }
+.arranque.fuera { opacity: 0; visibility: hidden; }
+@media (prefers-reduced-motion: reduce) { .arranque img { animation: none; } }
 
 html, body {
   margin: 0; padding: 0;
@@ -125,7 +146,7 @@ a  { color: var(--brand); }
 /* Antes de empezar, la barra superior toma el color del arranque:
    así el splash y la primera pantalla se leen como una sola cosa. */
 body.previo .topbar {
-  background: var(--brand-strong);
+  background: var(--arranque);
   border-bottom-color: transparent;
   color: #fff;
 }
@@ -133,7 +154,7 @@ body.previo .topbar .btn-ghost {
   border-color: rgba(255,255,255,.35); color: #fff; background: transparent;
 }
 body.previo .topbar .btn-ghost:hover { background: rgba(255,255,255,.12); }
-[data-theme="dark"] body.previo .topbar { background: #0a4a45; }
+
 
 .stat-chip {
   display: inline-flex; align-items: center; gap: 5px;
@@ -610,14 +631,14 @@ input:focus, select:focus, textarea:focus { border-color: var(--brand); }
    el paso del splash a la app sea continuo y no un salto de color. */
 .onb-hero {
   text-align: center;
-  background: var(--brand-strong);
+  background: var(--arranque);
   color: #fff;
   border-radius: var(--radius-lg);
   padding: 34px 22px 30px;
   margin: 2px 0 20px;
-  box-shadow: 0 10px 34px color-mix(in srgb, var(--brand-strong) 34%, transparent);
+  box-shadow: 0 10px 34px color-mix(in srgb, var(--arranque) 40%, transparent);
 }
-[data-theme="dark"] .onb-hero { background: #0a4a45; }
+
 .onb-logo {
   width: 84px; height: 84px; display: block; margin: 0 auto 18px; border-radius: 21px;
   box-shadow: 0 8px 22px rgba(0,0,0,.22);

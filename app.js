@@ -3106,6 +3106,15 @@ function boot() {
       ).join('') +
     '</div>';
   render();
+
+  // retirar la pantalla de arranque: se deja ver un momento y se desvanece
+  const arranque = document.getElementById('arranque');
+  if (arranque) {
+    setTimeout(() => {
+      arranque.classList.add('fuera');
+      setTimeout(() => { if (arranque.parentNode) arranque.remove(); }, 450);
+    }, 550);
+  }
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
