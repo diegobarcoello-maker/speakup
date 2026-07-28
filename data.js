@@ -2077,6 +2077,257 @@ const TOPIC_SUGGESTIONS = [
   'Presentar un informe de ventas'
 ];
 
+/* ══════════════════ DIÁLOGOS DE COMPRENSIÓN AUDITIVA ══════════════════
+   Se escuchan enteros y sin texto. Después se responden preguntas,
+   se escribe una frase al dictado y solo entonces se ve la transcripción. */
+
+const DIALOGUES = [
+{
+  id: 'dlg-1', level: 'A1', title: 'Alguien se acerca a tu stand',
+  context: 'Estás en una feria comercial. Un visitante se acerca a tu stand y se presenta.',
+  speakers: { A: 'Visitante', B: 'Tú' },
+  lines: [
+    { who: 'A', en: "Hi there. Is this your stand?", es: '¿Hola? ¿Este es su stand?' },
+    { who: 'B', en: "Yes, it is. Welcome. I'm Diego.", es: 'Sí. Bienvenido. Soy Diego.' },
+    { who: 'A', en: "Nice to meet you, Diego. I'm Karen, from Miami.", es: 'Encantada, Diego. Soy Karen, de Miami.' },
+    { who: 'B', en: "Nice to meet you too. What do you do, Karen?", es: 'Encantado yo también. ¿A qué se dedica, Karen?' },
+    { who: 'A', en: "I'm a buyer for a hardware chain. And you?", es: 'Soy compradora de una cadena de ferreterías. ¿Y usted?' },
+    { who: 'B', en: "I'm the sales manager here. Here's my card.", es: 'Soy el gerente de ventas. Aquí tiene mi tarjeta.' },
+    { who: 'A', en: "Thank you. Can I take a catalogue?", es: 'Gracias. ¿Puedo llevarme un catálogo?' },
+    { who: 'B', en: "Of course. Have a nice day.", es: 'Por supuesto. Que tenga buen día.' }
+  ],
+  questions: [
+    { q: '¿Cómo se llama la visitante?', opts: ['Karen', 'Carmen', 'Sharon'], a: 0, why: 'Dice "I’m Karen, from Miami". Fíjate en que el nombre suele venir justo después de "I’m".' },
+    { q: '¿A qué se dedica ella?', opts: ['Es vendedora', 'Es compradora', 'Es ingeniera'], a: 1, why: '"I’m a buyer" = soy compradora. Ojo: buyer (compra) y seller (vende) se confunden fácil.' },
+    { q: '¿Qué le pide ella a él al final?', opts: ['Una cotización', 'Un catálogo', 'Una reunión'], a: 1, why: '"Can I take a catalogue?" Escucha "catalogue", que en inglés suena "CA-ta-log".' }
+  ],
+  dictation: 5
+},
+
+{
+  id: 'dlg-2', level: 'A1', title: 'Pedir en un café',
+  context: 'Estás en una cafetería en Estados Unidos antes de una reunión.',
+  speakers: { A: 'Barista', B: 'Tú' },
+  lines: [
+    { who: 'A', en: "Good morning. What can I get for you?", es: 'Buenos días. ¿Qué le sirvo?' },
+    { who: 'B', en: "Good morning. A coffee, please.", es: 'Buenos días. Un café, por favor.' },
+    { who: 'A', en: "Sure. Hot or iced?", es: 'Claro. ¿Caliente o frío?' },
+    { who: 'B', en: "Hot, please. And a sandwich.", es: 'Caliente, por favor. Y un sándwich.' },
+    { who: 'A', en: "Anything else?", es: '¿Algo más?' },
+    { who: 'B', en: "No, that's all. How much is it?", es: 'No, eso es todo. ¿Cuánto es?' },
+    { who: 'A', en: "That'll be eight fifty. Cash or card?", es: 'Son ocho cincuenta. ¿Efectivo o tarjeta?' },
+    { who: 'B', en: "Card, please.", es: 'Tarjeta, por favor.' }
+  ],
+  questions: [
+    { q: '¿Qué pide él para beber?', opts: ['Un té', 'Un café caliente', 'Un café frío'], a: 1, why: 'Pide "a coffee" y luego aclara "Hot, please".' },
+    { q: '¿Cuánto cuesta todo?', opts: ['8,15', '8,50', '18,50'], a: 1, why: '"Eight fifty" = 8,50. Ojo con fifteen (15) y fifty (50): la diferencia está en dónde cae el acento.' },
+    { q: '¿Cómo paga?', opts: ['En efectivo', 'Con tarjeta', 'No paga'], a: 1, why: 'Responde "Card, please" a la pregunta "Cash or card?".' }
+  ],
+  dictation: 6
+},
+
+{
+  id: 'dlg-3', level: 'A2', title: 'Confirmar un pedido por teléfono',
+  context: 'Llamas a un cliente para confirmar los detalles de su pedido.',
+  speakers: { A: 'Tú', B: 'Cliente' },
+  lines: [
+    { who: 'A', en: "Good afternoon, Mr. Silva. I'm calling about your order.", es: 'Buenas tardes, Sr. Silva. Le llamo por su pedido.' },
+    { who: 'B', en: "Hello. Yes, go ahead.", es: 'Hola. Sí, dígame.' },
+    { who: 'A', en: "We have your purchase order for three hundred units.", es: 'Tenemos su orden de compra por trescientas unidades.' },
+    { who: 'B', en: "That's right. When can you deliver?", es: 'Correcto. ¿Cuándo pueden entregar?' },
+    { who: 'A', en: "The goods are in stock, so we can ship on Thursday.", es: 'La mercancía está en inventario, así que podemos enviar el jueves.' },
+    { who: 'B', en: "Thursday works. And the payment terms?", es: 'El jueves va bien. ¿Y las condiciones de pago?' },
+    { who: 'A', en: "Thirty days from the invoice date, as usual.", es: 'Treinta días desde la fecha de factura, como siempre.' },
+    { who: 'B', en: "Perfect. Could you send me the confirmation by email?", es: 'Perfecto. ¿Podría enviarme la confirmación por correo?' },
+    { who: 'A', en: "Of course. I'll send it right now.", es: 'Por supuesto. Se la envío ahora mismo.' }
+  ],
+  questions: [
+    { q: '¿Cuántas unidades tiene el pedido?', opts: ['30', '300', '3.000'], a: 1, why: '"Three hundred" = 300. Escucha si dice "hundred" o "thousand".' },
+    { q: '¿Cuándo se envía la mercancía?', opts: ['El martes', 'El jueves', 'En treinta días'], a: 1, why: '"We can ship on Thursday". Los treinta días son del pago, no del envío.' },
+    { q: '¿Por qué pueden enviar tan rápido?', opts: ['Porque el cliente pagó por adelantado', 'Porque la mercancía está en inventario', 'Porque es un cliente antiguo'], a: 1, why: '"The goods are in stock, SO we can ship" — el "so" marca la causa y la consecuencia.' },
+    { q: '¿Qué pide el cliente al final?', opts: ['Una llamada mañana', 'La confirmación por correo', 'Una visita'], a: 1, why: '"Could you send me the confirmation by email?".' }
+  ],
+  dictation: 4
+},
+
+{
+  id: 'dlg-4', level: 'A2', title: 'Check-in en el aeropuerto',
+  context: 'Vas a un viaje de negocios y estás en el mostrador de la aerolínea.',
+  speakers: { A: 'Agente', B: 'Tú' },
+  lines: [
+    { who: 'A', en: "Good evening. Passport and ticket, please.", es: 'Buenas noches. Pasaporte y boleto, por favor.' },
+    { who: 'B', en: "Here you are.", es: 'Aquí tiene.' },
+    { who: 'A', en: "Thank you. Are you checking any bags today?", es: 'Gracias. ¿Va a documentar equipaje hoy?' },
+    { who: 'B', en: "Just one suitcase. This bag is carry-on.", es: 'Solo una maleta. Este bolso es de mano.' },
+    { who: 'A', en: "Fine. Window or aisle?", es: 'Bien. ¿Ventana o pasillo?' },
+    { who: 'B', en: "Aisle, please. I'm quite tall.", es: 'Pasillo, por favor. Soy bastante alto.' },
+    { who: 'A', en: "No problem. Here's your boarding pass. Gate B twelve.", es: 'Sin problema. Aquí tiene su pase de abordar. Puerta B doce.' },
+    { who: 'B', en: "What time does boarding start?", es: '¿A qué hora empieza el abordaje?' },
+    { who: 'A', en: "At a quarter to eight. The flight is on time.", es: 'A las ocho menos cuarto. El vuelo sale a tiempo.' }
+  ],
+  questions: [
+    { q: '¿Cuánto equipaje documenta?', opts: ['Ninguno', 'Una maleta', 'Dos maletas'], a: 1, why: '"Just one suitcase". El otro bolso es "carry-on", equipaje de mano.' },
+    { q: '¿Qué asiento pide?', opts: ['De ventana', 'De pasillo', 'Le da igual'], a: 1, why: '"Aisle, please". Ojo: "aisle" se pronuncia "áil", la s no suena.' },
+    { q: '¿A qué hora empieza el abordaje?', opts: ['7:45', '8:15', '8:45'], a: 0, why: '"A quarter to eight" = las ocho menos cuarto = 7:45. Con TO se nombra la hora siguiente.' },
+    { q: '¿El vuelo sale a tiempo?', opts: ['Sí', 'No, está retrasado', 'No lo dice'], a: 0, why: '"The flight is on time" = sale a tiempo. Si estuviera retrasado diría "delayed".' }
+  ],
+  dictation: 6
+},
+
+{
+  id: 'dlg-5', level: 'A2', title: 'Reunión semanal de ventas',
+  context: 'Tu gerente regional te pide el reporte de la zona en la reunión de los lunes.',
+  speakers: { A: 'Sarah, gerente', B: 'Tú' },
+  lines: [
+    { who: 'A', en: "Good morning, everyone. Diego, how is your region doing?", es: 'Buenos días a todos. Diego, ¿cómo va tu zona?' },
+    { who: 'B', en: "Good morning. We're at eighty-five percent of the target.", es: 'Buenos días. Estamos al ochenta y cinco por ciento de la meta.' },
+    { who: 'A', en: "That's not bad. What's the main problem?", es: 'No está mal. ¿Cuál es el problema principal?' },
+    { who: 'B', en: "Two new sales reps. They need more training.", es: 'Dos vendedores nuevos. Necesitan más capacitación.' },
+    { who: 'A', en: "I see. What's your plan for this month?", es: 'Entiendo. ¿Cuál es tu plan para este mes?' },
+    { who: 'B', en: "I visit clients with them twice a week.", es: 'Visito clientes con ellos dos veces por semana.' },
+    { who: 'A', en: "Good idea. Do you need anything from me?", es: 'Buena idea. ¿Necesitas algo de mí?' },
+    { who: 'B', en: "A bigger budget for samples, if possible.", es: 'Un presupuesto mayor para muestras, si es posible.' },
+    { who: 'A', en: "Send me the numbers and I'll look at it.", es: 'Mándame las cifras y lo reviso.' }
+  ],
+  questions: [
+    { q: '¿En qué porcentaje de la meta está la zona?', opts: ['75%', '85%', '95%'], a: 1, why: '"Eighty-five percent". Distingue eighty (80) de eighteen (18).' },
+    { q: '¿Cuál dice que es el problema?', opts: ['Los precios', 'Dos vendedores nuevos sin capacitar', 'La competencia'], a: 1, why: '"Two new sales reps. They need more training".' },
+    { q: '¿Con qué frecuencia sale a visitar clientes con ellos?', opts: ['Una vez al mes', 'Dos veces por semana', 'Todos los días'], a: 1, why: '"Twice a week" = dos veces por semana.' },
+    { q: '¿Qué pide él?', opts: ['Más vendedores', 'Más presupuesto para muestras', 'Menos metas'], a: 1, why: '"A bigger budget for samples".' }
+  ],
+  dictation: 5
+},
+
+{
+  id: 'dlg-6', level: 'B1', title: 'Un envío se retrasa',
+  context: 'Tu proveedor asiático te llama para avisar de un problema con la producción.',
+  speakers: { A: 'Wei, proveedor', B: 'Tú' },
+  lines: [
+    { who: 'A', en: "Diego, I'm afraid I have some bad news about your order.", es: 'Diego, me temo que tengo malas noticias sobre su pedido.' },
+    { who: 'B', en: "Oh. What happened?", es: 'Vaya. ¿Qué pasó?' },
+    { who: 'A', en: "One of our machines broke down last week.", es: 'Una de nuestras máquinas se averió la semana pasada.' },
+    { who: 'B', en: "So the shipment will be delayed?", es: '¿Entonces el envío se retrasará?' },
+    { who: 'A', en: "Yes, by about two weeks. I'm really sorry.", es: 'Sí, unas dos semanas. Lo lamento mucho.' },
+    { who: 'B', en: "That's a problem. My client needs the goods in May.", es: 'Eso es un problema. Mi cliente necesita la mercancía en mayo.' },
+    { who: 'A', en: "We could send half the order now and the rest later.", es: 'Podríamos enviar la mitad ahora y el resto después.' },
+    { who: 'B', en: "Who would pay for the extra freight?", es: '¿Quién pagaría el flete adicional?' },
+    { who: 'A', en: "We would, of course. It's our fault.", es: 'Nosotros, por supuesto. Es culpa nuestra.' },
+    { who: 'B', en: "All right. Send me the new schedule in writing today.", es: 'De acuerdo. Envíeme el nuevo cronograma por escrito hoy.' }
+  ],
+  questions: [
+    { q: '¿Por qué se retrasa el envío?', opts: ['Por la aduana', 'Se averió una máquina', 'Falta materia prima'], a: 1, why: '"One of our machines broke down" — "break down" es averiarse.' },
+    { q: '¿Cuánto se retrasa?', opts: ['Dos días', 'Dos semanas', 'Dos meses'], a: 1, why: '"By about two weeks". El "by" indica la magnitud del retraso.' },
+    { q: '¿Qué solución propone el proveedor?', opts: ['Cancelar el pedido', 'Enviar la mitad ahora y el resto después', 'Bajar el precio'], a: 1, why: '"Send half the order now and the rest later" — es un envío parcial.' },
+    { q: '¿Quién paga el flete adicional?', opts: ['El cliente', 'El proveedor', 'Se reparte'], a: 1, why: '"We would, of course. It’s our fault". El "we" es el proveedor.' },
+    { q: '¿Qué pide Diego al final?', opts: ['Un descuento', 'El nuevo cronograma por escrito', 'Hablar con el jefe'], a: 1, why: '"Send me the new schedule in writing" — pedirlo por escrito es lo profesional.' }
+  ],
+  dictation: 6
+},
+
+{
+  id: 'dlg-7', level: 'B1', title: 'Un cliente se queja',
+  context: 'Un cliente llama molesto porque la mercancía llegó con unidades dañadas.',
+  speakers: { A: 'Cliente', B: 'Tú' },
+  lines: [
+    { who: 'A', en: "I'm calling because we have a problem with the last delivery.", es: 'Llamo porque tenemos un problema con la última entrega.' },
+    { who: 'B', en: "I'm sorry to hear that. What exactly happened?", es: 'Lamento oír eso. ¿Qué pasó exactamente?' },
+    { who: 'A', en: "About twenty units arrived damaged. The boxes were wet.", es: 'Unas veinte unidades llegaron dañadas. Las cajas estaban mojadas.' },
+    { who: 'B', en: "That shouldn't have happened. Have you taken photos?", es: 'Eso no debería haber pasado. ¿Tomaron fotos?' },
+    { who: 'A', en: "Yes, I've already sent them to your assistant.", es: 'Sí, ya se las envié a su asistente.' },
+    { who: 'B', en: "Good. I'll look into it today and call you back.", es: 'Bien. Lo reviso hoy y le devuelvo la llamada.' },
+    { who: 'A', en: "I need those units before the end of the month.", es: 'Necesito esas unidades antes de fin de mes.' },
+    { who: 'B', en: "Understood. We'll send a replacement at our cost.", es: 'Entendido. Enviaremos una reposición a nuestro costo.' },
+    { who: 'A', en: "That works. But please, check the packaging next time.", es: 'Eso funciona. Pero por favor, revise el embalaje la próxima vez.' }
+  ],
+  questions: [
+    { q: '¿Cuántas unidades llegaron dañadas?', opts: ['Unas 12', 'Unas 20', 'Unas 200'], a: 1, why: '"About twenty units". Distingue twenty (20) de twelve (12).' },
+    { q: '¿Cuál fue la causa aparente?', opts: ['Las cajas estaban mojadas', 'El transportista las tiró', 'Vinieron mal de fábrica'], a: 0, why: '"The boxes were wet" — el embalaje se mojó.' },
+    { q: '¿Ya envió las fotos el cliente?', opts: ['Sí, al asistente', 'No, las enviará mañana', 'No las tomó'], a: 0, why: '"I’ve already sent them" — el "already" en present perfect indica que ya está hecho.' },
+    { q: '¿Qué ofrece Diego?', opts: ['Un descuento', 'Una reposición a su costo', 'Devolver el dinero'], a: 1, why: '"A replacement at our cost" = reposición pagada por nosotros.' }
+  ],
+  dictation: 7
+},
+
+{
+  id: 'dlg-8', level: 'B1', title: 'Café antes de la reunión',
+  context: 'Charla informal con un colega extranjero mientras esperan que empiece la reunión.',
+  speakers: { A: 'Colega', B: 'Tú' },
+  lines: [
+    { who: 'A', en: "So, how was your flight?", es: 'Bueno, ¿qué tal el vuelo?' },
+    { who: 'B', en: "Long, but fine. I got in late last night.", es: 'Largo, pero bien. Llegué anoche tarde.' },
+    { who: 'A', en: "Is this your first time in Chicago?", es: '¿Es tu primera vez en Chicago?' },
+    { who: 'B', en: "Second, actually. I came here two years ago.", es: 'La segunda, en realidad. Vine hace dos años.' },
+    { who: 'A', en: "Nice. Did you get a chance to look around?", es: 'Qué bien. ¿Tuviste ocasión de dar una vuelta?' },
+    { who: 'B', en: "Not really. I've been busy with clients all week.", es: 'La verdad no. He estado ocupado con clientes toda la semana.' },
+    { who: 'A', en: "That's a shame. The food here is great.", es: 'Qué lástima. La comida de aquí es buenísima.' },
+    { who: 'B', en: "Maybe tonight, if the meeting doesn't run late.", es: 'Quizá esta noche, si la reunión no se alarga.' },
+    { who: 'A', en: "Fingers crossed. Shall we go in?", es: 'Crucemos los dedos. ¿Entramos?' }
+  ],
+  questions: [
+    { q: '¿Es su primera vez en Chicago?', opts: ['Sí', 'No, es la segunda', 'No, viene cada año'], a: 1, why: '"Second, actually". Recuerda que "actually" es "en realidad", no "actualmente".' },
+    { q: '¿Por qué no ha visitado la ciudad?', opts: ['Ha estado ocupado con clientes', 'No le interesa', 'Hace mal tiempo'], a: 0, why: '"I’ve been busy with clients all week".' },
+    { q: '¿Qué significa "if the meeting doesn’t run late"?', opts: ['Si la reunión no empieza tarde', 'Si la reunión no se alarga', 'Si la reunión no se cancela'], a: 1, why: '"Run late" es alargarse más de lo previsto, no empezar tarde.' },
+    { q: '¿Qué propone el colega al final?', opts: ['Ir a comer', 'Entrar a la reunión', 'Llamar a un taxi'], a: 1, why: '"Shall we go in?" — "shall we" es una propuesta muy educada.' }
+  ],
+  dictation: 5
+},
+
+{
+  id: 'dlg-9', level: 'B2', title: 'Negociar precio y volumen',
+  context: 'Un comprador exigente quiere mejor precio. Tú defiendes tu margen.',
+  speakers: { A: 'Comprador', B: 'Tú' },
+  lines: [
+    { who: 'A', en: "I've looked at your proposal, and honestly, the price is higher than we expected.", es: 'He visto su propuesta y, sinceramente, el precio es más alto de lo que esperábamos.' },
+    { who: 'B', en: "I understand. May I ask what you were expecting?", es: 'Lo entiendo. ¿Puedo preguntar qué esperaban?' },
+    { who: 'A', en: "Something around eleven dollars a unit. You quoted twelve fifty.", es: 'Algo cercano a once dólares por unidad. Ustedes cotizaron doce cincuenta.' },
+    { who: 'B', en: "That's a significant gap. At that price our margin wouldn't work.", es: 'Es una brecha importante. A ese precio nuestro margen no funcionaría.' },
+    { who: 'A', en: "So there's no flexibility at all?", es: '¿Entonces no hay ninguna flexibilidad?' },
+    { who: 'B', en: "There would be, if the volume were higher. How many units are we talking about?", es: 'La habría, si el volumen fuera mayor. ¿De cuántas unidades hablamos?' },
+    { who: 'A', en: "We were thinking of two thousand for the first order.", es: 'Pensábamos en dos mil para el primer pedido.' },
+    { who: 'B', en: "If you committed to five thousand a year, we could go down to eleven eighty.", es: 'Si se comprometieran a cinco mil al año, podríamos bajar a once ochenta.' },
+    { who: 'A', en: "Eleven eighty is closer. What about payment terms?", es: 'Once ochenta está más cerca. ¿Y las condiciones de pago?' },
+    { who: 'B', en: "Thirty days, and we'd cover the freight to your warehouse.", es: 'Treinta días, y cubriríamos el flete hasta su bodega.' },
+    { who: 'A', en: "Put that in writing and I'll take it to my team.", es: 'Póngalo por escrito y lo llevo a mi equipo.' }
+  ],
+  questions: [
+    { q: '¿Cuánto cotizó Diego por unidad?', opts: ['11,00', '11,80', '12,50'], a: 2, why: '"You quoted twelve fifty" = 12,50. El 11,80 aparece después, como concesión.' },
+    { q: '¿Qué condición pone Diego para bajar el precio?', opts: ['Pago por adelantado', 'Un compromiso de 5.000 unidades al año', 'Un contrato de dos años'], a: 1, why: '"If you committed to five thousand a year" — segundo condicional, propuesta hipotética.' },
+    { q: '¿Cuántas unidades quería el comprador en el primer pedido?', opts: ['500', '2.000', '5.000'], a: 1, why: '"Two thousand for the first order". Las 5.000 son el compromiso anual.' },
+    { q: '¿Quién paga el flete en la propuesta final?', opts: ['El comprador', 'Diego', 'Se reparte'], a: 1, why: '"We’d cover the freight to your warehouse".' },
+    { q: '¿Por qué Diego usa "if the volume WERE higher" y no "is"?', opts: ['Porque es un error', 'Porque plantea una hipótesis y así no se compromete', 'Porque habla del pasado'], a: 1, why: 'El segundo condicional le permite tantear sin hacer una oferta firme. Es la clave de la negociación.' }
+  ],
+  dictation: 8
+},
+
+{
+  id: 'dlg-10', level: 'B2', title: 'Entrevista para gerente comercial',
+  context: 'Un reclutador te entrevista para un puesto de gerente comercial regional.',
+  speakers: { A: 'Reclutador', B: 'Tú' },
+  lines: [
+    { who: 'A', en: "Thanks for coming in. Tell me a bit about your background.", es: 'Gracias por venir. Cuénteme un poco sobre su trayectoria.' },
+    { who: 'B', en: "Sure. I've spent the last ten years in foreign trade, mostly in regional sales.", es: 'Claro. He pasado los últimos diez años en comercio exterior, sobre todo en ventas regionales.' },
+    { who: 'A', en: "And what are you responsible for right now?", es: '¿Y de qué es responsable ahora mismo?' },
+    { who: 'B', en: "I manage a team of eight and report to the commercial director.", es: 'Dirijo un equipo de ocho y reporto al director comercial.' },
+    { who: 'A', en: "Can you tell me about a difficult situation you handled?", es: '¿Puede contarme una situación difícil que haya manejado?' },
+    { who: 'B', en: "Last year our portfolio coverage dropped to sixty percent.", es: 'El año pasado nuestra cobertura de cartera cayó al sesenta por ciento.' },
+    { who: 'A', en: "That's quite a drop. What did you do?", es: 'Es una caída considerable. ¿Qué hizo?' },
+    { who: 'B', en: "I redesigned the visit plan and retrained the two newest reps.", es: 'Rediseñé el plan de visitas y volví a capacitar a los dos vendedores más nuevos.' },
+    { who: 'A', en: "And what was the result?", es: '¿Y cuál fue el resultado?' },
+    { who: 'B', en: "Coverage went back up to eighty-two percent in three months.", es: 'La cobertura volvió a subir al ochenta y dos por ciento en tres meses.' },
+    { who: 'A', en: "Impressive. Do you have any questions for me?", es: 'Impresionante. ¿Tiene alguna pregunta para mí?' },
+    { who: 'B', en: "Yes. What would success look like in the first six months?", es: 'Sí. ¿Cómo se vería el éxito en los primeros seis meses?' }
+  ],
+  questions: [
+    { q: '¿Cuántos años lleva en comercio exterior?', opts: ['Cinco', 'Diez', 'Quince'], a: 1, why: '"The last ten years". Fíjate en el present perfect: "I’ve spent", porque sigue ahí.' },
+    { q: '¿A cuánto cayó la cobertura?', opts: ['16%', '60%', '66%'], a: 1, why: '"Sixty percent" = 60%. Sixty y sixteen se distinguen por el acento: SIX-ty frente a six-TEEN.' },
+    { q: '¿Qué dos acciones concretas tomó?', opts: ['Bajó precios y contrató gente', 'Rediseñó el plan de visitas y recapacitó a dos vendedores', 'Cambió de proveedor y de zona'], a: 1, why: 'Esa es la "A" del método STAR: la acción concreta que tomó él.' },
+    { q: '¿Hasta dónde se recuperó la cobertura?', opts: ['72%', '82%', '92%'], a: 1, why: '"Eighty-two percent". Terminar con la cifra es lo que da fuerza a la respuesta.' },
+    { q: '¿Qué pregunta él al reclutador?', opts: ['Cuánto paga el puesto', 'Cómo se vería el éxito en seis meses', 'Cuándo empieza'], a: 1, why: 'Es una pregunta excelente: demuestra que piensa en resultados, no en condiciones.' }
+  ],
+  dictation: 9
+}
+];
+
 /* Frases para el módulo de pronunciación, por nivel */
 const PRONUNCIATION_SETS = {
   A1: [

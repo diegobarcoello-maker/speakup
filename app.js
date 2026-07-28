@@ -41,7 +41,10 @@ const PATHS = {
   sparkle:   '<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M18 15l.8 2.2L21 18l-2.2.8L18 21l-.8-2.2L15 18l2.2-.8z"/>',
   note:      '<path d="M5 3h11l4 4v14H5z"/><path d="M15 3v5h5"/><path d="M9 12h7M9 16h5"/>',
   trash:     '<path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M6 7l1 13h10l1-13"/><path d="M10 11v6M14 11v6"/>',
-  upload:    '<path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>'
+  upload:    '<path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>',
+  headphones:'<path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="2" y="14" width="5" height="7" rx="2"/><rect x="17" y="14" width="5" height="7" rx="2"/>',
+  pause:     '<rect x="7" y="5" width="3.5" height="14" rx="1"/><rect x="13.5" y="5" width="3.5" height="14" rx="1"/>',
+  ear:       '<path d="M8 20a3 3 0 0 0 3-3c0-2 3-2.5 3-6a3 3 0 0 0-6 0"/><path d="M5 10a7 7 0 1 1 14 0c0 4-3 5-3 8a4 4 0 0 1-8 .5"/>'
 };
 // width/height por defecto: cualquier regla CSS más específica los sobrescribe
 function ic(n, cls) {
@@ -115,6 +118,7 @@ const DEFAULT_STATE = {
   srsProd: {},     // en -> tarjeta de PRODUCCIÓN (ves español, escribes inglés)
   customUnits: [], // unidades generadas con IA
   mistakes: [],    // libreta de errores: { id, date, wrong, right, note, tag, source }
+  dialoguesDone: {}, // dialogueId -> { score, date }
   convTurns: 0,
   pronBest: 0,
   pronCount: 0,
@@ -327,6 +331,14 @@ const Voice = {
     return Voice.list.find(v => v.lang && v.lang.toLowerCase().startsWith('en')) || null;
   },
   englishVoices() { return Voice.list.filter(v => v.lang && v.lang.toLowerCase().startsWith('en')); },
+  /* Dos voces distintas para que un diálogo suene a dos personas */
+  pickPair() {
+    const primera = Voice.pick();
+    const mismoAcento = Voice.englishVoices().filter(v => v.lang && v.lang.replace('_', '-') === S.settings.accent);
+    const pool = mismoAcento.length >= 2 ? mismoAcento : Voice.englishVoices();
+    const segunda = pool.filter(v => !primera || v.voiceURI !== primera.voiceURI)[0] || primera;
+    return [primera, segunda];
+  },
   speak(text, rate) {
     if (!('speechSynthesis' in window)) { toast('Tu navegador no permite reproducir audio.'); return; }
     try {
@@ -483,8 +495,10 @@ function go(tab) {
   sayAllToken++;            // detiene la lectura encadenada del vocabulario
   if (tab === 'review') V.review = null;   // recalcular las tarjetas pendientes al entrar
   stopListening();
+  stopDialogue();
   if (V.talk) V.talk.rec = false;
   if (V.pron) V.pron.rec = false;
+  if (tab !== 'pron' && V.audio) V.audio.id = null;
   if (window.speechSynthesis) { try { window.speechSynthesis.cancel(); } catch (e) {} }
   window.scrollTo(0, 0);
   render();
@@ -512,7 +526,7 @@ function render() {
   else if (V.tab === 'create')     html = viewCreate();
   else if (V.tab === 'lessons')    html = V.unit ? viewUnit() : viewLessons();
   else if (V.tab === 'talk')       html = viewTalk();
-  else if (V.tab === 'pron')       html = viewPron();
+  else if (V.tab === 'pron')       html = viewAudio();
   else if (V.tab === 'review')     html = viewReview();
   else if (V.tab === 'settings')   html = viewSettings();
   root.innerHTML = '<div class="view">' + html + '</div>';
@@ -1335,7 +1349,228 @@ async function reviewEmail() {
   T.busy = false; save(); render();
 }
 
-/* ══════════════════ 13. PRONUNCIACIÓN ══════════════════ */
+/* ══════════════════ 13. ESCUCHAR ══════════════════ */
+function audioState() {
+  if (!V.audio) V.audio = { tab: 'dialogs', id: null, stage: 'intro', qi: 0, answered: false, picked: null, right: 0, plays: 0, rate: 1, playing: false, playIdx: 0, dictTyped: '', dictResult: null };
+  return V.audio;
+}
+function dialogueById(id) { return DIALOGUES.find(d => d.id === id); }
+function guardarDialogo() {
+  const A = audioState();
+  const d = dialogueById(A.id);
+  if (!d) return;
+  const score = d.questions.length ? Math.round((A.right / d.questions.length) * 100) : 0;
+  const primero = !S.dialoguesDone[d.id];
+  S.dialoguesDone[d.id] = { score: Math.max(score, (S.dialoguesDone[d.id] || {}).score || 0), date: todayKey() };
+  d.lines.slice(0, 3).forEach(l => addSrs(l.en, l.es, d.id));
+  addXp(primero ? 25 : 8, true);
+  save();
+}
+
+/* --- Reproductor secuencial de diálogos --- */
+let dlgToken = 0;
+function stopDialogue() {
+  dlgToken++;
+  const A = audioState();
+  A.playing = false;
+  if (window.speechSynthesis) { try { window.speechSynthesis.cancel(); } catch (e) {} }
+}
+function paintPlayer(dlg) {
+  const el = document.getElementById('dlgstatus');
+  if (!el) return;
+  const A = audioState();
+  el.textContent = A.playing
+    ? 'Turno ' + Math.min(A.playIdx + 1, dlg.lines.length) + ' de ' + dlg.lines.length
+    : (A.plays ? 'Escuchado ' + A.plays + (A.plays === 1 ? ' vez' : ' veces') : 'Sin texto: solo el oído');
+}
+function playLines(lines, rate, onDone, dlg) {
+  if (!('speechSynthesis' in window)) { toast('Tu navegador no permite reproducir audio.'); return; }
+  const token = ++dlgToken;
+  const A = audioState();
+  const voces = Voice.pickPair();
+  A.playing = true; A.playIdx = 0;
+  const paso = () => {
+    if (token !== dlgToken) return;
+    if (A.playIdx >= lines.length) { A.playing = false; if (dlg) paintPlayer(dlg); onDone && onDone(); return; }
+    const linea = lines[A.playIdx];
+    if (dlg) paintPlayer(dlg);
+    try {
+      const u = new SpeechSynthesisUtterance(linea.en);
+      const v = linea.who === 'B' ? voces[1] : voces[0];
+      if (v) u.voice = v;
+      u.lang = (v && v.lang) || S.settings.accent;
+      u.rate = rate;
+      u.onend = () => { if (token !== dlgToken) return; A.playIdx++; setTimeout(paso, 300); };
+      u.onerror = () => { if (token !== dlgToken) return; A.playIdx++; setTimeout(paso, 300); };
+      window.speechSynthesis.speak(u);
+    } catch (e) { A.playIdx++; setTimeout(paso, 300); }
+  };
+  try { window.speechSynthesis.cancel(); } catch (e) {}
+  setTimeout(paso, 100);
+}
+
+function viewAudio() {
+  const A = audioState();
+  const tabs = '<div class="tabs" role="tablist">' +
+    '<button class="tab" role="tab" aria-selected="' + (A.tab === 'dialogs') + '" data-act="audio-tab" data-t="dialogs">' + ic('headphones') + ' Diálogos</button>' +
+    '<button class="tab" role="tab" aria-selected="' + (A.tab === 'pron') + '" data-act="audio-tab" data-t="pron">' + ic('mic') + ' Pronunciación</button>' +
+  '</div>';
+  if (A.tab === 'pron') return tabs + viewPron();
+  return tabs + (A.id ? viewDialogue() : viewDialogueList());
+}
+
+function viewDialogueList() {
+  const hechos = S.dialoguesDone || {};
+  let html = '<h1>Escuchar</h1>' +
+    '<p class="muted" style="margin-top:-6px">Dos personas hablando a velocidad normal, sin texto. Primero escuchas, después respondes. La transcripción se ve al final, no antes: si lees mientras oyes, no entrenas el oído.</p>';
+  for (const l of LEVELS) {
+    const desbloqueado = isLevelUnlocked(l.id);
+    const lista = DIALOGUES.filter(d => d.level === l.id);
+    if (!lista.length) continue;
+    html += '<div class="level-head">' + esc(l.name) + (desbloqueado ? '' : ' · bloqueado') + '</div>';
+    if (!desbloqueado) {
+      html += '<div class="notice"><b>' + ic('lock') + ' Se desbloquea con ' + l.xp + ' XP</b>Te faltan ' + (l.xp - S.xp) + ' XP.</div>';
+      continue;
+    }
+    html += '<div class="tile-list">' + lista.map(d => {
+      const r = hechos[d.id];
+      return '<button class="tile' + (r ? ' done' : '') + '" data-act="open-dlg" data-id="' + d.id + '">' +
+        '<span class="tile-ico">' + ic(r ? 'check' : 'headphones') + '</span>' +
+        '<span class="tile-body">' +
+          '<span class="tile-t">' + esc(d.title) + (r ? ' <span class="pill">' + r.score + '%</span>' : '') +
+            ' <span class="pill">' + d.lines.length + ' turnos</span></span>' +
+          '<span class="tile-d">' + esc(d.context) + '</span>' +
+        '</span>' +
+        '<span class="tile-go">' + ic('right') + '</span>' +
+      '</button>';
+    }).join('') + '</div>';
+  }
+  return html + '<div style="height:20px"></div>';
+}
+
+function viewDialogue() {
+  const A = audioState();
+  const d = dialogueById(A.id);
+  if (!d) { A.id = null; return viewDialogueList(); }
+  const atras = '<button class="back-link" data-act="close-dlg">' + ic('left') + ' Diálogos</button>';
+
+  /* --- 1. Escuchar --- */
+  if (A.stage === 'intro') {
+    return atras +
+    '<div class="row-between"><h1 style="margin-bottom:4px">' + esc(d.title) + '</h1><span class="pill ' + d.level + '">' + d.level + '</span></div>' +
+    '<div class="notice"><b>' + ic('ear') + ' La situación</b>' + esc(d.context) + '</div>' +
+    '<div class="card center">' +
+      '<div class="dlg-visual">' + ic('headphones', 'ic-lg') + '</div>' +
+      '<div id="dlgstatus" class="dlg-status" aria-live="polite">' +
+        (A.plays ? 'Escuchado ' + A.plays + (A.plays === 1 ? ' vez' : ' veces') : 'Sin texto: solo el oído') + '</div>' +
+      '<div class="btn-row" style="margin:16px 0 8px">' +
+        (A.playing
+          ? '<button class="btn btn-accent btn-block" data-act="dlg-stop">' + ic('pause') + ' Detener</button>'
+          : '<button class="btn btn-primary" data-act="dlg-play" data-rate="1">' + ic('play') + ' Reproducir</button>' +
+            '<button class="btn btn-ghost" data-act="dlg-play" data-rate="0.7">' + ic('play') + ' Despacio</button>') +
+      '</div>' +
+      '<p class="tiny muted">Escúchalo entero al menos una vez. Si no pillas todo, no pasa nada: repítelo antes de mirar nada.</p>' +
+      (A.plays
+        ? '<div class="divider"></div><button class="btn btn-primary btn-block" data-act="dlg-quiz">Responder las preguntas ' + ic('right') + '</button>'
+        : '') +
+    '</div><div style="height:22px"></div>';
+  }
+
+  /* --- 2. Preguntas --- */
+  if (A.stage === 'quiz') {
+    const q = d.questions[A.qi];
+    return atras +
+    '<div class="ex-progress" role="progressbar" aria-valuemin="1" aria-valuemax="' + d.questions.length + '" aria-valuenow="' + (A.qi + 1) + '">' +
+      d.questions.map((_, i) => '<i class="' + (i < A.qi ? 'on' : i === A.qi ? 'cur' : '') + '"></i>').join('') +
+    '</div>' +
+    '<div class="card">' +
+      '<div class="ex-kind">Comprensión · ' + (A.qi + 1) + ' de ' + d.questions.length + '</div>' +
+      '<div class="ex-q">' + esc(q.q) + '</div>' +
+      '<div class="opts">' +
+        q.opts.map((o, i) => {
+          let cls = '';
+          if (A.answered) { if (i === q.a) cls = ' correct'; else if (i === A.picked) cls = ' wrong'; }
+          return '<button class="opt' + cls + '" data-act="dlg-answer" data-i="' + i + '"' + (A.answered ? ' disabled' : '') + '>' + esc(o) + '</button>';
+        }).join('') +
+      '</div>' +
+      (A.answered
+        ? '<div class="feedback ' + (A.picked === q.a ? 'ok' : 'no') + '" role="status">' +
+            '<b>' + (A.picked === q.a ? '¡Correcto!' : 'La respuesta era: ' + esc(q.opts[q.a])) + '</b>' + esc(q.why) + '</div>' +
+          '<div class="btn-row" style="margin-top:12px">' +
+            '<button class="btn btn-ghost" data-act="dlg-replay">' + ic('volume') + ' Volver a oírlo</button>' +
+            '<button class="btn btn-primary" data-act="dlg-next-q" data-autofocus>' +
+              (A.qi + 1 < d.questions.length ? 'Siguiente ' : 'Al dictado ') + ic('right') + '</button>' +
+          '</div>'
+        : '<button class="btn btn-ghost btn-block btn-sm" style="margin-top:12px" data-act="dlg-replay">' + ic('volume') + ' Volver a oír el diálogo</button>') +
+    '</div><div style="height:22px"></div>';
+  }
+
+  /* --- 3. Dictado --- */
+  if (A.stage === 'dict') {
+    const linea = d.lines[d.dictation];
+    const r = A.dictResult;
+    let marcado = '';
+    if (r) {
+      const tokens = linea.en.split(/(\s+)/);
+      let wi = -1;
+      marcado = tokens.map(t => {
+        if (/^\s+$/.test(t)) return t;
+        wi++;
+        return '<span class="w ' + (r.marks[wi] ? 'hit' : 'miss') + '">' + esc(t) + '</span>';
+      }).join('');
+    }
+    return atras +
+    '<div class="card">' +
+      '<div class="ex-kind">Dictado</div>' +
+      '<div class="ex-q">Escribe exactamente lo que oigas</div>' +
+      '<div class="btn-row" style="margin-bottom:14px">' +
+        '<button class="btn btn-primary" data-act="say" data-text="' + esc(linea.en) + '">' + ic('volume') + ' Escuchar la frase</button>' +
+        '<button class="btn btn-ghost" data-act="say-slow" data-text="' + esc(linea.en) + '">' + ic('volume') + ' Despacio</button>' +
+      '</div>' +
+      (r
+        ? '<div class="pron-phrase" style="font-size:1.15rem;padding:14px 4px">' + marcado + '</div>' +
+          '<div class="score-ring"><div class="num" style="color:' + (r.score >= 80 ? 'var(--ok)' : r.score >= 50 ? 'var(--accent)' : 'var(--err)') + '">' + r.score + '%</div>' +
+          '<div class="lab">' + (r.score >= 90 ? 'Oído fino' : r.score >= 70 ? 'Muy bien' : r.score >= 40 ? 'Vas cogiendo el hilo' : 'Vuelve a escucharla despacio') + '</div></div>' +
+          '<p class="small muted center">' + esc(linea.es) + '</p>' +
+          '<button class="btn btn-primary btn-block" style="margin-top:10px" data-act="dlg-finish" data-autofocus>Ver la transcripción ' + ic('right') + '</button>'
+        : '<div class="field">' +
+            '<label class="sr-only" for="dictinput">Escribe la frase que oíste</label>' +
+            '<textarea id="dictinput" placeholder="Write what you hear…" spellcheck="false" style="min-height:80px" data-autofocus></textarea>' +
+          '</div>' +
+          '<button class="btn btn-primary btn-block" data-act="dlg-check-dict">Comprobar</button>' +
+          '<button class="btn btn-ghost btn-block btn-sm" style="margin-top:8px" data-act="dlg-skip-dict">Saltar el dictado</button>') +
+    '</div><div style="height:22px"></div>';
+  }
+
+  /* --- 4. Transcripción --- */
+  const score = d.questions.length ? Math.round((A.right / d.questions.length) * 100) : 0;
+  return atras +
+  '<div class="card center">' +
+    '<div style="color:var(--ok)">' + ic('check', 'ic-lg') + '</div>' +
+    '<h1 style="margin:8px 0 2px">' + score + '%</h1>' +
+    '<p class="muted small">' + A.right + ' de ' + d.questions.length + ' preguntas. ' +
+      (score >= 80 ? 'Lo entendiste sin leer: eso es lo que cuenta.' : score >= 50 ? 'Vas bien. Vuelve a escucharlo ahora con la transcripción delante.' : 'Escúchalo otra vez siguiendo el texto, y luego sin él.') + '</p>' +
+  '</div>' +
+  '<div class="card">' +
+    '<div class="card-title"><h3>Transcripción</h3>' +
+      '<button class="btn btn-sm btn-ghost" style="margin-left:auto" data-act="dlg-play" data-rate="1">' + ic('play') + ' Todo</button></div>' +
+    d.lines.map((l, i) =>
+      '<div class="dlg-line ' + (l.who === 'A' ? 'a' : 'b') + '">' +
+        '<div class="dlg-who">' + esc(l.who === 'A' ? d.speakers.A : d.speakers.B) + '</div>' +
+        '<div class="msg-row">' +
+          '<div class="dlg-text"><b>' + esc(l.en) + '</b><br><span class="muted small">' + esc(l.es) + '</span></div>' +
+          '<button class="spk" data-act="say" data-text="' + esc(l.en) + '" aria-label="Escuchar este turno">' + ic('volume') + '</button>' +
+        '</div>' +
+      '</div>'
+    ).join('') +
+  '</div>' +
+  '<div class="btn-row" style="margin-bottom:22px">' +
+    '<button class="btn btn-ghost" data-act="dlg-restart">' + ic('refresh') + ' Repetirlo</button>' +
+    '<button class="btn btn-primary" data-act="close-dlg">Otro diálogo</button>' +
+  '</div>';
+}
+
+/* ══════════════════ 13b. PRONUNCIACIÓN ══════════════════ */
 function pronPool() {
   const lv = currentLevel().id;
   let pool = (PRONUNCIATION_SETS[lv] || []).slice();
@@ -1912,6 +2147,66 @@ document.addEventListener('click', async (e) => {
   if (act === 'leave-email')  { const T = talkState(); T.emailTask = null; T.emailResult = null; render(); return; }
   if (act === 'review-email') { reviewEmail(); return; }
 
+  /* --- escuchar: diálogos --- */
+  if (act === 'audio-tab') { stopDialogue(); audioState().tab = t.dataset.t; window.scrollTo(0, 0); render(); return; }
+  if (act === 'open-dlg') {
+    const A = audioState();
+    A.id = t.dataset.id; A.stage = 'intro'; A.qi = 0; A.answered = false; A.picked = null;
+    A.right = 0; A.plays = 0; A.dictTyped = ''; A.dictResult = null;
+    window.scrollTo(0, 0); render(); return;
+  }
+  if (act === 'close-dlg')  { stopDialogue(); audioState().id = null; window.scrollTo(0, 0); render(); return; }
+  if (act === 'dlg-stop')   { stopDialogue(); render(); return; }
+  if (act === 'dlg-play') {
+    const A = audioState();
+    const d = dialogueById(A.id);
+    if (!d) return;
+    A.rate = Number(t.dataset.rate) || 1;
+    playLines(d.lines, A.rate, () => { A.plays++; render(); }, d);
+    render(); return;
+  }
+  if (act === 'dlg-replay') {
+    const A = audioState();
+    const d = dialogueById(A.id);
+    if (d) playLines(d.lines, A.rate || 1, null, null);
+    return;
+  }
+  if (act === 'dlg-quiz')   { stopDialogue(); const A = audioState(); A.stage = 'quiz'; A.qi = 0; A.answered = false; A.picked = null; A.right = 0; window.scrollTo(0, 0); render(); return; }
+  if (act === 'dlg-answer') {
+    const A = audioState();
+    const d = dialogueById(A.id);
+    if (A.answered) return;
+    A.picked = Number(t.dataset.i);
+    A.answered = true;
+    if (A.picked === d.questions[A.qi].a) { A.right++; addXp(8, true); } else addXp(2, true);
+    render(); return;
+  }
+  if (act === 'dlg-next-q') {
+    const A = audioState();
+    const d = dialogueById(A.id);
+    if (A.qi + 1 < d.questions.length) { A.qi++; A.answered = false; A.picked = null; }
+    else { A.stage = 'dict'; }
+    window.scrollTo(0, 0); render(); return;
+  }
+  if (act === 'dlg-check-dict') {
+    const A = audioState();
+    const d = dialogueById(A.id);
+    const box = document.getElementById('dictinput');
+    const val = box ? box.value : '';
+    if (!val.trim()) { toast('Escribe lo que oíste, o salta el dictado.'); return; }
+    A.dictTyped = val;
+    A.dictResult = lcsMarks(d.lines[d.dictation].en, val);
+    addXp(Math.max(3, Math.round(A.dictResult.score / 6)), true);
+    render(); return;
+  }
+  if (act === 'dlg-skip-dict') { audioState().stage = 'script'; guardarDialogo(); window.scrollTo(0, 0); render(); return; }
+  if (act === 'dlg-finish')    { audioState().stage = 'script'; guardarDialogo(); window.scrollTo(0, 0); render(); return; }
+  if (act === 'dlg-restart') {
+    const A = audioState();
+    A.stage = 'intro'; A.qi = 0; A.answered = false; A.picked = null; A.right = 0; A.plays = 0; A.dictResult = null; A.dictTyped = '';
+    window.scrollTo(0, 0); render(); return;
+  }
+
   /* --- pronunciación --- */
   if (act === 'pron-mic') {
     const P = pronState();
@@ -2125,7 +2420,7 @@ function boot() {
   document.getElementById('nav').innerHTML =
     '<div class="bottomnav-in">' +
       [['home', 'home', 'Inicio'], ['lessons', 'book', 'Lecciones'], ['talk', 'chat', 'Conversar'],
-       ['pron', 'mic', 'Pronunciar'], ['review', 'cards', 'Repaso']]
+       ['pron', 'headphones', 'Escuchar'], ['review', 'cards', 'Repaso']]
       .map(([tab, icon, label]) =>
         '<button class="navbtn" data-act="tab" data-tab="' + tab + '">' + ic(icon) + '<span>' + label + '</span></button>'
       ).join('') +

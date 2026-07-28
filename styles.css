@@ -471,6 +471,24 @@ input:focus, select:focus, textarea:focus { border-color: var(--brand); }
 @keyframes micpulse { 0%,100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--err) 55%, transparent); } 50% { box-shadow: 0 0 0 18px transparent; } }
 
 /* ---------- Repaso (SRS) ---------- */
+/* ---- Diálogos de escucha ---- */
+.dlg-visual {
+  width: 84px; height: 84px; border-radius: 50%; margin: 6px auto 12px;
+  display: grid; place-items: center;
+  background: var(--brand-soft); color: var(--brand-ink);
+}
+[data-theme="dark"] .dlg-visual { color: var(--brand); }
+.dlg-status { font-size: .88rem; font-weight: 700; color: var(--text-dim); min-height: 22px; }
+.dlg-line { padding: 12px 0; border-bottom: 1px solid var(--border); }
+.dlg-line:last-child { border-bottom: 0; }
+.dlg-who {
+  font-size: .7rem; font-weight: 800; text-transform: uppercase; letter-spacing: .05em;
+  margin-bottom: 4px; color: var(--text-soft);
+}
+.dlg-line.a .dlg-who { color: var(--accent); }
+.dlg-line.b .dlg-who { color: var(--brand); }
+.dlg-text { flex: 1; font-size: .93rem; line-height: 1.5; }
+
 /* Etiqueta de dirección del repaso */
 .dir-tag {
   display: inline-flex; align-items: center; gap: 7px;
