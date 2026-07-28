@@ -3107,13 +3107,16 @@ function boot() {
     '</div>';
   render();
 
-  // retirar la pantalla de arranque: se deja ver un momento y se desvanece
+  // Retirar la pantalla de arranque. Se queda quieta el tiempo suficiente
+  // para leer el nombre, y luego se desvanece. Cambia este número si la
+  // quieres más corta o más larga (está en milisegundos).
+  const ESPERA_ARRANQUE = 1900;
   const arranque = document.getElementById('arranque');
   if (arranque) {
     setTimeout(() => {
       arranque.classList.add('fuera');
-      setTimeout(() => { if (arranque.parentNode) arranque.remove(); }, 450);
-    }, 550);
+      setTimeout(() => { if (arranque.parentNode) arranque.remove(); }, 550);
+    }, ESPERA_ARRANQUE);
   }
 }
 
