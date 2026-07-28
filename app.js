@@ -131,6 +131,8 @@ const DEFAULT_STATE = {
     accent: 'en-US',
     theme: 'auto',
     apiKey: '',
+    proxyUrl: '',      // intermediario del equipo
+    codigo: '',        // código de acceso del equipo
     model: 'claude-sonnet-5',
     dailyGoal: 50,
     voiceURI: ''
@@ -390,22 +392,51 @@ function startListening(onFinal, onEnd, onErr) {
 }
 function stopListening() { if (recognizer) { try { recognizer.stop(); } catch (e) {} recognizer = null; } }
 
-/* ══════════════════ 5. API DE ANTHROPIC ══════════════════ */
+/* ══════════════════ 5. API DE ANTHROPIC ══════════════════
+   Dos caminos:
+   · EQUIPO — la app habla con el intermediario, que guarda la clave.
+     El usuario no configura nada: le basta abrir el enlace con el código.
+   · PROPIO — cada quien pone su clave de Anthropic y va directo.
+   Si hay intermediario configurado, se usa ese.                        */
+
 const API_URL = 'https://api.anthropic.com/v1/messages';
 
+/* Dirección del intermediario del equipo. Se rellena tras desplegar
+   el Worker; también se puede pasar por enlace con ?api=... */
+const PROXY_POR_DEFECTO = '';
+
+function proxyUrl()   { return (S.settings.proxyUrl || PROXY_POR_DEFECTO || '').trim().replace(/\/+$/, ''); }
+function codigoEquipo(){ return (S.settings.codigo || '').trim(); }
+function hayTutor()    { return !!((proxyUrl() && codigoEquipo()) || (S.settings.apiKey || '').trim()); }
+
+/* Identificador de este dispositivo, para repartir el límite diario */
+function idDispositivo() {
+  if (!S.deviceId) {
+    S.deviceId = 'd' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    save();
+  }
+  return S.deviceId;
+}
+
 async function callClaude(system, messages, maxTokens) {
+  const proxy = proxyUrl();
+  const codigo = codigoEquipo();
   const key = (S.settings.apiKey || '').trim();
-  if (!key) { const e = new Error('nokey'); e.code = 'nokey'; throw e; }
+  if (!proxy && !key) { const e = new Error('nokey'); e.code = 'nokey'; throw e; }
+  if (proxy && !codigo && !key) { const e = new Error('nocode'); e.code = 'nocode'; throw e; }
+
+  const usarProxy = !!(proxy && codigo);
+  const destino = usarProxy ? proxy : API_URL;
+  const cabeceras = usarProxy
+    ? { 'content-type': 'application/json', 'X-Codigo': codigo, 'X-Dispositivo': idDispositivo() }
+    : { 'content-type': 'application/json', 'x-api-key': key,
+        'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' };
+
   let res;
   try {
-    res = await fetch(API_URL, {
+    res = await fetch(destino, {
       method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        'x-api-key': key,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
+      headers: cabeceras,
       body: JSON.stringify({
         model: S.settings.model || 'claude-sonnet-5',
         max_tokens: maxTokens || 700,
@@ -420,8 +451,11 @@ async function callClaude(system, messages, maxTokens) {
     let detail = '';
     try { const j = await res.json(); detail = (j.error && j.error.message) || ''; } catch (x) {}
     const e = new Error(detail || ('HTTP ' + res.status));
-    e.code = res.status === 401 ? 'badkey' : res.status === 429 ? 'rate' : 'http';
+    e.code = res.status === 401 ? (usarProxy ? 'badcode' : 'badkey')
+           : res.status === 429 ? (usarProxy ? 'limite' : 'rate')
+           : 'http';
     e.status = res.status;
+    e.detalle = detail;
     throw e;
   }
   const data = await res.json();
@@ -439,8 +473,11 @@ function parseJson(raw) {
 
 function apiErrorText(err) {
   switch (err && err.code) {
-    case 'nokey':   return 'Necesitas tu clave de API de Anthropic para conversar con el tutor. Ve a Ajustes y pégala (o sigue en modo sin IA).';
+    case 'nokey':   return 'El tutor con IA todavía no está activado. Ve a Ajustes e introduce el código de tu equipo, o tu propia clave de Anthropic.';
+    case 'nocode':  return 'Te falta el código de acceso del equipo. Pídeselo a quien te pasó la app y ponlo en Ajustes.';
+    case 'badcode': return 'Ese código de acceso no es correcto. Revísalo en Ajustes o pídelo de nuevo.';
     case 'badkey':  return 'La clave de API no es válida. Revísala en Ajustes.';
+    case 'limite':  return (err.detalle || 'Has llegado al límite de uso de hoy.') + ' Mientras tanto, las lecciones, la escucha y el repaso funcionan igual.';
     case 'rate':    return 'La API está recibiendo demasiadas solicitudes. Espera unos segundos y vuelve a intentar.';
     case 'network': return 'No se pudo conectar. Revisa tu conexión a internet e inténtalo de nuevo.';
     default:        return 'Hubo un problema con la IA: ' + ((err && err.message) || 'error desconocido') + '. Puedes seguir en modo sin IA.';
@@ -665,7 +702,7 @@ const Sesion = {
            || allUnits().filter(x => x.custom || isLevelUnlocked(x.level)).slice(-1)[0];
     if (u) pasos.push({ tipo: 'lesson', meta: 5, hechas: 0, titulo: 'Lección', tab: 'lessons', unitId: u.id, unitTitle: u.title });
 
-    if ((S.settings.apiKey || '').trim()) {
+    if (hayTutor()) {
       pasos.push({ tipo: 'talk', meta: 2, hechas: 0, titulo: 'Conversar', tab: 'talk' });
     } else {
       pasos.push({ tipo: 'listen', meta: 3, hechas: 0, titulo: 'Escuchar', tab: 'pron' });
@@ -988,7 +1025,7 @@ function createState() {
 
 function viewCreate() {
   const C = createState();
-  const noKey = !(S.settings.apiKey || '').trim();
+  const noKey = !hayTutor();
   return '' +
   '<button class="back-link" data-act="tab" data-tab="lessons">' + ic('left') + ' Lecciones</button>' +
   '<h1>Crear una lección</h1>' +
@@ -996,7 +1033,7 @@ function viewCreate() {
   App.avisoSinConexion('Crear una lección') +
 
   (noKey
-    ? '<div class="notice warn"><b>' + ic('lock') + ' Necesita tu clave de API</b>Esta función usa la IA para escribir la lección. Pega tu clave en ' +
+    ? '<div class="notice warn"><b>' + ic('lock') + ' La IA no está activada</b>Esta función necesita el tutor con IA. Actívalo en ' +
       '<button class="btn btn-sm btn-soft" data-act="tab" data-tab="settings">Ajustes</button></div>'
     : '') +
 
@@ -1359,11 +1396,11 @@ function viewTalk() {
 }
 
 function viewScenarioPicker() {
-  const noKey = !(S.settings.apiKey || '').trim();
+  const noKey = !hayTutor();
   return '<h1>Conversar</h1>' +
   '<p class="muted" style="margin-top:-6px">Elige una situación y habla en inglés. El tutor te responde, te corrige en español y te sugiere qué decir.</p>' +
   App.avisoSinConexion('Conversar con el tutor') +
-  (noKey ? '<div class="notice warn"><b>Modo sin IA activo</b>Puedes practicar con diálogos guiados y correcciones básicas. Para que el tutor responda de verdad, pega tu clave de API en <button class="btn btn-sm btn-soft" data-act="tab" data-tab="settings" style="margin-left:4px">Ajustes</button></div>' : '') +
+  (noKey ? '<div class="notice warn"><b>Modo sin IA activo</b>Puedes practicar con diálogos guiados y correcciones básicas. Para que el tutor responda de verdad, activa la IA en <button class="btn btn-sm btn-soft" data-act="tab" data-tab="settings" style="margin-left:4px">Ajustes</button></div>' : '') +
   '<div class="tile-list two">' +
     SCENARIOS.map(s =>
       '<button class="tile" data-act="pick-scenario" data-id="' + s.id + '">' +
@@ -2241,11 +2278,28 @@ function viewSettings() {
   '</div>' +
 
   '<div class="card">' +
-    '<div class="card-title"><h3>Tutor con IA</h3></div>' +
-    '<p class="small muted">Para que el tutor converse y corrija de verdad, necesitas una clave de API de Anthropic. Se guarda <b>solo en este navegador</b> y nunca se envía a otro sitio que no sea la API de Anthropic.</p>' +
-    '<div class="field"><label for="setkey">Clave de API de Anthropic</label>' +
+    '<div class="card-title">' +
+      '<span style="color:' + (hayTutor() ? 'var(--ok)' : 'var(--text-dim)') + '">' + ic(hayTutor() ? 'check' : 'lock') + '</span>' +
+      '<h3>Tutor con IA</h3>' +
+      '<span class="pill' + (hayTutor() ? ' A1' : '') + '" style="margin-left:auto">' + (hayTutor() ? 'activo' : 'inactivo') + '</span></div>' +
+    '<p class="small muted" style="margin-top:-4px">Hace falta para Conversar, el Correo de negocios, el generador de lecciones y el asistente de dudas. El resto de la app funciona sin esto.</p>' +
+
+    '<div class="divider"></div>' +
+    '<b class="small">Opción 1 · Código del equipo</b>' +
+    '<p class="small muted" style="margin:4px 0 10px">Si alguien te pasó un código, ponlo aquí y listo. No necesitas cuenta ni clave propia.</p>' +
+    '<div class="field"><label class="sr-only" for="setcodigo">Código de acceso</label>' +
+      '<input type="text" id="setcodigo" value="' + esc(st.codigo || '') + '" placeholder="Código de acceso" autocomplete="off" spellcheck="false"></div>' +
+    '<div class="field"><label for="setproxy">Dirección del servicio <span class="muted" style="font-weight:400">(la rellena el enlace)</span></label>' +
+      '<input type="text" id="setproxy" value="' + esc(st.proxyUrl || '') + '" placeholder="https://…workers.dev" autocomplete="off" spellcheck="false">' +
+      '<div class="hint">Si abriste la app con el enlace que te compartieron, esto ya viene puesto.</div></div>' +
+
+    '<div class="divider"></div>' +
+    '<b class="small">Opción 2 · Tu propia clave</b>' +
+    '<p class="small muted" style="margin:4px 0 10px">Para ir por tu cuenta, con tu propio saldo de Anthropic. Se guarda <b>solo en este navegador</b>.</p>' +
+    '<div class="field"><label class="sr-only" for="setkey">Clave de API de Anthropic</label>' +
       '<input type="password" id="setkey" value="' + esc(st.apiKey) + '" placeholder="sk-ant-…" autocomplete="off" spellcheck="false">' +
-      '<div class="hint">Consíguela en console.anthropic.com → API Keys. Sin clave, la app sigue funcionando en modo guiado.</div></div>' +
+      '<div class="hint">Se consigue en console.anthropic.com → API Keys. Si tienes código de equipo, se usa ese antes que la clave.</div></div>' +
+
     '<div class="field"><label for="setmodel">Modelo</label>' +
       '<select id="setmodel">' +
         '<option value="claude-sonnet-5"' + (st.model === 'claude-sonnet-5' ? ' selected' : '') + '>Claude Sonnet 5 — equilibrado (recomendado)</option>' +
@@ -2682,6 +2736,8 @@ document.addEventListener('click', async (e) => {
     S.settings.accent = g('setaccent') || 'en-US';
     S.settings.voiceURI = g('setvoice') || '';
     S.settings.apiKey = (g('setkey') || '').trim();
+    S.settings.codigo = (g('setcodigo') || '').trim();
+    S.settings.proxyUrl = (g('setproxy') || '').trim();
     S.settings.model = g('setmodel') || 'claude-sonnet-5';
     S.settings.theme = g('settheme') || 'auto';
     const lv = LEVELS.find(l => l.id === g('setlevel'));
@@ -2694,7 +2750,8 @@ document.addEventListener('click', async (e) => {
     t.disabled = true; t.textContent = 'Probando…';
     try {
       const r = await callClaude('Reply with exactly: {"ok":true}', [{ role: 'user', content: 'ping' }], 40);
-      toast(parseJson(r) ? 'Conexión correcta. El tutor con IA está listo.' : 'Respondió, pero con un formato inesperado.');
+      const via = (proxyUrl() && codigoEquipo()) ? ' (por el servicio del equipo)' : ' (con tu clave)';
+      toast(parseJson(r) ? 'Conexión correcta' + via + '. El tutor está listo.' : 'Respondió, pero con un formato inesperado.');
     } catch (err) { toast(apiErrorText(err)); }
     t.disabled = false; t.textContent = 'Probar la conexión';
     return;
@@ -2802,9 +2859,13 @@ document.addEventListener('change', e => {
       Object.keys(data.srs || {}).length + ' palabras · ' + Object.keys(data.completed || {}).length + ' lecciones';
     if (!confirm('Se reemplazará el progreso de este navegador por:\n\n' + resumen + '\n\n¿Continuar?')) return;
     const claveActual = S.settings.apiKey;
+    const proxyActual = S.settings.proxyUrl;
+    const codigoActual = S.settings.codigo;
     S = Object.assign({}, JSON.parse(JSON.stringify(DEFAULT_STATE)), data);
     S.settings = Object.assign({}, DEFAULT_STATE.settings, data.settings || {});
-    if (!S.settings.apiKey && claveActual) S.settings.apiKey = claveActual;  // no pierdas la clave de este equipo
+    if (!S.settings.apiKey && claveActual) S.settings.apiKey = claveActual;   // no pierdas la clave de este equipo
+    if (!S.settings.proxyUrl && proxyActual) S.settings.proxyUrl = proxyActual;
+    if (!S.settings.codigo && codigoActual) S.settings.codigo = codigoActual;
     S.customUnits = Array.isArray(S.customUnits) ? S.customUnits : [];
     S.mistakes = Array.isArray(S.mistakes) ? S.mistakes : [];
     if (!S.srsProd || typeof S.srsProd !== 'object') S.srsProd = {};
@@ -2933,7 +2994,7 @@ function renderAsk() {
 
   if (!Ask.abierto) { caja.innerHTML = fab; return; }
 
-  const sinClave = !(S.settings.apiKey || '').trim();
+  const sinClave = !hayTutor();
   const mensajes = Ask.msgs.length
     ? Ask.msgs.map(m => '<div class="ask-msg ' + (m.who === 'me' ? 'me' : 'bot') + (m.error ? ' err' : '') + '">' +
         esc(m.text).replace(/\n/g, '<br>') + '</div>').join('')
@@ -2951,8 +3012,8 @@ function renderAsk() {
         '</span>' +
       '</div>' +
       (sinClave
-        ? '<div class="ask-cuerpo"><div class="notice warn" style="margin:0"><b>' + ic('lock') + ' Necesita tu clave de API</b>' +
-          'El asistente usa la IA para responderte. Pega tu clave en Ajustes y podrás preguntarle cualquier cosa.</div></div>'
+        ? '<div class="ask-cuerpo"><div class="notice warn" style="margin:0"><b>' + ic('lock') + ' La IA no está activada</b>' +
+          'El asistente usa la IA para responderte. Actívala en Ajustes y podrás preguntarle cualquier cosa.</div></div>'
         : '<div class="ask-cuerpo" id="askcuerpo">' + mensajes +
           (Ask.busy ? '<div class="ask-msg bot"><span class="typing"><i></i><i></i><i></i></span></div>' : '') +
           '</div>' +
@@ -3092,9 +3153,21 @@ function boot() {
   App.init();
   ensureDay();
   applyTheme();
-  // atajos del icono instalado: ?ir=review, ?ir=talk, ?ir=pron
   try {
-    const destino = new URLSearchParams(location.search).get('ir');
+    const p = new URLSearchParams(location.search);
+    // el enlace del equipo trae el acceso: ?api=...&codigo=...
+    let configurado = false;
+    const api = p.get('api'), cod = p.get('codigo');
+    if (api && /^https:\/\//.test(api)) { S.settings.proxyUrl = api.trim(); configurado = true; }
+    if (cod) { S.settings.codigo = cod.trim(); configurado = true; }
+    if (configurado) {
+      save();
+      // limpiar la barra de direcciones para no dejar el código a la vista
+      try { history.replaceState(null, '', location.pathname); } catch (e) {}
+      setTimeout(() => toast('Tutor con IA activado'), 900);
+    }
+    // atajos del icono instalado: ?ir=review, ?ir=talk, ?ir=pron
+    const destino = p.get('ir');
     if (destino && ['home', 'lessons', 'talk', 'pron', 'review'].indexOf(destino) >= 0 && S.onboarded) V.tab = destino;
   } catch (e) {}
   document.getElementById('nav').innerHTML =
