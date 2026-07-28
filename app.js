@@ -528,6 +528,7 @@ function paintStats() {
 function render() {
   applyTheme();
   const root = app();
+  document.body.classList.toggle('previo', !S.onboarded);
   if (!S.onboarded) {
     document.getElementById('nav').hidden = true;
     document.getElementById('topstats').hidden = true;

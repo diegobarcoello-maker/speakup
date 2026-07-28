@@ -122,6 +122,19 @@ a  { color: var(--brand); }
 .logo-mark { width: 30px; height: 30px; flex: none; display: block; border-radius: 8px; }
 .topbar-stats { margin-left: auto; display: flex; align-items: center; gap: 6px; }
 
+/* Antes de empezar, la barra superior toma el color del arranque:
+   así el splash y la primera pantalla se leen como una sola cosa. */
+body.previo .topbar {
+  background: var(--brand-strong);
+  border-bottom-color: transparent;
+  color: #fff;
+}
+body.previo .topbar .btn-ghost {
+  border-color: rgba(255,255,255,.35); color: #fff; background: transparent;
+}
+body.previo .topbar .btn-ghost:hover { background: rgba(255,255,255,.12); }
+[data-theme="dark"] body.previo .topbar { background: #0a4a45; }
+
 .stat-chip {
   display: inline-flex; align-items: center; gap: 5px;
   background: var(--surface); border: 1px solid var(--border);
@@ -593,15 +606,27 @@ input:focus, select:focus, textarea:focus { border-color: var(--brand); }
 
 /* ---------- Onboarding ---------- */
 .onb { max-width: 520px; margin: 0 auto; }
-.onb-hero { text-align: center; padding: 30px 0 6px; }
+/* El bloque de bienvenida repite el color del arranque, para que
+   el paso del splash a la app sea continuo y no un salto de color. */
+.onb-hero {
+  text-align: center;
+  background: var(--brand-strong);
+  color: #fff;
+  border-radius: var(--radius-lg);
+  padding: 34px 22px 30px;
+  margin: 2px 0 20px;
+  box-shadow: 0 10px 34px color-mix(in srgb, var(--brand-strong) 34%, transparent);
+}
+[data-theme="dark"] .onb-hero { background: #0a4a45; }
 .onb-logo {
-  width: 88px; height: 88px; display: block; margin: 0 auto 18px; border-radius: 22px;
-  box-shadow: 0 10px 30px color-mix(in srgb, var(--brand) 28%, transparent);
+  width: 84px; height: 84px; display: block; margin: 0 auto 18px; border-radius: 21px;
+  box-shadow: 0 8px 22px rgba(0,0,0,.22);
   animation: entrar .5s cubic-bezier(.2,.8,.3,1);
 }
 @keyframes entrar { from { opacity: 0; transform: translateY(12px) scale(.94); } to { opacity: 1; transform: none; } }
-.onb-hero h1 { font-size: 1.75rem; margin-bottom: .35em; }
-.onb-lema { color: var(--text-dim); font-size: 1rem; line-height: 1.6; max-width: 400px; margin: 0 auto; }
+.onb-hero h1 { font-size: 1.7rem; margin-bottom: .35em; color: #fff; }
+.onb-lema { color: rgba(255,255,255,.85); font-size: .97rem; line-height: 1.6; max-width: 400px; margin: 0 auto; }
+.onb-lema b { color: #fff; }
 
 .onb-puntos { display: grid; gap: 8px; margin: 24px 0 18px; }
 .onb-punto {
