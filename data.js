@@ -373,6 +373,108 @@ const UNITS = [
   ]
 },
 
+{
+  id: 'a1-4', level: 'A1', title: 'Posesivos, plurales y pronombres',
+  goal: 'Decir de quién es algo, hablar en plural y no repetir el nombre en cada frase.',
+  grammar: {
+    title: 'El genitivo sajón: la clave para no sonar traducido',
+    es: 'En español dices "el pedido DEL cliente". En inglés se le da la vuelta: el dueño va PRIMERO y lleva apóstrofo + s. "The CLIENT’S order".\n\n' +
+        'Esta es probablemente la construcción que más delata a un hispanohablante, porque la traducción literal ("the order of the client") es gramaticalmente posible pero suena rarísima con personas.\n\n' +
+        'LA REGLA: dueño + ’s + cosa poseída. My boss’s office · the company’s policy · Diego’s phone.\n\n' +
+        'Si el dueño es PLURAL y ya termina en -s, solo se añade el apóstrofo: the clients’ orders (los pedidos de los clientes). Si el plural es irregular, lleva ’s normal: the children’s books.\n\n' +
+        'CUÁNDO SÍ SE USA "OF": con cosas y conceptos, no con personas. "The end of the year", "the price of the product". Con personas y organizaciones, casi siempre ’s.\n\n' +
+        'Y ojo con el falso amigo del apóstrofo: "it’s" es "it is". El posesivo de it es ITS, sin apóstrofo. "The company and ITS clients".',
+    examples: [
+      { en: "This is the client's order.", es: 'Este es el pedido del cliente.' },
+      { en: "My boss's name is Sarah.", es: 'Mi jefa se llama Sarah.' },
+      { en: "The clients' complaints went up.", es: 'Las quejas de los clientes subieron.' },
+      { en: "The price of the product is fixed.", es: 'El precio del producto es fijo.' },
+      { en: "The company and its suppliers.", es: 'La empresa y sus proveedores.' }
+    ],
+    more: [
+      {
+        title: 'Posesivos y pronombres de objeto',
+        es: 'ADJETIVOS POSESIVOS (van antes del sustantivo): my, your, his, her, its, our, their. "This is MY office".\n\n' +
+            'Dos avisos importantes. Primero: NO cambian con el plural. Se dice "my clients", no "mys clients". Segundo: el género lo marca el DUEÑO, no la cosa. "Her office" es la oficina de ella; "his office", la de él. En español dices "su oficina" para los dos.\n\n' +
+            'PRONOMBRES POSESIVOS (van solos, sin sustantivo detrás): mine, yours, his, hers, ours, theirs. "That desk is MINE".\n\n' +
+            'PRONOMBRES DE OBJETO (reciben la acción): me, you, him, her, it, us, them. "Call HIM tomorrow", "Send it to THEM". Van SIEMPRE después del verbo, nunca antes: se dice "I called him", jamás "I him called".',
+        examples: [
+          { en: "Her office is next to mine.", es: 'Su oficina (de ella) está al lado de la mía.' },
+          { en: "I'll send them the invoice today.", es: 'Les enviaré la factura hoy.' },
+          { en: "Their prices are lower than ours.", es: 'Sus precios son más bajos que los nuestros.' }
+        ]
+      },
+      {
+        title: 'Plurales: regulares e irregulares',
+        es: 'REGLA GENERAL: + s. client → clients · price → prices.\n\n' +
+            '+ ES cuando la palabra acaba en -s, -ss, -sh, -ch, -x, -o: boxes, watches, potatoes.\n\n' +
+            'CONSONANTE + Y → IES: company → companies · country → countries. Pero si hay vocal antes de la y, solo -s: day → days, key → keys.\n\n' +
+            '-F / -FE → VES: shelf → shelves · life → lives · knife → knives.\n\n' +
+            'IRREGULARES que hay que memorizar: man → men · woman → women · child → children · person → people · foot → feet · tooth → teeth.\n\n' +
+            'Y los que NO cambian: sheep, fish, aircraft, series, equipment.\n\n' +
+            'Aviso: "people" ya es plural. Se dice "three people", nunca "three peoples". Y lleva verbo plural: "People ARE waiting".',
+        examples: [
+          { en: "We work with twelve companies.", es: 'Trabajamos con doce empresas.' },
+          { en: "Three people are waiting for you.", es: 'Tres personas te están esperando.' },
+          { en: "The boxes are in the warehouse.", es: 'Las cajas están en la bodega.' }
+        ]
+      }
+    ],
+    mistakes: [
+      { bad: 'The order of the client.', good: "The client's order.", es: 'Con personas se usa el genitivo sajón.' },
+      { bad: 'The company and it’s clients.', good: 'The company and its clients.', es: '"It’s" es "it is". El posesivo es "its", sin apóstrofo.' },
+      { bad: 'Mys clients.', good: 'My clients.', es: 'Los posesivos no tienen plural.' },
+      { bad: 'Three peoples.', good: 'Three people.', es: '"People" ya es plural.' },
+      { bad: 'I him called yesterday.', good: 'I called him yesterday.', es: 'El pronombre de objeto va después del verbo.' }
+    ]
+  },
+  vocab: [
+    { en: 'my', es: 'mi' }, { en: 'your', es: 'tu / su (de usted)' },
+    { en: 'his', es: 'su (de él)' }, { en: 'her', es: 'su (de ella)' },
+    { en: 'its', es: 'su (de ello)' }, { en: 'our', es: 'nuestro' },
+    { en: 'their', es: 'su (de ellos)' }, { en: 'mine', es: 'el mío' },
+    { en: 'yours', es: 'el tuyo' }, { en: 'ours', es: 'el nuestro' },
+    { en: 'theirs', es: 'el suyo (de ellos)' },
+    { en: 'me', es: 'me / a mí' }, { en: 'him', es: 'lo / le (a él)' },
+    { en: 'her (object)', es: 'la / le (a ella)' }, { en: 'us', es: 'nos / a nosotros' },
+    { en: 'them', es: 'los / les (a ellos)' },
+    { en: 'people', es: 'personas / gente' }, { en: 'children', es: 'niños / hijos' },
+    { en: 'women', es: 'mujeres' }, { en: 'men', es: 'hombres' },
+    { en: 'companies', es: 'empresas' }, { en: 'countries', es: 'países' },
+    { en: 'boxes', es: 'cajas' }, { en: 'shelves', es: 'estantes' },
+    { en: 'colleague', es: 'compañero de trabajo' }, { en: 'department', es: 'departamento' },
+    { en: 'branch', es: 'sucursal' }, { en: 'staff', es: 'personal' },
+    { en: 'owner', es: 'dueño' }, { en: 'to belong to', es: 'pertenecer a' }
+  ],
+  phrases: [
+    { en: "This is the client's order.", es: 'Este es el pedido del cliente.' },
+    { en: "What's your boss's name?", es: '¿Cómo se llama tu jefe?' },
+    { en: "Her office is next to mine.", es: 'Su oficina está al lado de la mía.' },
+    { en: "Is this yours?", es: '¿Esto es tuyo?' },
+    { en: "No, it's theirs.", es: 'No, es de ellos.' },
+    { en: "I'll send them the invoice.", es: 'Les enviaré la factura.' },
+    { en: "Could you call him back?", es: '¿Podrías devolverle la llamada?' },
+    { en: "Our prices are lower than theirs.", es: 'Nuestros precios son más bajos que los suyos.' },
+    { en: "Three people are waiting for you.", es: 'Tres personas te están esperando.' },
+    { en: "We have branches in four countries.", es: 'Tenemos sucursales en cuatro países.' },
+    { en: "The boxes are in the warehouse.", es: 'Las cajas están en la bodega.' },
+    { en: "That desk belongs to my colleague.", es: 'Ese escritorio es de mi compañero.' }
+  ],
+  exercises: [
+    { t: 'mc', q: '¿Cómo dices "el pedido del cliente"?', opts: ['The order of the client', "The client's order", 'The client order'], a: 1, why: 'Con personas se usa el genitivo sajón: dueño + ’s + cosa.' },
+    { t: 'fill', q: "The company and ___ suppliers work well together.", a: ['its'], why: 'Posesivo de "it" es ITS, sin apóstrofo. "It’s" significa "it is".' },
+    { t: 'mc', q: 'El plural de "company" es...', opts: ['companys', 'companies', 'companyes'], a: 1, why: 'Consonante + y se convierte en -ies.' },
+    { t: 'tr', q: 'Su oficina (de ella) está al lado de la mía.', a: ['her office is next to mine', "her office's next to mine"], why: 'HER porque la dueña es mujer, y MINE porque va solo, sin sustantivo detrás.' },
+    { t: 'order', words: ['I', 'called', 'him', 'yesterday', 'afternoon.'], a: 'I called him yesterday afternoon.', why: 'El pronombre de objeto va después del verbo, nunca antes.' },
+    { t: 'mc', q: '¿Cuál es correcta?', opts: ['Three peoples are waiting', 'Three people is waiting', 'Three people are waiting'], a: 2, why: '"People" ya es plural y lleva verbo plural.' },
+    { t: 'fill', q: "Is this desk yours? No, it's ___.", a: ['theirs', 'his', 'hers', 'mine'], why: 'Los pronombres posesivos van solos: mine, yours, his, hers, ours, theirs.' },
+    { t: 'tr', q: 'Les enviaré la factura mañana.', a: ["i'll send them the invoice tomorrow", 'i will send them the invoice tomorrow'], why: 'THEM es el pronombre de objeto de "they".' },
+    { t: 'listen', audio: "My boss's assistant sent us the contract this morning.", opts: ['La asistente de mi jefe nos envió el contrato esta mañana.', 'Mi jefe le envió el contrato a la asistente.', 'La asistente nos pidió el contrato esta mañana.'], a: 0, why: 'Escucha el "boss’s" con dos sonidos de s seguidos, y el "us" del final.' },
+    { t: 'mc', q: 'El plural de "child" es...', opts: ['childs', 'children', 'childes'], a: 1, why: 'Es irregular, como man→men, woman→women, person→people.' },
+    { t: 'order', words: ['Our', 'prices', 'are', 'lower', 'than', 'theirs.'], a: 'Our prices are lower than theirs.', why: 'OUR va antes del sustantivo; THEIRS va solo al final.' }
+  ]
+},
+
 /* ══════════════════ A2 ══════════════════ */
 {
   id: 'a2-4', level: 'A2', title: 'Presente simple: tu rutina',
@@ -852,6 +954,106 @@ const UNITS = [
       why: 'Asistir a un evento es ATTEND. "Assist" es ayudar.' },
     { t: 'listen', audio: "Go straight ahead and turn left after the bank. It takes about ten minutes.", opts: ['Siga recto y gire a la izquierda después del banco. Toma unos diez minutos.', 'Gire a la derecha antes del banco y camine diez minutos.', 'El banco está a diez minutos a la izquierda.'], a: 0,
       why: '"It takes" es la forma de decir cuánto tiempo lleva algo.' }
+  ]
+},
+
+{
+  id: 'a2-8', level: 'A2', title: 'Contables, incontables y cantidades',
+  goal: 'Preguntar y decir cantidades sin equivocarte entre "how much" y "how many".',
+  grammar: {
+    title: 'Contables e incontables: la división que lo decide todo',
+    es: 'En inglés cada sustantivo pertenece a uno de dos grupos, y de ahí sale casi todo lo demás.\n\n' +
+        'CONTABLES: se pueden contar de uno en uno y tienen plural. One client, two clients. One box, three boxes.\n\n' +
+        'INCONTABLES: se ven como una masa, NO tienen plural y NUNCA llevan "a/an". Money, information, advice, equipment, furniture, luggage, work, time, water, help, feedback, progress, news, software, staff.\n\n' +
+        'Aquí está la trampa: varias de estas SÍ son contables en español, y por eso se cometen los errores más marcados. "Una información" no existe: es "some information" o "a piece of information". "Los muebles" es "furniture", en singular. Y "news" acaba en -s pero es singular: "The news IS good".\n\n' +
+        'LA CONSECUENCIA PRÁCTICA:\n' +
+        '· HOW MANY + contables → How many clients? How many units?\n' +
+        '· HOW MUCH + incontables → How much money? How much time?\n\n' +
+        'Y ojo: "how much" también sirve para precios, porque el dinero es incontable: "How much is it?".',
+    examples: [
+      { en: "How many units do you need?", es: '¿Cuántas unidades necesita?' },
+      { en: "How much time do we have?", es: '¿Cuánto tiempo tenemos?' },
+      { en: "I need some information about the order.", es: 'Necesito información sobre el pedido.' },
+      { en: "The news is good.", es: 'Las noticias son buenas.' },
+      { en: "Can you give me some advice?", es: '¿Me puedes dar un consejo?' }
+    ],
+    more: [
+      {
+        title: 'SOME, ANY, A LOT OF, A FEW, A LITTLE',
+        es: 'SOME y ANY significan "algo de / algunos", pero se reparten así: SOME en frases afirmativas ("We have some stock") y ANY en negativas y preguntas ("We don’t have any stock", "Do you have any stock?").\n\n' +
+            'La excepción que conviene saber: se usa SOME en preguntas cuando ofreces o pides algo esperando un sí. "Would you like some coffee?", "Could you send me some samples?". Suena más amable que "any".\n\n' +
+            'A LOT OF / LOTS OF sirven para los dos grupos y son lo más usado al hablar: "a lot of clients", "a lot of work".\n\n' +
+            'MUCH y MANY se usan sobre todo en negativas y preguntas: "We don’t have much time", "Were there many people?". En afirmativas suenan formales; ahí es mejor "a lot of".\n\n' +
+            'POCO / UN POCO: A FEW + contables (a few clients = unos cuantos) y A LITTLE + incontables (a little time = un poco de tiempo). Sin el artículo cambian de sentido y se vuelven negativos: FEW clients = pocos clientes (casi ninguno), LITTLE time = poco tiempo (casi nada).',
+        examples: [
+          { en: "We don't have any samples left.", es: 'No nos quedan muestras.' },
+          { en: "Could you send me some samples?", es: '¿Podría enviarme unas muestras?' },
+          { en: "I have a little time before the meeting.", es: 'Tengo un poco de tiempo antes de la reunión.' }
+        ]
+      },
+      {
+        title: 'Medir lo incontable y hablar de precios',
+        es: 'Para contar lo incontable se usa un envase o una unidad de medida: a piece of information · a piece of advice · a bottle of water · a cup of coffee · two kilos of sugar · three items of equipment.\n\n' +
+            'PRECIOS Y CANTIDADES EN NEGOCIOS: unit price (precio unitario) · total amount (importe total) · quantity (cantidad) · a batch of (un lote de) · per unit (por unidad) · in bulk (a granel) · minimum order quantity, MOQ (pedido mínimo).\n\n' +
+            'Fíjate en el uso de PER: "twelve dollars per unit", "two visits per week". Es más formal que "a": "twelve dollars a unit" también vale y es más coloquial.',
+        examples: [
+          { en: "What's the minimum order quantity?", es: '¿Cuál es el pedido mínimo?' },
+          { en: "The unit price is twelve dollars.", es: 'El precio unitario es doce dólares.' },
+          { en: "Let me give you a piece of advice.", es: 'Déjame darte un consejo.' }
+        ]
+      }
+    ],
+    mistakes: [
+      { bad: 'How much clients do you have?', good: 'How many clients do you have?', es: 'Clients es contable: how many.' },
+      { bad: 'I need an information.', good: 'I need some information.', es: 'Information es incontable: sin "a".' },
+      { bad: 'The news are good.', good: 'The news is good.', es: '"News" acaba en -s pero es singular.' },
+      { bad: 'Do you have some samples?', good: 'Do you have any samples?', es: 'En preguntas neutras se usa "any".' },
+      { bad: 'We have many works to do.', good: 'We have a lot of work to do.', es: '"Work" es incontable y no lleva plural.' }
+    ]
+  },
+  vocab: [
+    { en: 'money', es: 'dinero (incontable)' }, { en: 'information', es: 'información (incontable)' },
+    { en: 'advice', es: 'consejo (incontable)' }, { en: 'equipment', es: 'equipo / equipamiento' },
+    { en: 'furniture', es: 'muebles (incontable)' }, { en: 'luggage', es: 'equipaje (incontable)' },
+    { en: 'news', es: 'noticias (singular)' }, { en: 'feedback', es: 'comentarios / retroalimentación' },
+    { en: 'progress', es: 'avance (incontable)' }, { en: 'work', es: 'trabajo (incontable)' },
+    { en: 'some', es: 'algo de / algunos' }, { en: 'any', es: 'algo / alguno (neg. y preg.)' },
+    { en: 'a lot of', es: 'mucho / muchos' }, { en: 'much', es: 'mucho (incontable)' },
+    { en: 'many', es: 'muchos (contable)' }, { en: 'a few', es: 'unos cuantos' },
+    { en: 'a little', es: 'un poco de' }, { en: 'enough', es: 'suficiente' },
+    { en: 'too much', es: 'demasiado' }, { en: 'a piece of', es: 'un/una...' },
+    { en: 'quantity', es: 'cantidad' }, { en: 'amount', es: 'importe / cantidad' },
+    { en: 'unit price', es: 'precio unitario' }, { en: 'total', es: 'total' },
+    { en: 'per unit', es: 'por unidad' }, { en: 'in bulk', es: 'a granel' },
+    { en: 'batch', es: 'lote' }, { en: 'minimum order', es: 'pedido mínimo' },
+    { en: 'to run out of', es: 'quedarse sin' }, { en: 'left (remaining)', es: 'que queda' }
+  ],
+  phrases: [
+    { en: "How many units do you need?", es: '¿Cuántas unidades necesita?' },
+    { en: "How much is the total?", es: '¿Cuánto es el total?' },
+    { en: "I need some information about the order.", es: 'Necesito información sobre el pedido.' },
+    { en: "We don't have any samples left.", es: 'No nos quedan muestras.' },
+    { en: "Could you send me some samples?", es: '¿Podría enviarme unas muestras?' },
+    { en: "There's a lot of work this week.", es: 'Hay mucho trabajo esta semana.' },
+    { en: "We don't have much time.", es: 'No tenemos mucho tiempo.' },
+    { en: "I have a few questions.", es: 'Tengo unas cuantas preguntas.' },
+    { en: "What's the minimum order quantity?", es: '¿Cuál es el pedido mínimo?' },
+    { en: "The unit price is twelve dollars.", es: 'El precio unitario es doce dólares.' },
+    { en: "Do we have enough stock?", es: '¿Tenemos suficiente inventario?' },
+    { en: "That's too much for our budget.", es: 'Eso es demasiado para nuestro presupuesto.' }
+  ],
+  exercises: [
+    { t: 'mc', q: '¿Cuál es correcta?', opts: ['How much clients do you have?', 'How many clients do you have?', 'How many client do you have?'], a: 1, why: '"Clients" es contable: HOW MANY.' },
+    { t: 'fill', q: "___ much time do we have?", a: ['how'], why: '"Time" es incontable: HOW MUCH.' },
+    { t: 'mc', q: '¿Cuál está bien?', opts: ['I need an information', 'I need some information', 'I need some informations'], a: 1, why: '"Information" es incontable: ni "a" ni plural.' },
+    { t: 'fill', q: "We don't have ___ samples left.", a: ['any'], why: 'ANY en frases negativas y preguntas neutras.' },
+    { t: 'tr', q: '¿Podría enviarme unas muestras?', a: ['could you send me some samples', 'could you send me some samples please'], why: 'En peticiones se usa SOME, no ANY: suena más amable.' },
+    { t: 'mc', q: '"The news ___ good."', opts: ['is', 'are', 'be'], a: 0, why: '"News" acaba en -s pero es singular.' },
+    { t: 'fill', q: "I have ___ few questions before we start.", a: ['a'], why: '"A few" = unos cuantos. Sin el "a" significaría "casi ninguna".' },
+    { t: 'tr', q: 'No tenemos mucho tiempo.', a: ["we don't have much time", 'we do not have much time'], why: 'MUCH con incontables, y en negativa es donde más natural suena.' },
+    { t: 'order', words: ['What', 'is', 'the', 'minimum', 'order', 'quantity?'], a: 'What is the minimum order quantity?', why: 'MOQ es una pregunta obligatoria al negociar con un proveedor nuevo.' },
+    { t: 'listen', audio: "We don't have many units left, but there's still a lot of stock in the other warehouse.", opts: ['No nos quedan muchas unidades, pero todavía hay mucho inventario en la otra bodega.', 'Nos quedan muchas unidades y también hay inventario en la otra bodega.', 'No queda inventario en ninguna de las dos bodegas.'], a: 0, why: 'MANY con "units" (contable) y A LOT OF con "stock" (incontable), en la misma frase.' },
+    { t: 'mc', q: '"We have a lot of work" — ¿por qué no "works"?', opts: ['Porque es un error de la app', 'Porque "work" es incontable', 'Porque va detrás de "a lot of"'], a: 1, why: '"Work" no tiene plural cuando significa trabajo en general.' }
   ]
 },
 
@@ -1355,6 +1557,314 @@ const UNITS = [
       why: '"On the other hand" introduce el contrapeso de un argumento.' },
     { t: 'listen', audio: "I see where you're coming from, but I'm not sure it would work in our market.", opts: ['Entiendo tu postura, pero no estoy seguro de que funcione en nuestro mercado.', 'No entiendo de dónde vienes ni si funciona el mercado.', 'Estoy de acuerdo en que funcionaría en nuestro mercado.'], a: 0,
       why: '"I see where you’re coming from" es la forma más empática de reconocer antes de discrepar.' }
+  ]
+},
+
+{
+  id: 'b1-10', level: 'B1', title: 'Obligación, prohibición y consejo',
+  goal: 'Decir lo que hay que hacer, lo que está prohibido y lo que conviene, sin sonar mandón.',
+  grammar: {
+    title: 'MUST, HAVE TO, SHOULD: la escala de la obligación',
+    es: 'Tres formas de decir "hay que", y elegir mal cambia la relación con quien te escucha.\n\n' +
+        'HAVE TO = obligación que viene de fuera: una norma, la ley, el jefe. "I have to send the report every Monday" (me lo exigen). Es la más usada en el día a día.\n\n' +
+        'MUST = obligación que sientes tú, o una norma escrita en un documento. "I must call that client today" (me lo impongo yo). En contratos y avisos: "All goods must be inspected".\n\n' +
+        'SHOULD = consejo, recomendación. No obliga. "You should confirm it in writing".\n\n' +
+        'AQUÍ ESTÁ LA TRAMPA MÁS IMPORTANTE DEL INGLÉS DE NEGOCIOS, y es la negación:\n\n' +
+        '· MUSTN’T = PROHIBIDO. "You mustn’t share these prices" = no puedes, está prohibido.\n' +
+        '· DON’T HAVE TO = NO HACE FALTA. "You don’t have to come" = puedes venir si quieres, pero no es necesario.\n\n' +
+        'Significan cosas opuestas. Confundirlas en un correo puede costarte un cliente o un malentendido serio.\n\n' +
+        'Nota de forma: must y should no llevan "to" después ni cambian con la persona. "He must go", no "He musts to go". HAVE TO sí cambia: "He HAS to go".',
+    examples: [
+      { en: "I have to send the report every Monday.", es: 'Tengo que enviar el informe cada lunes.' },
+      { en: "All goods must be inspected before shipping.", es: 'Toda la mercancía debe inspeccionarse antes del envío.' },
+      { en: "You should confirm it in writing.", es: 'Deberías confirmarlo por escrito.' },
+      { en: "You mustn't share these prices with anyone.", es: 'No debes compartir estos precios con nadie.' },
+      { en: "You don't have to come to the meeting.", es: 'No hace falta que vengas a la reunión.' }
+    ],
+    more: [
+      {
+        title: 'Obligación en pasado y en futuro',
+        es: 'MUST no tiene pasado. Para el pasado de la obligación se usa siempre HAD TO: "I had to cancel the trip". No existe "I musted".\n\n' +
+            'En futuro: "I’ll have to check with my boss" · "We’re going to have to postpone it".\n\n' +
+            'Para el consejo en pasado se usa SHOULD HAVE + participio, y sirve para reprochar o lamentar: "We should have confirmed it earlier" (deberíamos haberlo confirmado antes, pero no lo hicimos). Su negativo: "You shouldn’t have signed that".\n\n' +
+            'Y una alternativa muy útil: HAD BETTER (’d better) para advertencias con cierta urgencia. "We’d better call him now" = más vale que le llamemos ya. Es más fuerte que "should" pero menos que "must".',
+        examples: [
+          { en: "I had to cancel the trip last week.", es: 'Tuve que cancelar el viaje la semana pasada.' },
+          { en: "We should have confirmed it earlier.", es: 'Deberíamos haberlo confirmado antes.' },
+          { en: "We'd better call him before five.", es: 'Más vale que le llamemos antes de las cinco.' }
+        ]
+      },
+      {
+        title: 'Suavizar la obligación cuando hablas con un cliente',
+        es: 'Decirle "you must" o "you have to" a un cliente suena a orden. En su lugar, dale la vuelta:\n\n' +
+            'En vez de "You must pay 30% upfront" → "We would need a 30% deposit to start" o "The order requires a 30% deposit".\n' +
+            'En vez de "You have to send the PO" → "Could you send us the purchase order?" o "We’ll need the purchase order to proceed".\n' +
+            'En vez de "You should choose the other model" → "I’d recommend the other model" o "You might want to consider the other model".\n\n' +
+            'La técnica es mover la obligación de la persona al proceso: no es que TÚ debas, es que el proceso lo requiere. Suena impersonal y nadie se ofende.\n\n' +
+            'Verbos útiles para eso: require, need, involve. "The process requires...", "This would involve...".',
+        examples: [
+          { en: "We would need a thirty percent deposit to start.", es: 'Necesitaríamos un treinta por ciento de anticipo para empezar.' },
+          { en: "I'd recommend the second option.", es: 'Yo recomendaría la segunda opción.' },
+          { en: "You might want to consider a longer lead time.", es: 'Quizá quiera considerar un plazo más largo.' }
+        ]
+      }
+    ],
+    mistakes: [
+      { bad: "You don't have to share these prices (queriendo prohibir).", good: "You mustn't share these prices.", es: '"Don’t have to" es "no hace falta", no "está prohibido".' },
+      { bad: 'He musts to go.', good: 'He must go.', es: 'Must no lleva -s ni "to".' },
+      { bad: 'I musted cancel it.', good: 'I had to cancel it.', es: 'Must no tiene pasado: se usa "had to".' },
+      { bad: 'You must send me the PO.', good: 'Could you send us the purchase order?', es: 'A un cliente, "must" suena a orden.' },
+      { bad: 'We should to confirm it.', good: 'We should confirm it.', es: 'Should no lleva "to".' }
+    ]
+  },
+  vocab: [
+    { en: 'must', es: 'deber (obligación propia)' }, { en: 'have to', es: 'tener que' },
+    { en: 'should', es: 'debería' }, { en: "mustn't", es: 'no debe (prohibido)' },
+    { en: "don't have to", es: 'no hace falta' }, { en: 'had to', es: 'tuve que' },
+    { en: 'had better', es: 'más vale que' }, { en: 'to require', es: 'requerir' },
+    { en: 'to need', es: 'necesitar' }, { en: 'to involve', es: 'implicar' },
+    { en: 'to allow', es: 'permitir' }, { en: 'to forbid', es: 'prohibir' },
+    { en: 'allowed', es: 'permitido' }, { en: 'forbidden', es: 'prohibido' },
+    { en: 'compulsory', es: 'obligatorio' }, { en: 'optional', es: 'opcional' },
+    { en: 'deadline', es: 'fecha límite' }, { en: 'policy', es: 'política / norma' },
+    { en: 'rule', es: 'regla' }, { en: 'procedure', es: 'procedimiento' },
+    { en: 'to comply with', es: 'cumplir con' }, { en: 'compliance', es: 'cumplimiento' },
+    { en: 'to approve', es: 'aprobar' }, { en: 'approval', es: 'aprobación' },
+    { en: 'to authorize', es: 'autorizar' }, { en: 'signature', es: 'firma' },
+    { en: 'deposit', es: 'anticipo' }, { en: 'in writing', es: 'por escrito' },
+    { en: 'to proceed', es: 'proceder / continuar' }, { en: 'to recommend', es: 'recomendar' }
+  ],
+  phrases: [
+    { en: "I have to send the report every Monday.", es: 'Tengo que enviar el informe cada lunes.' },
+    { en: "You mustn't share these prices with the competition.", es: 'No debes compartir estos precios con la competencia.' },
+    { en: "You don't have to come if you're busy.", es: 'No hace falta que vengas si estás ocupado.' },
+    { en: "You should confirm it in writing.", es: 'Deberías confirmarlo por escrito.' },
+    { en: "I had to cancel the trip last week.", es: 'Tuve que cancelar el viaje la semana pasada.' },
+    { en: "We should have confirmed it earlier.", es: 'Deberíamos haberlo confirmado antes.' },
+    { en: "We'd better call him before five.", es: 'Más vale que le llamemos antes de las cinco.' },
+    { en: "The order requires a thirty percent deposit.", es: 'El pedido requiere un anticipo del treinta por ciento.' },
+    { en: "I'll have to check with my manager.", es: 'Tendré que consultarlo con mi gerente.' },
+    { en: "Does it need my approval?", es: '¿Necesita mi aprobación?' },
+    { en: "This has to be signed before Friday.", es: 'Esto tiene que firmarse antes del viernes.' },
+    { en: "I'd recommend waiting until next month.", es: 'Yo recomendaría esperar hasta el próximo mes.' }
+  ],
+  exercises: [
+    { t: 'mc', q: 'Quieres decir que está PROHIBIDO compartir los precios. ¿Cuál usas?', opts: ["You don't have to share these prices", "You mustn't share these prices", "You shouldn't have to share these prices"], a: 1, why: 'MUSTN’T = prohibido. DON’T HAVE TO significa que no hace falta, que es lo contrario.' },
+    { t: 'mc', q: '"You don’t have to come to the meeting" significa...', opts: ['Tienes prohibido venir', 'No hace falta que vengas', 'Deberías venir'], a: 1, why: 'Es ausencia de obligación, no prohibición. Es la confusión más costosa de este tema.' },
+    { t: 'fill', q: "I ___ to cancel the trip last week.", a: ['had'], why: 'Must no tiene pasado: se usa HAD TO.' },
+    { t: 'mc', q: 'Elige la correcta.', opts: ['He must to sign it', 'He musts sign it', 'He must sign it'], a: 2, why: 'Must no lleva "to" ni -s en tercera persona.' },
+    { t: 'tr', q: 'Deberías confirmarlo por escrito.', a: ['you should confirm it in writing', "you should confirm it in writing please"], why: 'SHOULD sin "to" después.' },
+    { t: 'order', words: ['We', 'should', 'have', 'confirmed', 'it', 'earlier.'], a: 'We should have confirmed it earlier.', why: 'SHOULD HAVE + participio: lo que convenía haber hecho y no se hizo.' },
+    { t: 'mc', q: 'Le escribes a un CLIENTE. ¿Cuál suena mejor?', opts: ['You must pay 30% upfront.', 'We would need a 30% deposit to start.', 'You have to pay us first.'], a: 1, why: 'Mueve la obligación de la persona al proceso: nadie se ofende.' },
+    { t: 'fill', q: "The order ___ a thirty percent deposit.", a: ['requires', 'needs'], why: 'REQUIRE despersonaliza la obligación. Es el verbo de los contratos.' },
+    { t: 'tr', q: 'Tendré que consultarlo con mi gerente.', a: ["i'll have to check with my manager", 'i will have to check with my manager'], why: 'En futuro la obligación se dice con WILL HAVE TO.' },
+    { t: 'listen', audio: "You don't have to sign it today, but you mustn't send it to anyone before we do.", opts: ['No hace falta que lo firmes hoy, pero no debes enviárselo a nadie antes que nosotros.', 'Tienes que firmarlo hoy y puedes enviarlo a quien quieras.', 'No puedes firmarlo hoy ni enviarlo después.'], a: 0, why: 'Las dos negaciones en la misma frase, con significados opuestos. Si distingues esto, ya lo tienes.' },
+    { t: 'mc', q: '"We’d better call him now" es...', opts: ['una sugerencia suave', 'una advertencia con urgencia', 'una obligación legal'], a: 1, why: 'HAD BETTER es más fuerte que "should" y menos que "must": implica consecuencia si no se hace.' }
+  ]
+},
+
+{
+  id: 'b1-11', level: 'B1', title: 'Gerundio o infinitivo',
+  goal: 'Saber cuándo va -ing y cuándo va to, que es donde más se equivoca un hispanohablante.',
+  grammar: {
+    title: 'Cuando un verbo va detrás de otro',
+    es: 'En español, detrás de un verbo casi siempre va un infinitivo: "quiero trabajar", "disfruto trabajando"... y ya. En inglés hay que elegir entre dos formas, y no hay lógica que valga: se memoriza por listas.\n\n' +
+        'VERBOS QUE PIDEN INFINITIVO CON TO: want, need, decide, hope, plan, agree, offer, promise, refuse, learn, manage, expect, would like, seem, afford, arrange.\n' +
+        '"I WANT TO place an order" · "We DECIDED TO change suppliers".\n\n' +
+        'VERBOS QUE PIDEN -ING: enjoy, finish, avoid, mind, suggest, recommend, consider, keep, practise, miss, risk, involve, deny, imagine.\n' +
+        '"I ENJOY WORKING with them" · "We RECOMMEND CHECKING the packaging".\n\n' +
+        'DESPUÉS DE UNA PREPOSICIÓN, SIEMPRE -ING. Esta regla no tiene excepciones y resuelve la mitad de los casos: "interested IN WORKING", "before SENDING it", "instead OF CALLING", "good AT NEGOTIATING".\n\n' +
+        'Y aquí está el que más falla: LOOK FORWARD TO lleva -ING, porque ese "to" es una preposición, no el infinitivo. Se dice "I look forward to HEARING from you", nunca "to hear". Aparece al final de casi todos los correos formales, así que este error se ve mucho.\n\n' +
+        'Igual pasa con: be used to + -ing (estar acostumbrado a), object to + -ing, commit to + -ing.',
+    examples: [
+      { en: "I want to place an order.", es: 'Quiero hacer un pedido.' },
+      { en: "I enjoy working with that supplier.", es: 'Disfruto trabajando con ese proveedor.' },
+      { en: "I look forward to hearing from you.", es: 'Quedo a la espera de su respuesta.' },
+      { en: "We're interested in working with you.", es: 'Nos interesa trabajar con ustedes.' },
+      { en: "Before sending it, check the address.", es: 'Antes de enviarlo, revisa la dirección.' }
+    ],
+    more: [
+      {
+        title: 'Verbos que aceptan las dos formas y cambian de significado',
+        es: 'Unos pocos verbos admiten -ing e infinitivo, pero significan cosas distintas. Merece la pena saberlos porque el malentendido es serio.\n\n' +
+            'REMEMBER: "I remembered TO SEND it" = me acordé de enviarlo (lo envié). "I remember SENDING it" = recuerdo haberlo enviado (el recuerdo es del pasado).\n\n' +
+            'FORGET: "I forgot TO CALL him" = se me olvidó llamarle (no llamé). "I’ll never forget MEETING him" = nunca olvidaré haberle conocido.\n\n' +
+            'STOP: "We stopped TO TALK" = paramos PARA hablar. "We stopped TALKING" = dejamos de hablar. Opuestos.\n\n' +
+            'TRY: "Try TO CALL him" = intenta llamarle (cuesta). "Try CALLING him" = prueba a llamarle (a ver si funciona).\n\n' +
+            'Y con LIKE / LOVE / HATE / PREFER las dos formas valen y significan casi lo mismo: "I like travelling" = "I like to travel".',
+        examples: [
+          { en: "I remembered to send the invoice.", es: 'Me acordé de enviar la factura.' },
+          { en: "We stopped to have a coffee.", es: 'Paramos para tomar un café.' },
+          { en: "Try calling him on his mobile.", es: 'Prueba a llamarle al celular.' }
+        ]
+      },
+      {
+        title: 'El -ING como sujeto y las estructuras con objeto',
+        es: 'Cuando la acción es el SUJETO de la frase, va en -ing: "NEGOTIATING with them is difficult", "TRAVELLING takes a lot of time". En español pondrías el infinitivo ("negociar con ellos es difícil"); en inglés, -ing.\n\n' +
+            'ESTRUCTURA VERBO + OBJETO + INFINITIVO: want, ask, tell, advise, expect, allow, remind. "I want YOU TO check it", "They asked US TO wait", "Remind ME TO call him".\n\n' +
+            'Fíjate en la diferencia con el español: no se dice "I want that you check it". El "que" español desaparece y se usa objeto + to + verbo. Es un error muy frecuente.\n\n' +
+            'Excepción: MAKE y LET van sin "to". "That makes me think", "Let me check".',
+        examples: [
+          { en: "Negotiating with them is not easy.", es: 'Negociar con ellos no es fácil.' },
+          { en: "I want you to check the packaging.", es: 'Quiero que revises el embalaje.' },
+          { en: "Let me check and get back to you.", es: 'Déjame revisar y te respondo.' }
+        ]
+      }
+    ],
+    mistakes: [
+      { bad: 'I look forward to hear from you.', good: 'I look forward to hearing from you.', es: 'Ese "to" es preposición: pide -ing.' },
+      { bad: 'I enjoy to work with them.', good: 'I enjoy working with them.', es: '"Enjoy" siempre pide -ing.' },
+      { bad: 'I want that you check it.', good: 'I want you to check it.', es: 'El "que" español no se traduce: objeto + to + verbo.' },
+      { bad: "I'm interested in to work with you.", good: "I'm interested in working with you.", es: 'Tras preposición, siempre -ing.' },
+      { bad: 'To negotiate with them is difficult.', good: 'Negotiating with them is difficult.', es: 'Como sujeto, lo natural es -ing.' }
+    ]
+  },
+  vocab: [
+    { en: 'to want to', es: 'querer' }, { en: 'to need to', es: 'necesitar' },
+    { en: 'to decide to', es: 'decidir' }, { en: 'to plan to', es: 'planear' },
+    { en: 'to agree to', es: 'acceder a' }, { en: 'to offer to', es: 'ofrecerse a' },
+    { en: 'to refuse to', es: 'negarse a' }, { en: 'to manage to', es: 'lograr' },
+    { en: 'to expect to', es: 'esperar' }, { en: 'to afford to', es: 'permitirse' },
+    { en: 'to enjoy -ing', es: 'disfrutar' }, { en: 'to avoid -ing', es: 'evitar' },
+    { en: 'to mind -ing', es: 'importar / molestar' }, { en: 'to suggest -ing', es: 'sugerir' },
+    { en: 'to recommend -ing', es: 'recomendar' }, { en: 'to consider -ing', es: 'considerar' },
+    { en: 'to keep -ing', es: 'seguir haciendo' }, { en: 'to involve -ing', es: 'implicar' },
+    { en: 'to risk -ing', es: 'arriesgarse a' }, { en: 'to look forward to', es: 'esperar con ganas' },
+    { en: 'to be used to -ing', es: 'estar acostumbrado a' }, { en: 'interested in', es: 'interesado en' },
+    { en: 'good at', es: 'bueno en' }, { en: 'instead of', es: 'en vez de' },
+    { en: 'before -ing', es: 'antes de' }, { en: 'after -ing', es: 'después de' },
+    { en: 'to remind', es: 'recordar (a alguien)' }, { en: 'to allow', es: 'permitir' },
+    { en: 'to let', es: 'dejar' }, { en: 'to make someone', es: 'hacer que alguien' }
+  ],
+  phrases: [
+    { en: "I want to place an order.", es: 'Quiero hacer un pedido.' },
+    { en: "I enjoy working with that supplier.", es: 'Disfruto trabajando con ese proveedor.' },
+    { en: "I look forward to hearing from you.", es: 'Quedo a la espera de su respuesta.' },
+    { en: "We're interested in working with you.", es: 'Nos interesa trabajar con ustedes.' },
+    { en: "Would you mind sending it again?", es: '¿Le importaría enviarlo otra vez?' },
+    { en: "I'd recommend checking the packaging.", es: 'Recomendaría revisar el embalaje.' },
+    { en: "We decided to change suppliers.", es: 'Decidimos cambiar de proveedor.' },
+    { en: "I want you to check the invoice.", es: 'Quiero que revises la factura.' },
+    { en: "Let me check and get back to you.", es: 'Déjame revisar y te respondo.' },
+    { en: "Remind me to call him tomorrow.", es: 'Recuérdame llamarle mañana.' },
+    { en: "Negotiating with them is not easy.", es: 'Negociar con ellos no es fácil.' },
+    { en: "Before sending it, check the address.", es: 'Antes de enviarlo, revisa la dirección.' }
+  ],
+  exercises: [
+    { t: 'mc', q: '¿Cómo se cierra un correo formal?', opts: ['I look forward to hear from you', 'I look forward to hearing from you', 'I look forward hear from you'], a: 1, why: 'Ese "to" es preposición, así que pide -ING. Es el error más visible porque va en todos los correos.' },
+    { t: 'fill', q: "I enjoy ___ with that supplier.", a: ['working'], why: '"Enjoy" siempre va seguido de -ing.' },
+    { t: 'mc', q: 'Elige la correcta.', opts: ['I want that you check it', 'I want you to check it', 'I want you check it'], a: 1, why: 'El "que" del español desaparece: objeto + to + verbo.' },
+    { t: 'fill', q: "We're interested in ___ with you.", a: ['working'], why: 'Después de preposición, siempre -ing. Sin excepciones.' },
+    { t: 'tr', q: 'Decidimos cambiar de proveedor.', a: ['we decided to change suppliers', 'we decided to change supplier'], why: '"Decide" pide infinitivo con TO.' },
+    { t: 'mc', q: '"We stopped to have a coffee" significa...', opts: ['dejamos de tomar café', 'paramos para tomar un café', 'seguimos tomando café'], a: 1, why: 'STOP + to = parar PARA hacer algo. STOP + -ing = dejar de hacerlo.' },
+    { t: 'order', words: ['Would', 'you', 'mind', 'sending', 'it', 'again?'], a: 'Would you mind sending it again?', why: '"Mind" pide -ing. Es una de las peticiones más educadas que existen.' },
+    { t: 'tr', q: 'Recuérdame llamarle mañana.', a: ['remind me to call him tomorrow'], why: 'Estructura verbo + objeto + to + verbo.' },
+    { t: 'mc', q: '¿Cuál es correcta como sujeto de la frase?', opts: ['To negotiate with them is hard', 'Negotiating with them is hard', 'Negotiate with them is hard'], a: 1, why: 'Cuando la acción es el sujeto, lo natural en inglés es -ing.' },
+    { t: 'listen', audio: "I forgot to send the quotation, but I remember checking the prices last night.", opts: ['Olvidé enviar la cotización, pero recuerdo haber revisado los precios anoche.', 'Recordé enviar la cotización después de revisar los precios.', 'Olvidé revisar los precios y no envié la cotización.'], a: 0, why: 'FORGET + to (no lo hizo) y REMEMBER + -ing (recuerda haberlo hecho), en la misma frase.' },
+    { t: 'fill', q: "___ me check and I'll get back to you.", a: ['let'], why: 'LET y MAKE van sin "to": "let me check", "it makes me think".' }
+  ]
+},
+
+{
+  id: 'b1-12', level: 'B1', title: 'Oraciones de relativo',
+  goal: 'Unir dos ideas en una sola frase y dejar de hablar a base de frases cortas.',
+  grammar: {
+    title: 'WHO, WHICH, THAT: describir sin repetirte',
+    es: 'Las oraciones de relativo sirven para añadir información sobre algo sin empezar una frase nueva. Son lo que separa un B1 de un A2: dejas de hablar en frases sueltas y empiezas a encadenar.\n\n' +
+        'WHO para personas: "The client WHO called yesterday".\n' +
+        'WHICH para cosas: "The order WHICH arrived damaged".\n' +
+        'THAT sirve para las dos y es lo más usado al hablar: "The client THAT called", "The order THAT arrived".\n' +
+        'WHERE para lugares: "The warehouse WHERE we store the samples".\n' +
+        'WHOSE para posesión: "The supplier WHOSE prices went up".\n\n' +
+        'LA REGLA QUE MÁS AHORRA: si el relativo es el OBJETO de la frase, se puede quitar. "The order (that) we sent yesterday". Los nativos lo omiten casi siempre. Si es el SUJETO, no se puede quitar: "The client THAT called" — ahí es obligatorio.\n\n' +
+        'Truco para saberlo: si después del relativo viene directamente un verbo, es sujeto y no se quita. Si viene un sujeto nuevo (we, he, the company), es objeto y sí se puede quitar.\n\n' +
+        'Y un error muy hispano: NO se repite el pronombre. Se dice "The client that called me", nunca "The client that HE called me".',
+    examples: [
+      { en: "The client who called yesterday wants a discount.", es: 'El cliente que llamó ayer quiere un descuento.' },
+      { en: "The order that we sent last week arrived today.", es: 'El pedido que enviamos la semana pasada llegó hoy.' },
+      { en: "This is the warehouse where we store the samples.", es: 'Esta es la bodega donde guardamos las muestras.' },
+      { en: "The supplier whose prices went up is in Asia.", es: 'El proveedor cuyos precios subieron está en Asia.' },
+      { en: "The report I sent you has the figures.", es: 'El informe que te envié tiene las cifras.' }
+    ],
+    more: [
+      {
+        title: 'Las dos clases de relativo y por qué importa la coma',
+        es: 'ESPECIFICATIVAS (sin comas): la información es necesaria para saber de qué hablas. "The client who called yesterday wants a discount" — de todos mis clientes, ese.\n\n' +
+            'EXPLICATIVAS (entre comas): la información es un añadido; si la quitas, la frase sigue teniendo sentido. "Mr. Silva, who called yesterday, wants a discount" — ya sabemos quién es, solo damos un dato extra.\n\n' +
+            'Dos reglas para las explicativas: NO se puede usar "that" (solo who o which), y NO se puede omitir el relativo.\n\n' +
+            'Un detalle elegante: WHICH puede referirse a toda la frase anterior, no solo a un sustantivo. "They cancelled the order, WHICH cost us the quarter" — el "which" es el hecho de cancelar.',
+        examples: [
+          { en: "Mr. Silva, who called yesterday, wants a discount.", es: 'El Sr. Silva, que llamó ayer, quiere un descuento.' },
+          { en: "They cancelled the order, which cost us the quarter.", es: 'Cancelaron el pedido, lo que nos costó el trimestre.' },
+          { en: "Our factory, which opened in 2019, is fully automated.", es: 'Nuestra fábrica, que abrió en 2019, está totalmente automatizada.' }
+        ]
+      },
+      {
+        title: 'Encadenar ideas: de A2 a B1 en una frase',
+        es: 'Compara estas dos formas de decir lo mismo.\n\n' +
+            'NIVEL A2: "I have a client. He is in Guayaquil. He buys a lot. He called me yesterday."\n' +
+            'NIVEL B1: "I have a client in Guayaquil who buys a lot and who called me yesterday."\n\n' +
+            'Mismo contenido, mitad de palabras, y suena mucho más competente. Este salto es exactamente lo que evalúa un examinador y lo que nota un cliente.\n\n' +
+            'Otros recursos para encadenar sin relativos: participios ("The goods SHIPPED last week arrived today"), y aposiciones ("Ms. Lee, OUR MAIN BUYER, will attend").\n\n' +
+            'Consejo práctico: cuando te oigas encadenando tres frases cortas seguidas, para y únelas con "who" o "that". Es el hábito que más rápido te sube de nivel.',
+        examples: [
+          { en: "I have a client in Guayaquil who buys a lot.", es: 'Tengo un cliente en Guayaquil que compra mucho.' },
+          { en: "The goods shipped last week arrived today.", es: 'La mercancía enviada la semana pasada llegó hoy.' },
+          { en: "Ms. Lee, our main buyer, will attend the meeting.", es: 'La Sra. Lee, nuestra compradora principal, asistirá a la reunión.' }
+        ]
+      }
+    ],
+    mistakes: [
+      { bad: 'The client that he called me.', good: 'The client that called me.', es: 'No se repite el pronombre sujeto.' },
+      { bad: 'The client which called me.', good: 'The client who called me.', es: 'WHICH es para cosas; para personas, who o that.' },
+      { bad: 'Mr. Silva, that called yesterday...', good: 'Mr. Silva, who called yesterday...', es: 'En las explicativas (con comas) no se usa "that".' },
+      { bad: 'The place where I work in.', good: 'The place where I work.', es: '"Where" ya incluye la preposición.' },
+      { bad: 'The supplier which prices went up.', good: 'The supplier whose prices went up.', es: 'Para posesión se usa WHOSE.' }
+    ]
+  },
+  vocab: [
+    { en: 'who', es: 'que / quien (personas)' }, { en: 'which', es: 'que / lo cual (cosas)' },
+    { en: 'that', es: 'que (personas y cosas)' }, { en: 'where', es: 'donde' },
+    { en: 'whose', es: 'cuyo' }, { en: 'when', es: 'cuando' },
+    { en: 'main', es: 'principal' }, { en: 'to store', es: 'almacenar' },
+    { en: 'to attend', es: 'asistir a' }, { en: 'to handle', es: 'manejar / gestionar' },
+    { en: 'to deal with', es: 'tratar con' }, { en: 'in charge of', es: 'a cargo de' },
+    { en: 'responsible for', es: 'responsable de' }, { en: 'headquarters', es: 'casa matriz' },
+    { en: 'branch', es: 'sucursal' }, { en: 'plant', es: 'planta' },
+    { en: 'region', es: 'región' }, { en: 'account', es: 'cuenta / cliente' },
+    { en: 'key account', es: 'cuenta clave' }, { en: 'portfolio', es: 'cartera' },
+    { en: 'to cover', es: 'cubrir' }, { en: 'to report', es: 'reportar' },
+    { en: 'figures', es: 'cifras' }, { en: 'issue', es: 'problema / asunto' },
+    { en: 'situation', es: 'situación' }, { en: 'reason', es: 'motivo' },
+    { en: 'which is why', es: 'por eso' }, { en: 'as well as', es: 'así como' },
+    { en: 'in addition to', es: 'además de' }, { en: 'apart from', es: 'aparte de' }
+  ],
+  phrases: [
+    { en: "The client who called yesterday wants a discount.", es: 'El cliente que llamó ayer quiere un descuento.' },
+    { en: "The order that we sent last week arrived today.", es: 'El pedido que enviamos la semana pasada llegó hoy.' },
+    { en: "This is the warehouse where we store the samples.", es: 'Esta es la bodega donde guardamos las muestras.' },
+    { en: "The supplier whose prices went up is in Asia.", es: 'El proveedor cuyos precios subieron está en Asia.' },
+    { en: "The report I sent you has all the figures.", es: 'El informe que te envié tiene todas las cifras.' },
+    { en: "Mr. Silva, who is our main buyer, will attend.", es: 'El Sr. Silva, que es nuestro comprador principal, asistirá.' },
+    { en: "They cancelled the order, which cost us the quarter.", es: 'Cancelaron el pedido, lo que nos costó el trimestre.' },
+    { en: "I have a client in Guayaquil who buys a lot.", es: 'Tengo un cliente en Guayaquil que compra mucho.' },
+    { en: "The person you spoke to is on holiday.", es: 'La persona con la que hablaste está de vacaciones.' },
+    { en: "That's the reason why we changed suppliers.", es: 'Esa es la razón por la que cambiamos de proveedor.' },
+    { en: "The team that handles key accounts is small.", es: 'El equipo que maneja las cuentas clave es pequeño.' },
+    { en: "Everything we ordered arrived on time.", es: 'Todo lo que pedimos llegó a tiempo.' }
+  ],
+  exercises: [
+    { t: 'mc', q: '¿Cuál es correcta?', opts: ['The client which called me', 'The client who called me', 'The client that he called me'], a: 1, why: 'WHO para personas. Y nunca se repite el pronombre: "that he called" sobra.' },
+    { t: 'fill', q: "The supplier ___ prices went up is in Asia.", a: ['whose'], why: 'WHOSE indica posesión: cuyos precios.' },
+    { t: 'mc', q: 'En "The order ___ we sent arrived today", ¿se puede quitar el relativo?', opts: ['Sí, porque es objeto', 'No, porque es sujeto', 'Nunca se puede quitar'], a: 0, why: 'Detrás viene un sujeto nuevo ("we"), así que es objeto y se puede omitir.' },
+    { t: 'tr', q: 'Esta es la bodega donde guardamos las muestras.', a: ['this is the warehouse where we store the samples'], why: 'WHERE ya incluye la preposición: no se añade "in" al final.' },
+    { t: 'order', words: ['The', 'team', 'that', 'handles', 'key', 'accounts', 'is', 'small.'], a: 'The team that handles key accounts is small.', why: 'Aquí "that" es sujeto (le sigue un verbo), así que no se puede quitar.' },
+    { t: 'mc', q: 'Elige la correcta con comas.', opts: ['Mr. Silva, that called yesterday, wants a discount', 'Mr. Silva, who called yesterday, wants a discount', 'Mr. Silva who called yesterday, wants a discount'], a: 1, why: 'En las explicativas no se usa "that", solo who o which.' },
+    { t: 'tr', q: 'El informe que te envié tiene todas las cifras.', a: ['the report i sent you has all the figures', 'the report that i sent you has all the figures'], why: 'Aquí el relativo es objeto, así que los nativos lo omiten casi siempre.' },
+    { t: 'fill', q: "They cancelled the order, ___ cost us the quarter.", a: ['which'], why: 'WHICH puede referirse a toda la idea anterior, no solo a un sustantivo.' },
+    { t: 'mc', q: '¿Cuál suena de nivel B1?', opts: ['I have a client. He is in Guayaquil. He buys a lot.', 'I have a client in Guayaquil who buys a lot.', 'I have a client and Guayaquil and buys a lot.'], a: 1, why: 'Encadenar con relativos es exactamente el salto de A2 a B1.' },
+    { t: 'listen', audio: "The person you spoke to last week is the one who handles our key accounts.", opts: ['La persona con la que hablaste la semana pasada es quien maneja nuestras cuentas clave.', 'La persona que habló contigo maneja las cuentas pequeñas.', 'Hablaste la semana pasada con quien maneja el almacén.'], a: 0, why: 'Dos relativos: el primero omitido ("the person [that] you spoke to") y el segundo explícito.' },
+    { t: 'order', words: ['Everything', 'we', 'ordered', 'arrived', 'on', 'time.'], a: 'Everything we ordered arrived on time.', why: 'Tras "everything", "something" y "all", el relativo se omite casi siempre.' }
   ]
 },
 
@@ -1880,6 +2390,229 @@ const UNITS = [
       why: '"Report to" = reportar a. Muy usado al describir tu puesto.' },
     { t: 'listen', audio: "I used to take on too much myself, but I've learned to delegate.", opts: ['Antes me cargaba con demasiado, pero he aprendido a delegar.', 'Suelo cargarme con demasiado y no sé delegar.', 'Aprendí a delegar porque me cargaban demasiado.'], a: 0,
       why: 'Fórmula perfecta para la pregunta de la debilidad: el defecto en pasado, la solución en present perfect.' }
+  ]
+},
+
+{
+  id: 'b2-14', level: 'B2', title: 'Voz pasiva',
+  goal: 'Escribir como se escribe en los negocios: centrado en el hecho, no en quién lo hizo.',
+  grammar: {
+    title: 'La pasiva: el registro por defecto del inglés comercial',
+    es: 'La pasiva pone el foco en la ACCIÓN o en la COSA, no en quién la hizo. Se forma con el verbo TO BE en el tiempo que toque + el PARTICIPIO del verbo principal.\n\n' +
+        'Activa: "We shipped the goods yesterday."\n' +
+        'Pasiva: "The goods WERE SHIPPED yesterday."\n\n' +
+        'POR QUÉ IMPORTA TANTO EN NEGOCIOS. Se usa cuando:\n' +
+        '· No se sabe o no importa quién lo hizo: "Your order has been processed."\n' +
+        '· Se quiere sonar objetivo e impersonal: "All prices are quoted in US dollars."\n' +
+        '· Y sobre todo, para dar una mala noticia SIN señalar a nadie: "The shipment was delayed" en lugar de "Wei delayed the shipment". Evita la acusación y baja la tensión.\n\n' +
+        'Esa última es una herramienta diplomática de primer orden. En un correo delicado, la pasiva te salva la relación.\n\n' +
+        'LA FORMA EN CADA TIEMPO:\n' +
+        '· Presente: is / are + participio → "The order is processed automatically."\n' +
+        '· Pasado: was / were + participio → "The goods were inspected."\n' +
+        '· Present perfect: has / have been + participio → "Your order has been shipped."\n' +
+        '· Futuro: will be + participio → "You will be contacted tomorrow."\n' +
+        '· Modales: must / can / should be + participio → "It must be signed."\n\n' +
+        'Si hace falta decir quién, se añade BY: "The contract was signed BY the director". Pero en la mayoría de los casos se omite, y ese es justamente el propósito.',
+    examples: [
+      { en: "The goods were shipped yesterday.", es: 'La mercancía fue enviada ayer.' },
+      { en: "Your order has been processed.", es: 'Su pedido ha sido procesado.' },
+      { en: "All prices are quoted in US dollars.", es: 'Todos los precios se cotizan en dólares.' },
+      { en: "You will be contacted within 24 hours.", es: 'Se le contactará en 24 horas.' },
+      { en: "The contract must be signed before Friday.", es: 'El contrato debe firmarse antes del viernes.' }
+    ],
+    more: [
+      {
+        title: 'La pasiva frente al "se" impersonal del español',
+        es: 'Aquí hay una equivalencia que resuelve muchísimo. El "se" impersonal español se traduce casi siempre por una pasiva inglesa.\n\n' +
+            '"Se enviaron las muestras" → "The samples WERE SENT."\n' +
+            '"Se requiere un anticipo del 30%" → "A 30% deposit IS REQUIRED."\n' +
+            '"No se permite fumar" → "Smoking IS NOT ALLOWED."\n' +
+            '"Se le informará oportunamente" → "You WILL BE INFORMED in due course."\n\n' +
+            'Si en español te sale un "se" impersonal, en inglés piensa en pasiva. Es de los atajos más rentables que existen entre los dos idiomas.\n\n' +
+            'Y el aviso: en inglés NO existe el "se" reflexivo impersonal. No se dice "It sells well se"; se dice "It sells well" o "It is sold well". Traducir el "se" literalmente produce frases que no significan nada.',
+        examples: [
+          { en: "A thirty percent deposit is required.", es: 'Se requiere un anticipo del treinta por ciento.' },
+          { en: "Smoking is not allowed in the warehouse.", es: 'No se permite fumar en la bodega.' },
+          { en: "You will be informed in due course.", es: 'Se le informará oportunamente.' }
+        ]
+      },
+      {
+        title: 'Cuándo NO usar la pasiva',
+        es: 'La pasiva es potente, pero abusar de ella hace que un texto suene burocrático y confuso. Tres reglas para no pasarse:\n\n' +
+            'USA ACTIVA cuando quieras asumir responsabilidad o mostrar iniciativa. "I will send it today" transmite compromiso; "It will be sent today" transmite distancia. En una entrevista o en una promesa a un cliente, usa la activa.\n\n' +
+            'USA ACTIVA cuando el sujeto sea importante. "OUR ENGINEERS designed this system" vende más que "This system was designed".\n\n' +
+            'USA PASIVA para procesos, normas, malas noticias y comunicaciones oficiales.\n\n' +
+            'Prueba rápida: si al leer tu frase te preguntas "¿y quién hizo esto?" y la respuesta importa, ponla en activa.',
+        examples: [
+          { en: "I'll send you the revised offer today.", es: 'Le envío la oferta revisada hoy.' },
+          { en: "Our engineers designed this system.", es: 'Nuestros ingenieros diseñaron este sistema.' },
+          { en: "Unfortunately, the shipment was delayed.", es: 'Lamentablemente, el envío se retrasó.' }
+        ]
+      }
+    ],
+    mistakes: [
+      { bad: 'The goods was shipped.', good: 'The goods were shipped.', es: '"Goods" es plural: were.' },
+      { bad: 'Your order has been process.', good: 'Your order has been processed.', es: 'Falta el participio: process → processed.' },
+      { bad: 'It was happened yesterday.', good: 'It happened yesterday.', es: '"Happen" no admite pasiva: no tiene objeto.' },
+      { bad: 'The report is wrote by Ana.', good: 'The report was written by Ana.', es: 'El participio de write es written, no wrote.' },
+      { bad: 'It sells well se.', good: 'It sells well.', es: 'El "se" español no se traduce.' }
+    ]
+  },
+  vocab: [
+    { en: 'to be shipped', es: 'ser enviado' }, { en: 'to be processed', es: 'ser procesado' },
+    { en: 'to be delivered', es: 'ser entregado' }, { en: 'to be delayed', es: 'ser retrasado' },
+    { en: 'to be cancelled', es: 'ser cancelado' }, { en: 'to be approved', es: 'ser aprobado' },
+    { en: 'to be signed', es: 'ser firmado' }, { en: 'to be required', es: 'ser requerido' },
+    { en: 'to be allowed', es: 'estar permitido' }, { en: 'to be inspected', es: 'ser inspeccionado' },
+    { en: 'to be quoted', es: 'ser cotizado' }, { en: 'to be charged', es: 'ser cobrado' },
+    { en: 'to be informed', es: 'ser informado' }, { en: 'to be contacted', es: 'ser contactado' },
+    { en: 'written (write)', es: 'escrito' }, { en: 'sent (send)', es: 'enviado' },
+    { en: 'made (make)', es: 'hecho' }, { en: 'taken (take)', es: 'tomado' },
+    { en: 'given (give)', es: 'dado' }, { en: 'paid (pay)', es: 'pagado' },
+    { en: 'held (hold)', es: 'retenido / celebrado' }, { en: 'kept (keep)', es: 'guardado' },
+    { en: 'in due course', es: 'oportunamente' }, { en: 'upon receipt', es: 'al recibirlo' },
+    { en: 'as agreed', es: 'según lo acordado' }, { en: 'as requested', es: 'según lo solicitado' },
+    { en: 'attached', es: 'adjunto' }, { en: 'enclosed', es: 'adjunto (en carta)' },
+    { en: 'subject to change', es: 'sujeto a cambios' }, { en: 'unless otherwise stated', es: 'salvo indicación contraria' }
+  ],
+  phrases: [
+    { en: "The goods were shipped yesterday.", es: 'La mercancía fue enviada ayer.' },
+    { en: "Your order has been processed.", es: 'Su pedido ha sido procesado.' },
+    { en: "All prices are quoted in US dollars.", es: 'Todos los precios se cotizan en dólares.' },
+    { en: "You will be contacted within 24 hours.", es: 'Se le contactará en 24 horas.' },
+    { en: "The contract must be signed before Friday.", es: 'El contrato debe firmarse antes del viernes.' },
+    { en: "A thirty percent deposit is required.", es: 'Se requiere un anticipo del treinta por ciento.' },
+    { en: "Unfortunately, the shipment was delayed.", es: 'Lamentablemente, el envío se retrasó.' },
+    { en: "The documents are attached.", es: 'Los documentos van adjuntos.' },
+    { en: "Payment is due upon receipt of the invoice.", es: 'El pago vence al recibir la factura.' },
+    { en: "Prices are subject to change without notice.", es: 'Los precios están sujetos a cambio sin previo aviso.' },
+    { en: "The samples were sent as requested.", es: 'Las muestras se enviaron según lo solicitado.' },
+    { en: "The meeting has been postponed to Thursday.", es: 'La reunión se ha pospuesto para el jueves.' }
+  ],
+  exercises: [
+    { t: 'mc', q: 'Pasa a pasiva: "We shipped the goods yesterday."', opts: ['The goods was shipped yesterday', 'The goods were shipped yesterday', 'The goods are shipped yesterday'], a: 1, why: '"Goods" es plural, así que WERE, y el pasado exige tiempo pasado.' },
+    { t: 'fill', q: "Your order has been ___.", a: ['processed', 'shipped', 'delivered', 'approved'], why: 'Present perfect pasivo: has been + participio.' },
+    { t: 'tr', q: 'Se requiere un anticipo del treinta por ciento.', a: ['a thirty percent deposit is required', 'a 30% deposit is required', 'a thirty per cent deposit is required'], why: 'El "se" impersonal español se traduce por pasiva.' },
+    { t: 'mc', q: 'Quieres dar una mala noticia SIN culpar a nadie. ¿Cuál eliges?', opts: ['Wei delayed the shipment.', 'The shipment was delayed.', 'You caused the delay.'], a: 1, why: 'La pasiva quita el dedo acusador y baja la tensión. Es una herramienta diplomática.' },
+    { t: 'order', words: ['The', 'contract', 'must', 'be', 'signed', 'before', 'Friday.'], a: 'The contract must be signed before Friday.', why: 'Pasiva con modal: modal + BE + participio.' },
+    { t: 'mc', q: '¿Cuál es el participio de "write"?', opts: ['wrote', 'written', 'writed'], a: 1, why: 'write → wrote (pasado) → written (participio). En pasiva va siempre el participio.' },
+    { t: 'fill', q: "You will ___ contacted within 24 hours.", a: ['be'], why: 'Futuro pasivo: will + BE + participio.' },
+    { t: 'tr', q: 'La reunión se ha pospuesto para el jueves.', a: ['the meeting has been postponed to thursday', 'the meeting has been postponed until thursday'], why: 'Otro "se" impersonal que pide present perfect pasivo.' },
+    { t: 'mc', q: 'Le prometes algo a un cliente. ¿Cuál transmite más compromiso?', opts: ['It will be sent today.', "I'll send it today.", 'The sending will be done today.'], a: 1, why: 'Aquí la activa gana: asume responsabilidad. La pasiva sonaría a evasiva.' },
+    { t: 'listen', audio: "The samples were sent as requested, and payment is due upon receipt of the invoice.", opts: ['Las muestras se enviaron según lo solicitado, y el pago vence al recibir la factura.', 'Las muestras se enviarán cuando paguen la factura.', 'Pedimos las muestras y la factura llegó después.'], a: 0, why: 'Dos fórmulas fijas del inglés comercial: "as requested" y "upon receipt".' },
+    { t: 'mc', q: '¿Por qué "It was happened yesterday" está mal?', opts: ['Porque falta el "by"', 'Porque "happen" no admite pasiva', 'Porque debería ser "were"'], a: 1, why: 'Solo los verbos con objeto directo pueden ir en pasiva. "Happen" no tiene objeto.' }
+  ]
+},
+
+{
+  id: 'b2-15', level: 'B2', title: 'Reportar lo que dijeron',
+  goal: 'Contar a tu jefe lo que dijo el cliente, sin inventarte los tiempos verbales.',
+  grammar: {
+    title: 'Estilo indirecto: el paso atrás de los tiempos',
+    es: 'Cuando cuentas lo que otro dijo, en inglés los tiempos verbales dan UN PASO ATRÁS. Es mecánico y una vez lo ves, no se olvida.\n\n' +
+        'presente → pasado · "I need it" → He said he NEEDED it.\n' +
+        'presente continuo → pasado continuo · "We are checking" → They said they WERE CHECKING.\n' +
+        'pasado simple → past perfect · "We sent it" → They said they HAD SENT it.\n' +
+        'present perfect → past perfect · "I have signed" → He said he HAD SIGNED.\n' +
+        'will → would · "I will call" → She said she WOULD CALL.\n' +
+        'can → could · must → had to · may → might.\n\n' +
+        'TAMBIÉN CAMBIAN los pronombres y las referencias de tiempo y lugar: I → he/she · my → his/her · today → that day · tomorrow → the next day · yesterday → the day before · here → there · this → that.\n\n' +
+        'SAY frente a TELL: "say" no lleva persona detrás ("He said that..."), "tell" sí y es obligatoria ("He TOLD ME that..."). Decir "He said me" es un error muy frecuente. Y "that" se puede omitir: "He said he needed it".\n\n' +
+        'PREGUNTAS REPORTADAS: se pierde el orden de pregunta y el auxiliar. "Where is the invoice?" → He asked where the invoice WAS (no "where was the invoice"). Si la pregunta era de sí/no, se usa IF o WHETHER: "Did you send it?" → She asked IF I HAD SENT it.',
+    examples: [
+      { en: "He said he needed it by Friday.", es: 'Dijo que lo necesitaba para el viernes.' },
+      { en: "They told me they had sent the samples.", es: 'Me dijeron que habían enviado las muestras.' },
+      { en: "She said she would call back.", es: 'Dijo que devolvería la llamada.' },
+      { en: "He asked where the invoice was.", es: 'Preguntó dónde estaba la factura.' },
+      { en: "She asked if I had received the quotation.", es: 'Preguntó si había recibido la cotización.' }
+    ],
+    more: [
+      {
+        title: 'Verbos para reportar con precisión',
+        es: 'Repetir "he said" todo el rato es de nivel B1. Un B2 elige el verbo que describe la INTENCIÓN, y eso comunica mucho más:\n\n' +
+            'AGREE TO — aceptó. "They agreed to extend the deadline."\n' +
+            'REFUSE TO — se negó. "He refused to lower the price."\n' +
+            'OFFER TO — se ofreció. "She offered to cover the freight."\n' +
+            'PROMISE TO — prometió. "They promised to ship on Monday."\n' +
+            'THREATEN TO — amenazó con. "He threatened to cancel the order."\n' +
+            'SUGGEST + -ing — sugirió. "She suggested meeting next week."\n' +
+            'RECOMMEND + -ing — recomendó.\n' +
+            'INSIST ON + -ing — insistió en.\n' +
+            'APOLOGIZE FOR + -ing — se disculpó por.\n' +
+            'DENY + -ing — negó.\n' +
+            'ADMIT + -ing — admitió.\n' +
+            'WARN someone ABOUT — advirtió.\n\n' +
+            'Fíjate en el patrón: unos piden infinitivo (agree, refuse, offer, promise, threaten) y otros -ing (suggest, recommend, insist on, apologize for, deny, admit). Es el mismo mecanismo de la unidad anterior.',
+        examples: [
+          { en: "They agreed to extend the deadline.", es: 'Aceptaron ampliar el plazo.' },
+          { en: "He refused to lower the price.", es: 'Se negó a bajar el precio.' },
+          { en: "She suggested meeting next week.", es: 'Sugirió reunirnos la próxima semana.' }
+        ]
+      },
+      {
+        title: 'Question tags y cuándo NO hay que retroceder',
+        es: 'QUESTION TAGS son esas coletillas que confirman algo: "You sent it, DIDN’T YOU?", "It isn’t ready, IS IT?". La regla: si la frase es afirmativa, la coletilla es negativa, y al revés. Se usa el mismo auxiliar de la frase.\n\n' +
+            'En negocios sirven para confirmar sin sonar a interrogatorio: "We agreed on thirty days, didn’t we?".\n\n' +
+            'Y una excepción importante del estilo indirecto: NO hay que retroceder el tiempo cuando lo dicho SIGUE SIENDO VERDAD ahora. "He said the factory IS in Guangzhou" — sigue estándolo. Retroceder ahí ("was") sugeriría que ya no.\n\n' +
+            'Tampoco se retrocede si reportas algo dicho hace un momento: "She just said she’s on her way".',
+        examples: [
+          { en: "We agreed on thirty days, didn't we?", es: 'Acordamos treinta días, ¿verdad?' },
+          { en: "He said the factory is in Guangzhou.", es: 'Dijo que la fábrica está en Guangzhou.' },
+          { en: "She just said she's on her way.", es: 'Acaba de decir que viene en camino.' }
+        ]
+      }
+    ],
+    mistakes: [
+      { bad: 'He said me that...', good: 'He told me that... / He said that...', es: '"Say" no lleva persona; "tell" la lleva obligatoriamente.' },
+      { bad: 'He asked where was the invoice.', good: 'He asked where the invoice was.', es: 'En preguntas reportadas se pierde el orden interrogativo.' },
+      { bad: 'She asked me that if I had sent it.', good: 'She asked me if I had sent it.', es: 'No se combinan "that" e "if".' },
+      { bad: 'He said he will call.', good: 'He said he would call.', es: 'Will retrocede a would.' },
+      { bad: 'They suggested to meet next week.', good: 'They suggested meeting next week.', es: '"Suggest" pide -ing.' }
+    ]
+  },
+  vocab: [
+    { en: 'to say', es: 'decir (sin persona)' }, { en: 'to tell', es: 'decir a alguien' },
+    { en: 'to ask', es: 'preguntar / pedir' }, { en: 'to reply', es: 'responder' },
+    { en: 'to add', es: 'añadir' }, { en: 'to explain', es: 'explicar' },
+    { en: 'to agree to', es: 'aceptar' }, { en: 'to refuse to', es: 'negarse a' },
+    { en: 'to offer to', es: 'ofrecerse a' }, { en: 'to promise to', es: 'prometer' },
+    { en: 'to threaten to', es: 'amenazar con' }, { en: 'to suggest -ing', es: 'sugerir' },
+    { en: 'to insist on -ing', es: 'insistir en' }, { en: 'to apologize for -ing', es: 'disculparse por' },
+    { en: 'to deny -ing', es: 'negar' }, { en: 'to admit -ing', es: 'admitir' },
+    { en: 'to warn about', es: 'advertir sobre' }, { en: 'to confirm', es: 'confirmar' },
+    { en: 'to point out', es: 'señalar' }, { en: 'to complain about', es: 'quejarse de' },
+    { en: 'whether', es: 'si (alternativa)' }, { en: 'the day before', es: 'el día anterior' },
+    { en: 'the next day', es: 'al día siguiente' }, { en: 'according to', es: 'según' },
+    { en: 'as far as I know', es: 'que yo sepa' }, { en: 'apparently', es: 'al parecer' },
+    { en: 'to follow up on', es: 'dar seguimiento a' }, { en: 'update', es: 'actualización' },
+    { en: 'minutes (of a meeting)', es: 'acta' }, { en: 'to summarize', es: 'resumir' }
+  ],
+  phrases: [
+    { en: "He said he needed it by Friday.", es: 'Dijo que lo necesitaba para el viernes.' },
+    { en: "They told me they had sent the samples.", es: 'Me dijeron que habían enviado las muestras.' },
+    { en: "She said she would call back this afternoon.", es: 'Dijo que devolvería la llamada esta tarde.' },
+    { en: "He asked where the invoice was.", es: 'Preguntó dónde estaba la factura.' },
+    { en: "She asked if I had received the quotation.", es: 'Preguntó si había recibido la cotización.' },
+    { en: "They agreed to extend the deadline.", es: 'Aceptaron ampliar el plazo.' },
+    { en: "He refused to lower the price.", es: 'Se negó a bajar el precio.' },
+    { en: "She suggested meeting next week.", es: 'Sugirió reunirnos la próxima semana.' },
+    { en: "They apologized for the delay.", es: 'Se disculparon por el retraso.' },
+    { en: "According to the client, the boxes were wet.", es: 'Según el cliente, las cajas estaban mojadas.' },
+    { en: "We agreed on thirty days, didn't we?", es: 'Acordamos treinta días, ¿verdad?' },
+    { en: "To summarize, they need it two weeks earlier.", es: 'En resumen, lo necesitan dos semanas antes.' }
+  ],
+  exercises: [
+    { t: 'mc', q: 'El cliente dijo: "I need it by Friday". ¿Cómo lo reportas?', opts: ['He said he need it by Friday', 'He said he needed it by Friday', 'He said he needs it by Friday'], a: 1, why: 'El presente retrocede a pasado en estilo indirecto.' },
+    { t: 'mc', q: '¿Cuál es correcta?', opts: ['He said me that he would call', 'He told me that he would call', 'He told that he would call'], a: 1, why: '"Tell" lleva persona obligatoria; "say" no la lleva.' },
+    { t: 'fill', q: 'She said she ___ call back this afternoon.', a: ['would'], why: 'WILL retrocede a WOULD.' },
+    { t: 'mc', q: 'Reporta "Where is the invoice?"', opts: ['He asked where was the invoice', 'He asked where the invoice was', 'He asked where is the invoice'], a: 1, why: 'En preguntas reportadas se pierde el orden interrogativo: sujeto antes del verbo.' },
+    { t: 'tr', q: 'Preguntó si había recibido la cotización.', a: ['she asked if i had received the quotation', 'he asked if i had received the quotation', 'she asked whether i had received the quotation'], why: 'Preguntas de sí/no se reportan con IF o WHETHER.' },
+    { t: 'order', words: ['They', 'told', 'me', 'they', 'had', 'sent', 'the', 'samples.'], a: 'They told me they had sent the samples.', why: 'El pasado simple ("we sent") retrocede a past perfect ("they had sent").' },
+    { t: 'mc', q: 'El proveedor no quiso bajar el precio. ¿Cuál lo reporta mejor?', opts: ['He said no about the price', 'He refused to lower the price', 'He said he not lower the price'], a: 1, why: 'Elegir el verbo que describe la intención es lo que distingue a un B2.' },
+    { t: 'fill', q: 'She suggested ___ next week.', a: ['meeting'], why: '"Suggest" pide -ing, no infinitivo.' },
+    { t: 'tr', q: 'Se disculparon por el retraso.', a: ['they apologized for the delay', 'they apologised for the delay'], why: '"Apologize for" + sustantivo o -ing.' },
+    { t: 'listen', audio: "He told me they had already shipped it, but he asked if we could confirm the address.", opts: ['Me dijo que ya lo habían enviado, pero preguntó si podíamos confirmar la dirección.', 'Me pidió que enviara la dirección antes de despachar.', 'Dijo que enviarían el pedido cuando confirmáramos la dirección.'], a: 0, why: 'Un reporte con las dos formas: afirmación con "told me" y pregunta con "asked if".' },
+    { t: 'mc', q: '"We agreed on thirty days, ___?"', opts: ["didn't we", 'did we', "don't we"], a: 0, why: 'Frase afirmativa en pasado → coletilla negativa con el mismo auxiliar: didn’t we.' }
   ]
 }
 ];

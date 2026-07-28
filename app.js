@@ -498,7 +498,7 @@ function go(tab) {
   stopDialogue();
   if (V.talk) V.talk.rec = false;
   if (V.pron) V.pron.rec = false;
-  if (tab !== 'pron' && V.audio) V.audio.id = null;
+  if (V.audio) { V.audio.id = null; V.audio.stage = 'intro'; }   // volver siempre a la lista de diálogos
   if (window.speechSynthesis) { try { window.speechSynthesis.cancel(); } catch (e) {} }
   window.scrollTo(0, 0);
   render();

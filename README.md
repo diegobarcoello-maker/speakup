@@ -15,7 +15,7 @@ Funciona **entera dentro del navegador**: sin backend, sin compilación, sin ins
 | Sección | Qué hace |
 |---|---|
 | **Inicio** | Meta diaria de XP, racha, palabras aprendidas y mapa de ruta visible A1 → A2 → B1 → B2 con B2 marcado como meta. |
-| **Lecciones** | 15 unidades (3 de A1, 4 de A2, 4 de B1, 4 de B2). Cada una trae un punto de gramática explicado a fondo en español, 1-2 puntos adicionales, una tabla de errores típicos del hispanohablante, 26-30 palabras de vocabulario con audio, 12 frases útiles y 11-12 ejercicios de 5 tipos. |
+| **Lecciones** | 22 unidades (4 de A1, 5 de A2, 7 de B1, 6 de B2) que cubren el temario completo de A1 a B2. Cada una trae un punto de gramática explicado a fondo en español, 1-2 puntos adicionales, una tabla de errores típicos del hispanohablante, 26-30 palabras de vocabulario con audio, 12 frases útiles y 11-12 ejercicios de 5 tipos. |
 | **Crear lección** | Escribes un tema en español —*aduanas*, *cobranzas*, *reclamos de calidad*— y el tutor genera una unidad completa a tu nivel: vocabulario, frases, gramática y ejercicios. Se guarda junto a las demás. |
 | **Mis errores** | Cada corrección del tutor se guarda con su categoría gramatical. La app te muestra qué fallas más y genera una práctica hecha solo con tus errores reales. |
 | **Conversar** | 10 escenarios de roleplay con el tutor de IA. Responde en inglés, se puede escuchar, y cada turno trae una **nota de coach** que corrige en español y una pista de qué decir. Entrada por texto o por voz. |
@@ -27,7 +27,17 @@ Funciona **entera dentro del navegador**: sin backend, sin compilación, sin ins
 
 El nivel sube solo al acumular XP: **A1** 0 · **A2** 450 · **B1** 1300 · **B2** 2800.
 
-En total: **433 palabras de vocabulario**, 180 frases, 173 ejercicios, 75 errores típicos documentados y unos 30.000 caracteres de explicación gramatical en español. Las lecciones por sí solas dan unos 2.180 XP, así que llegar a B2 exige también conversar y repasar — que es justo lo que se busca.
+En total: **643 palabras de vocabulario**, 264 frases, 250 ejercicios, 110 errores típicos documentados y unos 47.000 caracteres de explicación gramatical en español. Las lecciones dan 3.160 XP, así que la ruta hasta B2 cierra con el contenido incluido, sin depender de nada externo.
+
+### Temario cubierto
+
+**A1** — verbo *to be*, pronombres, artículos, palabras interrogativas, edad y nacionalidad, preposiciones de tiempo, horas y números, posesivos, genitivo sajón, plurales y pronombres de objeto.
+
+**A2** — presente simple y adverbios de frecuencia, presente continuo, *can* / *could* / *would like*, *there is/are*, comparativos y superlativos, lenguaje de viaje, falsos amigos, contables e incontables, *some* / *any* / *much* / *many*.
+
+**B1** — pasado simple y continuo, *used to*, los tres futuros, grados de certeza, present perfect y su contraste con el pasado, conectores y opiniones, *must* / *have to* / *should* (y la trampa de *mustn't* frente a *don't have to*), gerundio o infinitivo, oraciones de relativo.
+
+**B2** — los cuatro condicionales, phrasal verbs y expresiones idiomáticas, lenguaje diplomático, presentar cifras, Incoterms y condiciones de pago, voz pasiva, estilo indirecto y *question tags*, método STAR para entrevistas.
 
 ---
 
