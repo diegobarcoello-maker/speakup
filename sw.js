@@ -11,7 +11,7 @@
    petición que no sea a este mismo sitio.
    ============================================================ */
 
-const VERSION = 'speakup-v6';
+const VERSION = 'speakup-v7';
 
 const ESENCIALES = [
   './',
@@ -22,6 +22,7 @@ const ESENCIALES = [
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
+  './icon-1024.png',
   './icon-maskable-512.png',
   './apple-touch-icon.png'
 ];

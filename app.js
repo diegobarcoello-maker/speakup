@@ -574,19 +574,28 @@ function viewOnboarding() {
   if (step === 1) {
     return '<div class="onb">' +
       '<div class="onb-hero">' +
-        '<div class="logo-mark">SU</div>' +
+        '<img class="onb-logo" src="icon-192.png" alt="" width="88" height="88">' +
         '<h1>Bienvenido a SpeakUp</h1>' +
-        '<p class="muted">Tu tutor personal de inglés. Te lleva desde cero hasta <b>B2</b>: hablar y entender con soltura, en el día a día y en los negocios.</p>' +
+        '<p class="onb-lema">Tu tutor personal de inglés. Desde cero hasta <b>B2</b>: hablar y entender con soltura, en el día a día y en los negocios.</p>' +
       '</div>' +
+
+      '<div class="onb-puntos">' +
+        [['chat', 'Habla', 'Conversa con un tutor que te corrige en español'],
+         ['headphones', 'Escucha', 'Diálogos reales a velocidad normal'],
+         ['cards', 'Recuerda', 'Repaso espaciado para que no se te olvide']]
+        .map(([i, t, d]) =>
+          '<div class="onb-punto"><span>' + ic(i) + '</span><b>' + t + '</b><i>' + d + '</i></div>').join('') +
+      '</div>' +
+
       '<div class="card">' +
         '<div class="field">' +
           '<label for="onbname">¿Cómo te llamas? <span class="muted" style="font-weight:400">(opcional)</span></label>' +
           '<input type="text" id="onbname" placeholder="Tu nombre" autocomplete="given-name" value="' + esc(S.name) + '">' +
           '<div class="hint">Lo usaremos para saludarte y para practicar presentaciones.</div>' +
         '</div>' +
-        '<button class="btn btn-primary btn-block" data-act="onb-next">Continuar ' + ic('right') + '</button>' +
+        '<button class="btn btn-primary btn-block" data-act="onb-next">Empezar ' + ic('right') + '</button>' +
       '</div>' +
-      '<p class="tiny muted center">Todo tu progreso se guarda en este navegador. No se envía a ningún servidor.</p>' +
+      '<p class="tiny muted center">Tu progreso se guarda en este dispositivo. Sin cuentas ni servidores.</p>' +
     '</div>';
   }
   return '<div class="onb">' +
