@@ -522,6 +522,7 @@ function render() {
     document.getElementById('topstats').hidden = true;
     // el engranaje debe funcionar también antes de empezar: ahí está el botón de instalar
     root.innerHTML = '<div class="view">' + (V.tab === 'settings' ? viewSettingsPrevio() : viewOnboarding()) + '</div>';
+    renderAsk();
     afterRender();
     return;
   }
@@ -544,12 +545,14 @@ function render() {
     if (b.dataset.tab === navTab) b.setAttribute('aria-current', 'page');
     else b.removeAttribute('aria-current');
   });
+  renderAsk();
   afterRender();
 }
 
 function afterRender() {
   const chat = document.getElementById('chatbox');
   if (chat) chat.scrollIntoView({ block: 'end' });
+  if (Ask.abierto) return;                       // si el asistente está abierto, el foco es suyo
   const focusEl = document.querySelector('[data-autofocus]');
   if (focusEl) focusEl.focus();
 }
@@ -643,7 +646,9 @@ function viewHome() {
     ? 'Meta diaria cumplida. Todo lo que hagas ahora es ganancia.'
     : 'Te faltan <b>' + (goal - S.dailyXp) + ' XP</b> para cumplir la meta de hoy.') + '</p>' +
 
-  '<div class="card">' +
+  '<div class="home-grid">' +
+
+  '<div class="card home-wide">' +
     '<div class="row-between" style="margin-bottom:9px">' +
       '<b class="small">Meta de hoy</b>' +
       '<span class="small muted">' + S.dailyXp + ' / ' + goal + ' XP</span>' +
@@ -651,7 +656,7 @@ function viewHome() {
     '<div class="bar accent"><i style="width:' + pct + '%"></i></div>' +
   '</div>' +
 
-  '<div class="stats-grid" style="margin-bottom:14px">' +
+  '<div class="stats-grid home-wide" style="margin-bottom:14px">' +
     '<div class="stat-box"><div class="stat-num">' + S.streak + '</div><div class="stat-lab">Días de racha</div></div>' +
     '<div class="stat-box"><div class="stat-num">' + Object.keys(S.srs).length +
       (srsStats().prod ? '<span style="font-size:.9rem;color:var(--brand)"> / ' + srsStats().prod + '</span>' : '') +
@@ -693,7 +698,7 @@ function viewHome() {
       '</div>'
     : '') +
 
-  '<div class="card">' +
+  '<div class="card home-wide">' +
     '<div class="card-title"><span style="color:var(--accent)">' + ic('target') + '</span><h3>Tu ruta hasta B2</h3></div>' +
     '<div class="roadmap">' +
       LEVELS.map((l, i) => {
@@ -722,7 +727,7 @@ function viewHome() {
   '</div>' +
 
   (App.invitacion && !App.instalada
-    ? '<div class="card">' +
+    ? '<div class="card home-wide">' +
         '<div class="row-between">' +
           '<div><b>' + ic('download') + ' Ponla en tu pantalla de inicio</b>' +
           '<div class="small muted">Con su icono, sin barra de navegador y funcionando sin internet.</div></div>' +
@@ -731,9 +736,11 @@ function viewHome() {
       '</div>'
     : '') +
 
-  '<div class="btn-row" style="margin-bottom:20px">' +
+  '<div class="btn-row home-wide" style="margin-bottom:20px">' +
     '<button class="btn btn-ghost" data-act="tab" data-tab="talk">' + ic('chat') + ' Conversar</button>' +
     '<button class="btn btn-ghost" data-act="tab" data-tab="pron">' + ic('headphones') + ' Escuchar</button>' +
+  '</div>' +
+
   '</div>';
 }
 
@@ -2367,6 +2374,13 @@ document.addEventListener('click', async (e) => {
     toast('Copia de seguridad descargada');
     return;
   }
+  /* --- asistente flotante --- */
+  if (act === 'ask-open')  { Ask.abierto = true;  renderAsk(); return; }
+  if (act === 'ask-close') { Ask.abierto = false; renderAsk(); return; }
+  if (act === 'ask-clear') { Ask.msgs = []; Ask.draft = ''; renderAsk(); return; }
+  if (act === 'ask-send')  { const b = document.getElementById('askinput'); if (b) Ask.enviar(b.value); return; }
+  if (act === 'ask-sug')   { Ask.enviar(t.dataset.q); return; }
+
   if (act === 'instalar') { App.instalar(); return; }
   if (act === 'save-theme') {
     const sel = document.getElementById('settheme');
@@ -2409,6 +2423,10 @@ document.addEventListener('keydown', e => {
       e.preventDefault();
       const b = document.querySelector('[data-act="check-prod"]'); if (b) b.click();
     }
+    if (el.id === 'askinput' && !e.shiftKey) {
+      e.preventDefault();
+      Ask.enviar(el.value);
+    }
     if (el.id === 'ctopic') {
       e.preventDefault();
       const b = document.querySelector('[data-act="gen-unit"]'); if (b && !b.disabled) b.click();
@@ -2424,6 +2442,7 @@ document.addEventListener('keydown', e => {
 document.addEventListener('input', e => {
   if (e.target.id === 'chatinput') talkState().draft = e.target.value;
   if (e.target.id === 'emailtext') talkState().emailText = e.target.value;
+  if (e.target.id === 'askinput')  Ask.draft = e.target.value;
 });
 
 /* --- importar una copia de seguridad --- */
@@ -2464,6 +2483,153 @@ if (window.matchMedia) {
   const onChange = () => { if (S.settings.theme === 'auto') applyTheme(); };
   if (mq.addEventListener) mq.addEventListener('change', onChange);
   else if (mq.addListener) mq.addListener(onChange);
+}
+
+/* ══════════════════ 16b. ASISTENTE FLOTANTE ══════════════════
+   Un botón siempre a mano para preguntar cualquier duda. Sabe en qué
+   pantalla estás, qué unidad tienes abierta y qué errores repites, así
+   que puede responder "¿por qué esto es así?" sin que expliques nada.  */
+
+const Ask = {
+  abierto: false,
+  msgs: [],
+  busy: false,
+  draft: '',
+
+  /* Dónde está el usuario ahora mismo, en texto para la IA */
+  contexto() {
+    const partes = [];
+    const pantallas = {
+      home: 'la pantalla de Inicio', lessons: 'las Lecciones', create: 'el generador de lecciones',
+      talk: 'Conversar con el tutor', pron: 'Escuchar', review: 'el Repaso', settings: 'los Ajustes'
+    };
+    partes.push('Está en ' + (pantallas[V.tab] || 'la app') + '.');
+    partes.push('Su nivel actual es ' + currentLevel().id + ' (' + S.xp + ' XP).');
+
+    if (V.unit) {
+      const u = unitById(V.unit);
+      if (u) {
+        partes.push('Tiene abierta la unidad "' + u.title + '" (' + u.level + '), sobre: ' + u.grammar.title + '.');
+        if (V.lesson && V.lesson.step === 'ex') {
+          const ex = u.exercises[V.lesson.i];
+          if (ex) {
+            partes.push('Está en el ejercicio ' + (V.lesson.i + 1) + ': ' + JSON.stringify(ex).slice(0, 500));
+            if (V.lesson.answered) partes.push('Ya respondió y ' + (V.lesson.correct ? 'acertó' : 'falló') + '.');
+          }
+        }
+      }
+    }
+    if (V.tab === 'pron' && V.audio && V.audio.id) {
+      const d = dialogueById(V.audio.id);
+      if (d) partes.push('Está con el diálogo "' + d.title + '".');
+    }
+    if (V.tab === 'talk' && V.talk && V.talk.scenario) {
+      const sc = SCENARIOS.find(s => s.id === V.talk.scenario);
+      if (sc) partes.push('Está conversando en el escenario "' + sc.title + '".');
+    }
+    const top = mistakesByTag().slice(0, 3).map(g => g.tag + ' (' + g.total + ')');
+    if (top.length) partes.push('Sus errores más repetidos: ' + top.join(', ') + '.');
+    return partes.join(' ');
+  },
+
+  sistema() {
+    return 'Eres el asistente de SpeakUp, una app que enseña inglés a Diego, un hispanohablante que es Jefe Zonal de Ventas en comercio exterior y va de A1 a B2.\n\n' +
+      'RESPONDE SIEMPRE EN ESPAÑOL, salvo los ejemplos en inglés. Sé breve: 2 a 5 frases, o una lista corta. Nada de rodeos ni de repetir la pregunta.\n\n' +
+      'Puedes resolver dos tipos de duda:\n' +
+      '1. DE INGLÉS: gramática, vocabulario, pronunciación, cómo se dice algo, por qué una respuesta es la correcta. Da siempre un ejemplo en inglés con su traducción. Si el error es típico del hispanohablante, dilo.\n' +
+      '2. DE LA APP: cómo funciona alguna sección o cómo hacer algo.\n\n' +
+      'CÓMO ES SPEAKUP, para las dudas del tipo 2:\n' +
+      '· Inicio: meta diaria de XP, racha, palabras aprendidas frente a las que ya sabe producir, y el mapa de ruta A1→A2→B1→B2. El nivel sube solo con el XP: A2 a los 450, B1 a los 1300, B2 a los 2800.\n' +
+      '· Lecciones: 22 unidades con gramática explicada, vocabulario con audio, frases y ejercicios. Arriba hay un generador para crear una lección a medida sobre el tema que pida.\n' +
+      '· Conversar: 10 escenarios de roleplay con el tutor, por texto o por voz, con nota de coach que corrige en español. Tiene además el modo Correo de negocios, que corrige y reescribe correos.\n' +
+      '· Escuchar: 10 diálogos a dos voces que se oyen sin texto, con preguntas de comprensión y un dictado; la transcripción aparece al final. Y una pestaña de Pronunciación con micrófono.\n' +
+      '· Repaso: repetición espaciada en dos direcciones. Reconocimiento (ve el inglés, recuerda el español) y Producción (ve el español y escribe el inglés). Una palabra pasa a producción al acertarla dos veces. También está la libreta "Mis errores", que guarda cada corrección con su categoría y genera práctica dirigida.\n' +
+      '· Ajustes: nombre, meta diaria, nivel, acento americano o británico, voz, clave de API, tema claro/oscuro, exportar e importar el progreso, e instalar la app.\n' +
+      '· Se instala en el móvil y funciona sin internet, salvo Conversar, el Correo y el generador, que necesitan red.\n' +
+      '· El progreso se guarda solo en su navegador, no hay servidor ni cuenta.\n\n' +
+      'Si te pregunta por algo que la app no hace, dilo con claridad en vez de inventarlo.';
+  },
+
+  async enviar(texto) {
+    if (!texto.trim() || Ask.busy) return;
+    Ask.msgs.push({ who: 'me', text: texto.trim() });
+    Ask.draft = '';
+    Ask.busy = true;
+    renderAsk();
+
+    const historial = Ask.msgs.slice(-10).map(m => ({ role: m.who === 'me' ? 'user' : 'assistant', content: m.text }));
+    if (historial.length && historial[0].role !== 'user') historial.shift();
+    historial[historial.length - 1].content =
+      'CONTEXTO (no lo menciones salvo que venga a cuento): ' + Ask.contexto() + '\n\nPREGUNTA: ' + texto.trim();
+
+    try {
+      const raw = await callClaude(Ask.sistema(), historial, 700);
+      Ask.msgs.push({ who: 'bot', text: (raw || '').trim() || 'No supe qué responder. Prueba a preguntarlo de otra forma.' });
+    } catch (err) {
+      Ask.msgs.push({ who: 'bot', text: apiErrorText(err), error: true });
+    }
+    Ask.busy = false;
+    renderAsk();
+  },
+
+  /* Sugerencias que cambian según dónde esté */
+  sugerencias() {
+    if (V.lesson && V.lesson.step === 'ex' && V.lesson.answered) return ['¿Por qué es esa la correcta?', 'Dame otro ejemplo', '¿Cuándo NO se usa así?'];
+    if (V.tab === 'lessons' && V.unit) return ['Explícamelo más simple', 'Dame 3 ejemplos de trabajo', '¿Cuál es el error típico aquí?'];
+    if (V.tab === 'talk') return ['¿Cómo digo esto en inglés?', '¿Suena natural lo que escribí?', 'Dame una frase para responder'];
+    if (V.tab === 'pron') return ['No entendí una parte', '¿Cómo se pronuncia esto?', '¿Qué significa esa expresión?'];
+    if (V.tab === 'review') return ['¿Cómo funciona el repaso?', 'Dame un truco para memorizar', '¿Qué es producción?'];
+    return ['¿Cómo se dice "cotización"?', '¿Cómo instalo la app?', '¿Qué hago hoy para avanzar?'];
+  }
+};
+
+function renderAsk() {
+  const caja = document.getElementById('ask');
+  if (!caja) return;
+  if (!S.onboarded) { caja.innerHTML = ''; return; }
+
+  const fab = '<button class="ask-fab" data-act="ask-open" aria-label="Preguntar una duda" title="¿Alguna duda?">' +
+    ic('chat') + (Ask.msgs.length ? '<span class="ask-dot"></span>' : '') + '</button>';
+
+  if (!Ask.abierto) { caja.innerHTML = fab; return; }
+
+  const sinClave = !(S.settings.apiKey || '').trim();
+  const mensajes = Ask.msgs.length
+    ? Ask.msgs.map(m => '<div class="ask-msg ' + (m.who === 'me' ? 'me' : 'bot') + (m.error ? ' err' : '') + '">' +
+        esc(m.text).replace(/\n/g, '<br>') + '</div>').join('')
+    : '<div class="ask-vacio">' + ic('bulb') +
+      '<p><b>Pregúntame lo que sea.</b><br>Dudas de inglés o de cómo funciona la app. Sé dónde estás, así que puedes preguntar directamente "¿por qué es así?".</p></div>';
+
+  caja.innerHTML = fab +
+    '<div class="ask-fondo" data-act="ask-close"></div>' +
+    '<div class="ask-panel" role="dialog" aria-label="Asistente de dudas">' +
+      '<div class="ask-cab">' +
+        '<b>' + ic('bulb') + ' ¿Alguna duda?</b>' +
+        '<span style="margin-left:auto;display:flex;gap:6px">' +
+          (Ask.msgs.length ? '<button class="btn btn-ghost btn-sm" data-act="ask-clear" aria-label="Empezar de nuevo">' + ic('refresh') + '</button>' : '') +
+          '<button class="btn btn-ghost btn-sm" data-act="ask-close" aria-label="Cerrar">' + ic('x') + '</button>' +
+        '</span>' +
+      '</div>' +
+      (sinClave
+        ? '<div class="ask-cuerpo"><div class="notice warn" style="margin:0"><b>' + ic('lock') + ' Necesita tu clave de API</b>' +
+          'El asistente usa la IA para responderte. Pega tu clave en Ajustes y podrás preguntarle cualquier cosa.</div></div>'
+        : '<div class="ask-cuerpo" id="askcuerpo">' + mensajes +
+          (Ask.busy ? '<div class="ask-msg bot"><span class="typing"><i></i><i></i><i></i></span></div>' : '') +
+          '</div>' +
+          '<div class="ask-sug">' +
+            Ask.sugerencias().map(s => '<button class="ask-chip" data-act="ask-sug" data-q="' + esc(s) + '">' + esc(s) + '</button>').join('') +
+          '</div>' +
+          '<div class="ask-pie">' +
+            '<label class="sr-only" for="askinput">Escribe tu duda</label>' +
+            '<textarea id="askinput" rows="1" placeholder="Escribe tu duda…"' + (Ask.busy ? ' disabled' : ' data-askfocus') + '>' + esc(Ask.draft) + '</textarea>' +
+            '<button class="btn btn-primary btn-icon" data-act="ask-send" aria-label="Enviar"' + (Ask.busy ? ' disabled' : '') + '>' + ic('send') + '</button>' +
+          '</div>') +
+    '</div>';
+
+  const cuerpo = document.getElementById('askcuerpo');
+  if (cuerpo) cuerpo.scrollTop = cuerpo.scrollHeight;
+  const campo = caja.querySelector('[data-askfocus]');
+  if (campo && Ask.abierto) campo.focus();
 }
 
 /* ══════════════════ 17. INSTALAR Y FUNCIONAR SIN CONEXIÓN ══════════════════ */
