@@ -42,6 +42,7 @@ const PATHS = {
   note:      '<path d="M5 3h11l4 4v14H5z"/><path d="M15 3v5h5"/><path d="M9 12h7M9 16h5"/>',
   trash:     '<path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M6 7l1 13h10l1-13"/><path d="M10 11v6M14 11v6"/>',
   upload:    '<path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>',
+  download:  '<path d="M12 4v12"/><path d="m7 11 5 5 5-5"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>',
   headphones:'<path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="2" y="14" width="5" height="7" rx="2"/><rect x="17" y="14" width="5" height="7" rx="2"/>',
   pause:     '<rect x="7" y="5" width="3.5" height="14" rx="1"/><rect x="13.5" y="5" width="3.5" height="14" rx="1"/>',
   ear:       '<path d="M8 20a3 3 0 0 0 3-3c0-2 3-2.5 3-6a3 3 0 0 0-6 0"/><path d="M5 10a7 7 0 1 1 14 0c0 4-3 5-3 8a4 4 0 0 1-8 .5"/>'
@@ -688,9 +689,19 @@ function viewHome() {
       : '<div class="notice" style="margin:14px 0 0"><b>Llegaste a B2.</b>Ahora toca mantenerlo: conversa a diario y repasa el vocabulario.</div>') +
   '</div>' +
 
+  (App.invitacion && !App.instalada
+    ? '<div class="card">' +
+        '<div class="row-between">' +
+          '<div><b>' + ic('download') + ' Ponla en tu pantalla de inicio</b>' +
+          '<div class="small muted">Con su icono, sin barra de navegador y funcionando sin internet.</div></div>' +
+          '<button class="btn btn-soft btn-sm" data-act="instalar">Instalar</button>' +
+        '</div>' +
+      '</div>'
+    : '') +
+
   '<div class="btn-row" style="margin-bottom:20px">' +
     '<button class="btn btn-ghost" data-act="tab" data-tab="talk">' + ic('chat') + ' Conversar</button>' +
-    '<button class="btn btn-ghost" data-act="tab" data-tab="pron">' + ic('mic') + ' Pronunciar</button>' +
+    '<button class="btn btn-ghost" data-act="tab" data-tab="pron">' + ic('headphones') + ' Escuchar</button>' +
   '</div>';
 }
 
@@ -751,6 +762,7 @@ function viewCreate() {
   '<button class="back-link" data-act="tab" data-tab="lessons">' + ic('left') + ' Lecciones</button>' +
   '<h1>Crear una lección</h1>' +
   '<p class="muted" style="margin-top:-6px">Escribe el tema en español. El tutor genera vocabulario, frases, una nota de gramática y los ejercicios, todo a tu nivel.</p>' +
+  App.avisoSinConexion('Crear una lección') +
 
   (noKey
     ? '<div class="notice warn"><b>' + ic('lock') + ' Necesita tu clave de API</b>Esta función usa la IA para escribir la lección. Pega tu clave en ' +
@@ -1119,6 +1131,7 @@ function viewScenarioPicker() {
   const noKey = !(S.settings.apiKey || '').trim();
   return '<h1>Conversar</h1>' +
   '<p class="muted" style="margin-top:-6px">Elige una situación y habla en inglés. El tutor te responde, te corrige en español y te sugiere qué decir.</p>' +
+  App.avisoSinConexion('Conversar con el tutor') +
   (noKey ? '<div class="notice warn"><b>Modo sin IA activo</b>Puedes practicar con diálogos guiados y correcciones básicas. Para que el tutor responda de verdad, pega tu clave de API en <button class="btn btn-sm btn-soft" data-act="tab" data-tab="settings" style="margin-left:4px">Ajustes</button></div>' : '') +
   '<div class="tile-list two">' +
     SCENARIOS.map(s =>
@@ -1926,6 +1939,8 @@ function viewSettings() {
     '<button class="btn btn-ghost btn-block" data-act="test-api">Probar la conexión</button>' +
   '</div>' +
 
+  App.tarjeta() +
+
   '<div class="card">' +
     '<div class="card-title"><h3>Apariencia</h3></div>' +
     '<div class="field"><label for="settheme">Tema</label>' +
@@ -2320,6 +2335,7 @@ document.addEventListener('click', async (e) => {
     toast('Copia de seguridad descargada');
     return;
   }
+  if (act === 'instalar') { App.instalar(); return; }
   if (act === 'import') {
     const f = document.getElementById('importfile');
     if (f) f.click();
@@ -2412,11 +2428,107 @@ if (window.matchMedia) {
   else if (mq.addListener) mq.addListener(onChange);
 }
 
-/* ══════════════════ 17. ARRANQUE ══════════════════ */
+/* ══════════════════ 17. INSTALAR Y FUNCIONAR SIN CONEXIÓN ══════════════════ */
+const App = {
+  invitacion: null,          // el evento que Chrome guarda para poder instalar
+  instalada: false,
+  esIOS: false,
+  hayInternet: true,
+
+  init() {
+    App.esIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    App.instalada = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+                    window.navigator.standalone === true;
+    App.hayInternet = navigator.onLine !== false;
+
+    window.addEventListener('beforeinstallprompt', e => {
+      e.preventDefault();
+      App.invitacion = e;
+      if (V.tab === 'settings' || V.tab === 'home') render();
+    });
+    window.addEventListener('appinstalled', () => {
+      App.invitacion = null; App.instalada = true;
+      toast('SpeakUp instalada. Búscala en tu pantalla de inicio.');
+      render();
+    });
+    window.addEventListener('online',  () => { App.hayInternet = true;  render(); });
+    window.addEventListener('offline', () => { App.hayInternet = false; render(); });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').then(reg => {
+          reg.addEventListener('updatefound', () => {
+            const nuevo = reg.installing;
+            if (!nuevo) return;
+            nuevo.addEventListener('statechange', () => {
+              if (nuevo.state === 'installed' && navigator.serviceWorker.controller) {
+                toast('Hay una versión nueva. Se aplicará al reabrir la app.');
+              }
+            });
+          });
+        }).catch(e => console.warn('No se pudo activar el modo sin conexión:', e));
+      });
+    }
+  },
+
+  async instalar() {
+    if (!App.invitacion) return;
+    App.invitacion.prompt();
+    try {
+      const r = await App.invitacion.userChoice;
+      if (r && r.outcome === 'accepted') toast('Instalando…');
+    } catch (e) {}
+    App.invitacion = null;
+    render();
+  },
+
+  /* Tarjeta de instalación, adaptada a lo que el navegador permita */
+  tarjeta() {
+    if (App.instalada) {
+      return '<div class="card">' +
+        '<div class="card-title"><span style="color:var(--ok)">' + ic('check') + '</span><h3>App instalada</h3></div>' +
+        '<p class="small muted" style="margin:0">Estás usando SpeakUp como aplicación. Funciona sin conexión: lecciones, escucha y repaso siguen ahí aunque no tengas internet.</p>' +
+      '</div>';
+    }
+    if (App.invitacion) {
+      return '<div class="card">' +
+        '<div class="card-title"><span style="color:var(--brand)">' + ic('download') + '</span><h3>Instálala en tu teléfono</h3></div>' +
+        '<p class="small muted">Queda como una app más, con su icono, sin barra de navegador, y funciona sin internet. Es lo que convierte los diez minutos del taxi en práctica.</p>' +
+        '<button class="btn btn-primary btn-block" data-act="instalar">' + ic('download') + ' Instalar SpeakUp</button>' +
+      '</div>';
+    }
+    if (App.esIOS) {
+      return '<div class="card">' +
+        '<div class="card-title"><span style="color:var(--brand)">' + ic('download') + '</span><h3>Instálala en tu iPhone</h3></div>' +
+        '<p class="small muted">En Safari, toca el botón <b>Compartir</b> (el cuadrado con la flecha hacia arriba) y elige <b>Añadir a pantalla de inicio</b>. Quedará como una app, sin barra de navegador y funcionando sin internet.</p>' +
+        '<p class="tiny muted" style="margin:0">Tiene que ser desde Safari: en iPhone, Chrome no puede instalar aplicaciones web.</p>' +
+      '</div>';
+    }
+    return '<div class="card">' +
+      '<div class="card-title"><span style="color:var(--text-dim)">' + ic('download') + '</span><h3>Instalarla como app</h3></div>' +
+      '<p class="small muted" style="margin:0">En Chrome o Edge de escritorio, busca el icono de instalar en la barra de direcciones. En Android, el menú del navegador tiene <b>Instalar aplicación</b>. En iPhone, desde Safari: Compartir → Añadir a pantalla de inicio.</p>' +
+    '</div>';
+  },
+
+  /* Aviso cuando algo necesita internet y no lo hay */
+  avisoSinConexion(queNecesita) {
+    if (App.hayInternet) return '';
+    return '<div class="notice warn"><b>' + ic('x') + ' Sin conexión</b>' + esc(queNecesita) +
+      ' necesita internet. Mientras tanto tienes disponibles las lecciones, la escucha y el repaso, que funcionan sin red.</div>';
+  }
+};
+
+/* ══════════════════ 18. ARRANQUE ══════════════════ */
 function boot() {
   Voice.init();
+  App.init();
   ensureDay();
   applyTheme();
+  // atajos del icono instalado: ?ir=review, ?ir=talk, ?ir=pron
+  try {
+    const destino = new URLSearchParams(location.search).get('ir');
+    if (destino && ['home', 'lessons', 'talk', 'pron', 'review'].indexOf(destino) >= 0 && S.onboarded) V.tab = destino;
+  } catch (e) {}
   document.getElementById('nav').innerHTML =
     '<div class="bottomnav-in">' +
       [['home', 'home', 'Inicio'], ['lessons', 'book', 'Lecciones'], ['talk', 'chat', 'Conversar'],

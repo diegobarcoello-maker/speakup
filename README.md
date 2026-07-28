@@ -41,14 +41,30 @@ En total: **643 palabras de vocabulario**, 264 frases, 250 ejercicios, 110 error
 
 ---
 
+## Instalarla en el teléfono
+
+SpeakUp es una **aplicación web instalable**: se pone en tu pantalla de inicio con su icono, se abre sin barra de navegador y **funciona sin internet**.
+
+- **Android / Chrome / Edge** — la propia app te ofrece el botón *Instalar* en Inicio y en Ajustes.
+- **iPhone** — desde **Safari** (no Chrome): botón **Compartir** → **Añadir a pantalla de inicio**.
+- **Escritorio** — icono de instalar en la barra de direcciones de Chrome o Edge.
+
+Manteniendo pulsado el icono aparecen tres atajos directos: **Repaso**, **Conversar** y **Escuchar**.
+
+**Qué funciona sin conexión:** lecciones, ejercicios, diálogos de escucha, pronunciación, repaso y todo tu progreso. **Qué necesita internet:** Conversar con el tutor, el Correo de negocios y el generador de lecciones, porque llaman a la IA. La app te avisa cuando estás sin red y te dice qué sí puedes hacer.
+
 ## Archivos
 
 ```
-index.html    ← página principal (debe ir en la raíz del repositorio)
-styles.css    ← diseño, modo claro/oscuro, accesibilidad
-data.js       ← contenido pedagógico: unidades, escenarios, correos
-app.js        ← lógica: lecciones, SRS, voz, IA, progreso
-README.md     ← este archivo
+index.html         ← página principal (debe ir en la raíz del repositorio)
+styles.css         ← diseño, modo claro/oscuro, accesibilidad
+data.js            ← contenido pedagógico: unidades, diálogos, escenarios
+app.js             ← lógica: lecciones, SRS, voz, IA, progreso
+manifest.json      ← identidad de la app instalable
+sw.js              ← service worker: funcionamiento sin conexión
+icon-*.png         ← iconos de la app
+apple-touch-icon.png
+README.md          ← este archivo
 ```
 
 Todas las rutas son **relativas** (`styles.css`, `data.js`, `app.js`), así que la app funciona igual en `usuario.github.io/repo/` que abriendo `index.html` con doble clic.

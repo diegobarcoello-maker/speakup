@@ -1,0 +1,24 @@
+{
+  "name": "SpeakUp — Tutor de inglés",
+  "short_name": "SpeakUp",
+  "description": "Tutor personal de inglés de A1 a B2, con enfoque en negocios y comercio exterior. Interfaz en español.",
+  "lang": "es",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#fbf9f6",
+  "theme_color": "#0f766e",
+  "categories": ["education", "productivity"],
+  "icons": [
+    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Repaso de hoy", "short_name": "Repaso", "url": "./?ir=review", "icons": [{ "src": "./icon-192.png", "sizes": "192x192" }] },
+    { "name": "Conversar", "short_name": "Conversar", "url": "./?ir=talk", "icons": [{ "src": "./icon-192.png", "sizes": "192x192" }] },
+    { "name": "Escuchar", "short_name": "Escuchar", "url": "./?ir=pron", "icons": [{ "src": "./icon-192.png", "sizes": "192x192" }] }
+  ]
+}
