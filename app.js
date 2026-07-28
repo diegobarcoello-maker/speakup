@@ -517,7 +517,14 @@ function paintStats() {
 function render() {
   applyTheme();
   const root = app();
-  if (!S.onboarded) { root.innerHTML = viewOnboarding(); document.getElementById('nav').hidden = true; document.getElementById('topstats').hidden = true; afterRender(); return; }
+  if (!S.onboarded) {
+    document.getElementById('nav').hidden = true;
+    document.getElementById('topstats').hidden = true;
+    // el engranaje debe funcionar también antes de empezar: ahí está el botón de instalar
+    root.innerHTML = '<div class="view">' + (V.tab === 'settings' ? viewSettingsPrevio() : viewOnboarding()) + '</div>';
+    afterRender();
+    return;
+  }
   document.getElementById('nav').hidden = false;
   document.getElementById('topstats').hidden = false;
   paintStats();
@@ -588,6 +595,31 @@ function viewOnboarding() {
       '<b>' + ic('target') + ' Tu meta: nivel B2</b>' +
       'Sostener conversaciones reales — personales y de negocios — y entender sin traducir en tu cabeza.' +
     '</div>' +
+  '</div>';
+}
+
+/* Ajustes reducidos, accesibles desde la pantalla de bienvenida */
+function viewSettingsPrevio() {
+  const st = S.settings;
+  return '<div class="onb">' +
+    '<button class="back-link" data-act="tab" data-tab="home">' + ic('left') + ' Volver</button>' +
+    '<h1>Ajustes</h1>' +
+    App.tarjeta() +
+    '<div class="card">' +
+      '<div class="card-title"><h3>Apariencia</h3></div>' +
+      '<div class="field"><label for="settheme">Tema</label>' +
+        '<select id="settheme">' +
+          ['auto', 'light', 'dark'].map(t => '<option value="' + t + '"' + (st.theme === t ? ' selected' : '') + '>' + (t === 'auto' ? 'Automático (según el sistema)' : t === 'light' ? 'Claro' : 'Oscuro') + '</option>').join('') +
+        '</select></div>' +
+      '<button class="btn btn-primary btn-block" data-act="save-theme">Guardar</button>' +
+    '</div>' +
+    '<div class="card">' +
+      '<div class="card-title"><h3>¿Ya usabas SpeakUp?</h3></div>' +
+      '<p class="small muted">Si tienes una copia de seguridad de otro equipo, impórtala ahora y sigues donde ibas.</p>' +
+      '<button class="btn btn-ghost btn-block" data-act="import">' + ic('upload') + ' Importar mi progreso</button>' +
+      '<input type="file" id="importfile" accept="application/json,.json" class="sr-only" tabindex="-1" aria-hidden="true">' +
+    '</div>' +
+    '<p class="tiny muted center" style="margin-bottom:24px">El resto de ajustes — voz, acento, clave de IA — están disponibles una vez empieces.</p>' +
   '</div>';
 }
 
@@ -2336,6 +2368,12 @@ document.addEventListener('click', async (e) => {
     return;
   }
   if (act === 'instalar') { App.instalar(); return; }
+  if (act === 'save-theme') {
+    const sel = document.getElementById('settheme');
+    S.settings.theme = (sel && sel.value) || 'auto';
+    save(); applyTheme(); render(); toast('Guardado');
+    return;
+  }
   if (act === 'import') {
     const f = document.getElementById('importfile');
     if (f) f.click();
@@ -2437,6 +2475,8 @@ const App = {
 
   init() {
     App.esIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    App.esAndroid = /Android/.test(navigator.userAgent);
+    App.incognito = false;
     App.instalada = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
                     window.navigator.standalone === true;
     App.hayInternet = navigator.onLine !== false;
@@ -2500,13 +2540,35 @@ const App = {
     if (App.esIOS) {
       return '<div class="card">' +
         '<div class="card-title"><span style="color:var(--brand)">' + ic('download') + '</span><h3>Instálala en tu iPhone</h3></div>' +
-        '<p class="small muted">En Safari, toca el botón <b>Compartir</b> (el cuadrado con la flecha hacia arriba) y elige <b>Añadir a pantalla de inicio</b>. Quedará como una app, sin barra de navegador y funcionando sin internet.</p>' +
-        '<p class="tiny muted" style="margin:0">Tiene que ser desde Safari: en iPhone, Chrome no puede instalar aplicaciones web.</p>' +
+        '<ol class="pasos">' +
+          '<li>Ábrela en <b>Safari</b> (en iPhone, Chrome no puede instalar apps web).</li>' +
+          '<li>Toca el botón <b>Compartir</b>, el cuadrado con la flecha hacia arriba.</li>' +
+          '<li>Baja y elige <b>Añadir a pantalla de inicio</b>.</li>' +
+          '<li>Toca <b>Añadir</b>.</li>' +
+        '</ol>' +
+        '<p class="tiny muted" style="margin:0">Quedará con su icono, a pantalla completa y funcionando sin internet.</p>' +
+      '</div>';
+    }
+    if (App.esAndroid) {
+      return '<div class="card">' +
+        '<div class="card-title"><span style="color:var(--brand)">' + ic('download') + '</span><h3>Instálala en tu Android</h3></div>' +
+        '<p class="small muted">Chrome a veces tarda en ofrecerlo solo. Puedes hacerlo tú ahora mismo:</p>' +
+        '<ol class="pasos">' +
+          '<li>Toca los <b>tres puntos</b> ⋮ arriba a la derecha de Chrome.</li>' +
+          '<li>Busca <b>Instalar aplicación</b> o <b>Añadir a pantalla de inicio</b>.</li>' +
+          '<li>Confirma con <b>Instalar</b>.</li>' +
+        '</ol>' +
+        '<p class="tiny muted" style="margin:0">Si no ves ninguna de las dos opciones, usa la app un minuto y vuelve a abrir el menú: Chrome la habilita al detectar que la usas.</p>' +
       '</div>';
     }
     return '<div class="card">' +
-      '<div class="card-title"><span style="color:var(--text-dim)">' + ic('download') + '</span><h3>Instalarla como app</h3></div>' +
-      '<p class="small muted" style="margin:0">En Chrome o Edge de escritorio, busca el icono de instalar en la barra de direcciones. En Android, el menú del navegador tiene <b>Instalar aplicación</b>. En iPhone, desde Safari: Compartir → Añadir a pantalla de inicio.</p>' +
+      '<div class="card-title"><span style="color:var(--brand)">' + ic('download') + '</span><h3>Instalarla en la computadora</h3></div>' +
+      '<p class="small muted">En Chrome o Edge queda como programa propio, con su ventana y su icono:</p>' +
+      '<ol class="pasos">' +
+        '<li>Busca el icono de <b>instalar</b> en la barra de direcciones, a la derecha (una pantalla con una flecha hacia abajo).</li>' +
+        '<li>Si no aparece, abre el menú <b>⋮</b> y busca <b>Instalar SpeakUp</b> — puede estar dentro de <i>Guardar y compartir</i> o de <i>Más herramientas</i>.</li>' +
+      '</ol>' +
+      '<p class="tiny muted" style="margin:0">No funciona en ventanas de <b>incógnito</b>: ahí Chrome bloquea la instalación y además no guarda tu progreso.</p>' +
     '</div>';
   },
 

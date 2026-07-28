@@ -471,6 +471,11 @@ input:focus, select:focus, textarea:focus { border-color: var(--brand); }
 @keyframes micpulse { 0%,100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--err) 55%, transparent); } 50% { box-shadow: 0 0 0 18px transparent; } }
 
 /* ---------- Repaso (SRS) ---------- */
+/* ---- Pasos numerados (instrucciones de instalación) ---- */
+.pasos { margin: 0 0 12px; padding-left: 20px; font-size: .9rem; line-height: 1.6; }
+.pasos li { margin-bottom: 7px; }
+.pasos li::marker { color: var(--brand); font-weight: 800; }
+
 /* ---- Diálogos de escucha ---- */
 .dlg-visual {
   width: 84px; height: 84px; border-radius: 50%; margin: 6px auto 12px;
