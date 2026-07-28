@@ -21,7 +21,7 @@ Funciona **entera dentro del navegador**: sin backend, sin compilación, sin ins
 | **Conversar** | 10 escenarios de roleplay con el tutor de IA. Responde en inglés, se puede escuchar, y cada turno trae una **nota de coach** que corrige en español y una pista de qué decir. Entrada por texto o por voz. |
 | **Correo de negocios** | 6 tareas reales (pedir cotización, dar seguimiento, confirmar pedido, disculparse por un retraso, proponer reunión, tema libre). El tutor corrige, puntúa y reescribe el correo. |
 | **Pronunciación** | Escuchas la frase nativa (normal o despacio), la dices con tu voz y recibes un puntaje que marca en verde y rojo qué palabras salieron bien. |
-| **Repaso** | Repetición espaciada (SRS) sobre todo el vocabulario aprendido, con tres niveles de recuerdo. |
+| **Repaso** | Repetición espaciada (SRS) en **dos direcciones**. *Reconocimiento*: ves el inglés y recuerdas el español. *Producción*: ves el español y tienes que **escribir** el inglés — se corrige solo. Cada dirección lleva su propio calendario, y la de producción se abre cuando aciertas dos veces la de reconocimiento. Arriba ves cuántas palabras reconoces frente a cuántas sabes producir: esa segunda cifra es la que mide si vas a poder hablar. |
 | **Ajustes** | Nombre, meta diaria, nivel de partida, acento (americano/británico), voz del tutor, clave de API, modelo, tema claro/oscuro, y exportar/importar el progreso para llevarlo a otro equipo o al teléfono. |
 
 El nivel sube solo al acumular XP: **A1** 0 · **A2** 450 · **B1** 1300 · **B2** 2800.

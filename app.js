@@ -111,7 +111,8 @@ const DEFAULT_STATE = {
   dailyDate: '',
   dailyXp: 0,
   completed: {},   // unitId -> { score, date }
-  srs: {},         // en -> tarjeta
+  srs: {},         // en -> tarjeta de RECONOCIMIENTO (ves inglés, recuerdas español)
+  srsProd: {},     // en -> tarjeta de PRODUCCIÓN (ves español, escribes inglés)
   customUnits: [], // unidades generadas con IA
   mistakes: [],    // libreta de errores: { id, date, wrong, right, note, tag, source }
   convTurns: 0,
@@ -216,9 +217,70 @@ function addSrs(en, es, unitId) {
   if (S.srs[en]) return;
   S.srs[en] = { en, es, unit: unitId, due: startOfDay(Date.now()), interval: 0, ease: 2.5, reps: 0, lapses: 0 };
 }
+/* ---- Dos direcciones de repaso ----
+   'rec'  reconocimiento: ves el inglés y recuerdas el español (fácil, entra primero)
+   'prod' producción:     ves el español y ESCRIBES el inglés (difícil, es la que te hace hablar)
+   Cada dirección lleva su propio calendario. La de producción se desbloquea
+   cuando ya has acertado dos veces la de reconocimiento.                        */
+const PROD_UNLOCK_REPS = 2;
+
+function unlockProduction(en) {
+  const rec = S.srs[en];
+  if (!rec || S.srsProd[en] || rec.reps < PROD_UNLOCK_REPS) return false;
+  S.srsProd[en] = { en: rec.en, es: rec.es, unit: rec.unit, due: startOfDay(Date.now()), interval: 0, ease: 2.5, reps: 0, lapses: 0 };
+  return true;
+}
+function deck(dir) { return dir === 'prod' ? S.srsProd : S.srs; }
+
 function dueCards() {
   const limit = startOfDay(Date.now()) + 86400000 - 1;
-  return Object.values(S.srs).filter(c => c.due <= limit);
+  const out = [];
+  Object.values(S.srs).forEach(c => { if (c.due <= limit) out.push({ en: c.en, dir: 'rec' }); });
+  Object.values(S.srsProd).forEach(c => { if (c.due <= limit) out.push({ en: c.en, dir: 'prod' }); });
+  return out;
+}
+
+/* Respuestas aceptadas al escribir el inglés de una tarjeta de producción */
+function prodAnswers(en) {
+  const out = new Set();
+  const base = String(en || '').trim();
+  out.add(base);
+  const sinParen = base.replace(/\s*\([^)]*\)/g, '').trim();
+  if (sinParen) out.add(sinParen);
+  const m = base.match(/\(([^)]+)\)/);
+  if (m) out.add(m[1].trim());
+  base.split('/').forEach(p => {
+    const t = p.replace(/\s*\([^)]*\)/g, '').trim();
+    if (t) out.add(t);
+  });
+  Array.from(out).forEach(t => { if (/^to\s+/i.test(t)) out.add(t.replace(/^to\s+/i, '')); });
+  return Array.from(out).map(norm).filter(Boolean);
+}
+/* Otras palabras del mazo con la MISMA traducción (hola → hello / hi).
+   Si escribes una de ellas no es un fallo, solo no era la que tocaba. */
+function siblingAnswers(en, es) {
+  const objetivo = norm(es);
+  const out = [];
+  Object.values(S.srs).forEach(c => {
+    if (c.en !== en && norm(c.es) === objetivo) out.push(c.en);
+  });
+  return out;
+}
+function checkProduction(card, typed) {
+  const t = norm(typed);
+  if (!t) return { estado: 'vacio' };
+  if (prodAnswers(card.en).indexOf(t) >= 0) return { estado: 'bien' };
+  const hermanos = siblingAnswers(card.en, card.es);
+  for (const h of hermanos) {
+    if (prodAnswers(h).indexOf(t) >= 0) return { estado: 'hermano', otra: h };
+  }
+  return { estado: 'mal' };
+}
+function srsStats() {
+  const rec = Object.keys(S.srs).length;
+  const prod = Object.keys(S.srsProd).length;
+  const solido = Object.values(S.srsProd).filter(c => c.reps >= 2).length;
+  return { rec, prod, solido };
 }
 function scheduleCard(card, grade) {
   // grade: 0 = otra vez · 1 = casi · 2 = lo sabía
@@ -544,7 +606,9 @@ function viewHome() {
 
   '<div class="stats-grid" style="margin-bottom:14px">' +
     '<div class="stat-box"><div class="stat-num">' + S.streak + '</div><div class="stat-lab">Días de racha</div></div>' +
-    '<div class="stat-box"><div class="stat-num">' + Object.keys(S.srs).length + '</div><div class="stat-lab">Palabras aprendidas</div></div>' +
+    '<div class="stat-box"><div class="stat-num">' + Object.keys(S.srs).length +
+      (srsStats().prod ? '<span style="font-size:.9rem;color:var(--brand)"> / ' + srsStats().prod + '</span>' : '') +
+      '</div><div class="stat-lab">' + (srsStats().prod ? 'Palabras · activas' : 'Palabras aprendidas') + '</div></div>' +
     '<div class="stat-box"><div class="stat-num">' + doneCount + '</div><div class="stat-lab">Lecciones hechas</div></div>' +
     '<div class="stat-box"><div class="stat-num">' + S.convTurns + '</div><div class="stat-lab">Turnos hablados</div></div>' +
   '</div>' +
@@ -1347,7 +1411,7 @@ function viewPron() {
 
 /* ══════════════════ 14. REPASO (SRS) ══════════════════ */
 function reviewState() {
-  if (!V.review) V.review = { queue: null, i: 0, flipped: false, done: 0 };
+  if (!V.review) V.review = { queue: null, i: 0, flipped: false, done: 0, prodResult: null, prodTyped: '' };
   return V.review;
 }
 
@@ -1475,29 +1539,87 @@ function viewVocabReview() {
   }
 
   if (R.i >= R.queue.length) {
-    const upcoming = Object.values(S.srs).filter(c => c.due > startOfDay(Date.now()) + 86400000 - 1).length;
+    const manana = startOfDay(Date.now()) + 86400000 - 1;
+    const upcoming = Object.values(S.srs).concat(Object.values(S.srsProd)).filter(c => c.due > manana).length;
+    const st = srsStats();
+    const pct = st.rec ? Math.round((st.prod / st.rec) * 100) : 0;
     return '<h1>Repaso</h1>' +
       '<div class="card center" style="margin-top:20px">' +
         '<div style="color:var(--ok)">' + ic('check', 'ic-lg') + '</div>' +
         '<h2 style="margin:10px 0 4px">' + (R.done ? 'Repaso terminado' : 'Nada pendiente por hoy') + '</h2>' +
         '<p class="muted small">' + (R.done ? 'Repasaste ' + R.done + ' tarjeta' + (R.done === 1 ? '' : 's') + '. ' : '') +
-          upcoming + ' palabra' + (upcoming === 1 ? '' : 's') + ' volverán en los próximos días, justo antes de que las olvides.</p>' +
+          upcoming + ' tarjeta' + (upcoming === 1 ? '' : 's') + ' volverán en los próximos días, justo antes de que las olvides.</p>' +
         '<div class="divider"></div>' +
         '<button class="btn btn-ghost btn-block" data-act="review-extra">Adelantar repaso de otras palabras</button>' +
+      '</div>' +
+
+      '<div class="card">' +
+        '<div class="card-title"><span style="color:var(--brand)">' + ic('target') + '</span><h3>Reconocer no es hablar</h3></div>' +
+        '<p class="small muted" style="margin-top:-4px">Entender una palabra al leerla es fácil. Sacarla tú cuando la necesitas es lo que de verdad cuenta, y por eso se mide aparte.</p>' +
+        '<div class="stats-grid" style="margin-bottom:12px">' +
+          '<div class="stat-box" style="grid-column:span 2"><div class="stat-num">' + st.rec + '</div><div class="stat-lab">Palabras que reconoces</div></div>' +
+          '<div class="stat-box" style="grid-column:span 2"><div class="stat-num" style="color:var(--brand)">' + st.prod + '</div><div class="stat-lab">Que ya sabes producir</div></div>' +
+        '</div>' +
+        '<div class="row-between small muted" style="margin-bottom:6px"><span>Activas de tu vocabulario</span><span>' + pct + '%</span></div>' +
+        '<div class="bar"><i style="width:' + pct + '%"></i></div>' +
+        '<p class="tiny muted" style="margin:10px 0 0">Cada palabra pasa a producción cuando la aciertas dos veces reconociéndola. Entonces te la pedimos al revés: verás el español y tendrás que escribir el inglés.</p>' +
       '</div>' +
       '<div class="card">' +
         '<div class="card-title"><h3>Tu vocabulario</h3><span class="pill" style="margin-left:auto">' + total + '</span></div>' +
         '<div class="vocab-list">' +
           Object.values(S.srs).sort((a, b) => a.due - b.due).slice(0, 40).map(c =>
             '<div class="vocab-row"><span><span class="vocab-en">' + esc(c.en) + '</span><br><span class="vocab-es">' + esc(c.es) + '</span></span>' +
-            '<span class="pill" style="margin-left:auto">' + (c.due <= startOfDay(Date.now()) + 86400000 - 1 ? 'hoy' : 'en ' + Math.max(1, Math.round((c.due - startOfDay(Date.now())) / 86400000)) + ' d') + '</span></div>'
+            (S.srsProd[c.en] ? '<span class="pill A1" style="margin-left:auto" title="Ya la practicas en producción">activa</span>' : '<span style="margin-left:auto"></span>') +
+            '<span class="pill">' + (c.due <= startOfDay(Date.now()) + 86400000 - 1 ? 'hoy' : 'en ' + Math.max(1, Math.round((c.due - startOfDay(Date.now())) / 86400000)) + ' d') + '</span></div>'
           ).join('') +
         '</div>' +
       '</div><div style="height:20px"></div>';
   }
 
-  const card = R.queue[R.i];
-  return '<div class="row-between"><h1 style="margin:0">Repaso</h1><span class="pill">' + (R.i + 1) + ' / ' + R.queue.length + '</span></div>' +
+  const item = R.queue[R.i];
+  const card = deck(item.dir)[item.en];
+  if (!card) { R.i++; return viewVocabReview(); }          // la tarjeta se borró: sigue
+  const audio = esc(card.en.replace(/^to /, '').replace(/\s*\(.*\)/, ''));
+
+  const cabecera =
+    '<div class="row-between"><h1 style="margin:0">Repaso</h1><span class="pill">' + (R.i + 1) + ' / ' + R.queue.length + '</span></div>' +
+    '<div class="dir-tag ' + item.dir + '">' + ic(item.dir === 'prod' ? 'pen' : 'cards') +
+      (item.dir === 'prod' ? 'Producción · escribe el inglés' : 'Reconocimiento · recuerda el significado') + '</div>';
+
+  /* ---- Dirección PRODUCCIÓN: ves el español y escribes el inglés ---- */
+  if (item.dir === 'prod') {
+    const res = R.prodResult;
+    return cabecera +
+    '<p class="muted small">Esta es la que te hace hablar: no vale con reconocerla, tienes que sacarla tú.</p>' +
+    '<div class="card">' +
+      '<div class="prod-prompt">' + esc(card.es) + '</div>' +
+      '<div class="field" style="margin-bottom:10px">' +
+        '<label class="sr-only" for="prodinput">Escribe la palabra en inglés</label>' +
+        '<input type="text" id="prodinput" placeholder="Escríbelo en inglés…" autocomplete="off" autocapitalize="off" spellcheck="false"' +
+          (res ? ' disabled value="' + esc(R.prodTyped || '') + '"' : ' data-autofocus') + '>' +
+      '</div>' +
+      (!res
+        ? '<button class="btn btn-primary btn-block" data-act="check-prod">Comprobar</button>' +
+          '<button class="btn btn-ghost btn-block btn-sm" style="margin-top:8px" data-act="prod-blank">No me sale</button>'
+        : '<div class="feedback ' + (res.estado === 'mal' ? 'no' : 'ok') + '" role="status">' +
+            '<b>' + (res.estado === 'bien' ? '¡Exacto!' : res.estado === 'hermano' ? 'Correcto, aunque buscábamos otra' : res.estado === 'blanco' ? 'Sin problema, así se aprende' : 'Casi. Era:') + '</b>' +
+            '<div class="sol" style="font-size:1.05rem">' + esc(card.en) + '</div>' +
+            (res.estado === 'hermano' ? '<div class="tiny muted" style="margin-top:4px">Lo que escribiste (' + esc(res.otra) + ') también significa "' + esc(card.es) + '".</div>' : '') +
+          '</div>' +
+          '<div class="btn-row" style="margin-top:12px">' +
+            '<button class="btn btn-ghost" data-act="say" data-text="' + audio + '">' + ic('volume') + ' Escuchar</button>' +
+            (res.estado === 'mal' || res.estado === 'blanco'
+              ? '<button class="btn btn-primary" data-act="grade" data-g="0" data-autofocus>Continuar</button>'
+              : '<button class="btn btn-primary" data-act="grade" data-g="' + (res.estado === 'bien' ? '2' : '1') + '" data-autofocus>Continuar</button>') +
+          '</div>' +
+          (res.estado === 'mal'
+            ? '<button class="btn btn-ghost btn-block btn-sm" style="margin-top:8px" data-act="grade" data-g="1">Fue solo un error de tecleo</button>'
+            : '')) +
+    '</div><div style="height:22px"></div>';
+  }
+
+  /* ---- Dirección RECONOCIMIENTO: ves el inglés y recuerdas el español ---- */
+  return cabecera +
   '<p class="muted small">Recuerda el significado antes de girar la tarjeta. El esfuerzo de recordar es lo que fija la palabra.</p>' +
   '<div class="card flashcard" data-act="flip" role="button" tabindex="0" aria-label="Girar tarjeta">' +
     '<div>' +
@@ -1506,7 +1628,7 @@ function viewVocabReview() {
     '</div>' +
   '</div>' +
   '<div class="btn-row" style="margin-bottom:12px">' +
-    '<button class="btn btn-ghost btn-sm" data-act="say" data-text="' + esc(card.en.replace(/^to /, '').replace(/\s*\(.*\)/, '')) + '">' + ic('volume') + ' Escuchar</button>' +
+    '<button class="btn btn-ghost btn-sm" data-act="say" data-text="' + audio + '">' + ic('volume') + ' Escuchar</button>' +
   '</div>' +
   (R.flipped
     ? '<div class="btn-row" style="margin-bottom:22px">' +
@@ -1824,20 +1946,47 @@ document.addEventListener('click', async (e) => {
 
   /* --- repaso --- */
   if (act === 'flip') { reviewState().flipped = true; render(); return; }
+  if (act === 'check-prod') {
+    const R = reviewState();
+    const item = R.queue[R.i];
+    const card = deck(item.dir)[item.en];
+    const input = document.getElementById('prodinput');
+    const val = input ? input.value : '';
+    if (!val.trim()) { toast('Escríbelo, o pulsa "No me sale".'); return; }
+    R.prodTyped = val;
+    R.prodResult = checkProduction(card, val);
+    render(); return;
+  }
+  if (act === 'prod-blank') {
+    const R = reviewState();
+    R.prodTyped = '';
+    R.prodResult = { estado: 'blanco' };
+    render(); return;
+  }
   if (act === 'grade') {
     const R = reviewState();
-    const card = R.queue[R.i];
+    const item = R.queue[R.i];
+    const card = deck(item.dir)[item.en];
     const g = Number(t.dataset.g);
-    scheduleCard(S.srs[card.en] || card, g);
-    if (g === 0) R.queue.push(card);
-    R.done++; R.i++; R.flipped = false;
-    addXp(3, true);
+    if (card) {
+      scheduleCard(card, g);
+      // acertar dos veces reconociendo abre la tarjeta de producción
+      if (item.dir === 'rec' && g === 2 && unlockProduction(item.en)) {
+        R.queue.push({ en: item.en, dir: 'prod' });
+        toast('"' + item.en + '" pasa a producción');
+      }
+    }
+    if (g === 0) R.queue.push(item);
+    R.done++; R.i++; R.flipped = false; R.prodResult = null; R.prodTyped = '';
+    addXp(item.dir === 'prod' ? (g === 0 ? 2 : 6) : 3, true);
     save(); render(); return;
   }
   if (act === 'review-extra') {
     const R = reviewState();
-    R.queue = shuffle(Object.values(S.srs)).slice(0, 15);
-    R.i = 0; R.flipped = false; R.done = 0;
+    const todas = Object.keys(S.srs).map(en => ({ en, dir: 'rec' }))
+      .concat(Object.keys(S.srsProd).map(en => ({ en, dir: 'prod' })));
+    R.queue = shuffle(todas).slice(0, 15);
+    R.i = 0; R.flipped = false; R.done = 0; R.prodResult = null; R.prodTyped = '';
     render(); return;
   }
 
@@ -1907,6 +2056,14 @@ document.addEventListener('keydown', e => {
       e.preventDefault();
       const b = document.querySelector('[data-act="onb-next"]'); if (b) b.click();
     }
+    if (el.id === 'prodinput') {
+      e.preventDefault();
+      const b = document.querySelector('[data-act="check-prod"]'); if (b) b.click();
+    }
+    if (el.id === 'ctopic') {
+      e.preventDefault();
+      const b = document.querySelector('[data-act="gen-unit"]'); if (b && !b.disabled) b.click();
+    }
     if (el.classList && el.classList.contains('flashcard')) { e.preventDefault(); reviewState().flipped = true; render(); }
   }
   if (e.key === ' ' && e.target.classList && e.target.classList.contains('flashcard')) {
@@ -1942,6 +2099,7 @@ document.addEventListener('change', e => {
     if (!S.settings.apiKey && claveActual) S.settings.apiKey = claveActual;  // no pierdas la clave de este equipo
     S.customUnits = Array.isArray(S.customUnits) ? S.customUnits : [];
     S.mistakes = Array.isArray(S.mistakes) ? S.mistakes : [];
+    if (!S.srsProd || typeof S.srsProd !== 'object') S.srsProd = {};
     save();
     V.tab = 'home'; V.unit = null; V.lesson = null; V.review = null; V.talk = null; V.pron = null;
     render();

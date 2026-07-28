@@ -471,6 +471,22 @@ input:focus, select:focus, textarea:focus { border-color: var(--brand); }
 @keyframes micpulse { 0%,100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--err) 55%, transparent); } 50% { box-shadow: 0 0 0 18px transparent; } }
 
 /* ---------- Repaso (SRS) ---------- */
+/* Etiqueta de dirección del repaso */
+.dir-tag {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: .74rem; font-weight: 800; text-transform: uppercase; letter-spacing: .05em;
+  padding: 6px 12px; border-radius: 999px; margin: 10px 0 2px;
+}
+.dir-tag svg { width: 15px; height: 15px; }
+.dir-tag.rec  { background: var(--surface-2);  color: var(--text-dim); }
+.dir-tag.prod { background: var(--brand-soft); color: var(--brand-ink); }
+[data-theme="dark"] .dir-tag.prod { color: var(--brand); }
+
+.prod-prompt {
+  font-size: 1.75rem; font-weight: 800; letter-spacing: -.02em; line-height: 1.3;
+  text-align: center; padding: 24px 12px 20px; color: var(--brand);
+}
+
 .flashcard {
   min-height: 210px; display: grid; place-items: center; text-align: center;
   padding: 26px 18px; cursor: pointer; user-select: none;
