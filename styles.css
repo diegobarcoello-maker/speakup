@@ -733,16 +733,24 @@ svg.ic-lg { width: 36px; height: 36px; }
   .card { padding: 22px; }
 }
 
+/* Con el teclado del móvil abierto, la barra inferior no aporta
+   y roba espacio: se aparta. */
+body.con-teclado .bottomnav { transform: translateY(110%); }
+.bottomnav { transition: transform .2s ease; }
+
 /* ============================================================
    ASISTENTE FLOTANTE
    ============================================================ */
 .ask-fab {
-  position: fixed; right: 16px; bottom: calc(84px + env(safe-area-inset-bottom));
+  position: fixed; right: 16px;
+  /* --teclado lo calcula la app: si el teclado del móvil está abierto,
+     el botón se sube por encima en vez de quedarse debajo, inalcanzable. */
+  bottom: calc(84px + env(safe-area-inset-bottom) + var(--teclado, 0px));
+  transition: bottom .2s ease, transform .12s;
   width: 54px; height: 54px; border-radius: 50%; border: 0; cursor: pointer;
   background: var(--brand); color: #fff; z-index: 70;
   display: grid; place-items: center;
   box-shadow: 0 6px 22px color-mix(in srgb, var(--brand) 45%, transparent), var(--shadow);
-  transition: transform .12s;
 }
 [data-theme="dark"] .ask-fab { color: #06231f; }
 .ask-fab svg { width: 24px; height: 24px; }
@@ -761,7 +769,7 @@ svg.ic-lg { width: 36px; height: 36px; }
 }
 .ask-panel {
   position: fixed; z-index: 85;
-  left: 0; right: 0; bottom: 0;
+  left: 0; right: 0; bottom: var(--teclado, 0px);
   max-height: 82vh;
   display: flex; flex-direction: column;
   background: var(--surface);

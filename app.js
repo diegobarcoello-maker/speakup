@@ -598,12 +598,38 @@ function render() {
   afterRender();
 }
 
+/* ¿pantalla táctil? En el móvil no conviene abrir el teclado solo:
+   tapa media pantalla justo cuando toca leer el enunciado. */
+const ESoTACTIL = (function () {
+  try { return window.matchMedia('(hover: none) and (pointer: coarse)').matches; }
+  catch (e) { return false; }
+})();
+
 function afterRender() {
   const chat = document.getElementById('chatbox');
   if (chat) chat.scrollIntoView({ block: 'end' });
   if (Ask.abierto) return;                       // si el asistente está abierto, el foco es suyo
   const focusEl = document.querySelector('[data-autofocus]');
-  if (focusEl) focusEl.focus();
+  if (!focusEl) return;
+  // en táctil solo enfocamos botones; nunca campos de texto, para no forzar el teclado
+  const esCampo = /^(INPUT|TEXTAREA)$/.test(focusEl.tagName);
+  if (ESoTACTIL && esCampo) return;
+  focusEl.focus();
+}
+
+/* El teclado del móvil tapa lo que está anclado abajo. Con esto el botón
+   del asistente y su panel se levantan por encima del teclado. */
+function vigilarTeclado() {
+  const vv = window.visualViewport;
+  if (!vv) return;
+  const ajustar = () => {
+    const tapado = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
+    document.documentElement.style.setProperty('--teclado', tapado + 'px');
+    document.body.classList.toggle('con-teclado', tapado > 120);
+  };
+  vv.addEventListener('resize', ajustar);
+  vv.addEventListener('scroll', ajustar);
+  ajustar();
 }
 
 /* ══════════════════ 9. ONBOARDING ══════════════════ */
@@ -3151,6 +3177,7 @@ const App = {
 function boot() {
   Voice.init();
   App.init();
+  vigilarTeclado();
   ensureDay();
   applyTheme();
   try {
