@@ -913,3 +913,14 @@ body.con-teclado .bottomnav { transform: translateY(110%); }
   font-size: 3rem; font-weight: 800; letter-spacing: -.03em;
   color: var(--brand); line-height: 1.1; margin-bottom: 4px;
 }
+
+/* Los packs esenciales se distinguen de los temáticos */
+.level-head.sub {
+  font-size: .78rem; color: var(--text-soft);
+  text-transform: none; letter-spacing: 0;
+  margin-top: 16px;
+}
+.pill.esencial {
+  background: var(--accent-soft); color: var(--accent);
+  font-size: .68rem; vertical-align: middle;
+}

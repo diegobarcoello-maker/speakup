@@ -1019,13 +1019,13 @@ function unitTile(u) {
 
 function viewLessons() {
   const mine = S.customUnits || [];
-  const totalVoc = (typeof VOCAB_PACKS === 'undefined' ? [] : VOCAB_PACKS).reduce((n, p) => n + p.words.length, 0);
+  const totalVoc = todosLosPacks().reduce((n, p) => n + p.words.length, 0);
   let html = '<h1>Lecciones</h1><p class="muted" style="margin-top:-6px">' + UNITS.length + ' unidades que te llevan de A1 a B2, con peso extra en inglés de negocios y comercio exterior. Y las que crees tú.</p>' +
     '<button class="tile" data-act="tab" data-tab="vocab" style="border-color:var(--brand)">' +
       '<span class="tile-ico">' + ic('cards') + '</span>' +
       '<span class="tile-body">' +
         '<span class="tile-t">Vocabulario del día a día <span class="pill">' + totalVoc + ' palabras</span></span>' +
-        '<span class="tile-d">La casa, la familia, la comida, la salud, el clima, el dinero, los verbos y adjetivos más usados. Con frase de ejemplo y audio.</span>' +
+        '<span class="tile-d">Las palabras más frecuentes del inglés, los verbos irregulares y 22 packs temáticos: la casa, la comida, la salud, el clima, el dinero. Con frase de ejemplo y audio.</span>' +
       '</span>' +
       '<span class="tile-go">' + ic('right') + '</span>' +
     '</button>' +
@@ -1446,8 +1446,14 @@ function talkState() {
    debería esperar 1.300 XP para aprender a decir "cocina".
    ============================================================ */
 
-function packsPorNivel(id) {
-  return (typeof VOCAB_PACKS === 'undefined' ? [] : VOCAB_PACKS).filter(p => p.level === id);
+function todosLosPacks() {
+  return (typeof VOCAB_TODO === 'undefined')
+    ? (typeof VOCAB_PACKS === 'undefined' ? [] : VOCAB_PACKS)
+    : VOCAB_TODO;
+}
+function packsPorNivel(id) { return todosLosPacks().filter(p => p.level === id); }
+function packsEsenciales() {
+  return todosLosPacks().filter(p => p.level === 'ESE').sort((a, b) => (a.orden || 0) - (b.orden || 0));
 }
 
 /* cuántas palabras del pack ya están en tu repaso */
@@ -1460,9 +1466,12 @@ function packAprendidas(p) {
 function packTile(p) {
   const hechas = packAprendidas(p);
   const pct = Math.round(hechas / p.words.length * 100);
+  const esencial = p.level === 'ESE';
   return '<button class="tile" data-act="open-pack" data-id="' + p.id + '">' +
-    '<span class="tile-ico"' + (pct === 100 ? ' style="background:var(--ok-soft);color:var(--ok)"' : '') + '>' +
-      ic(pct === 100 ? 'check' : 'cards') + '</span>' +
+    '<span class="tile-ico"' +
+      (pct === 100 ? ' style="background:var(--ok-soft);color:var(--ok)"'
+       : esencial ? ' style="background:var(--accent-soft);color:var(--accent)"' : '') + '>' +
+      ic(pct === 100 ? 'check' : esencial ? 'bolt' : 'cards') + '</span>' +
     '<span class="tile-body">' +
       '<span class="tile-t">' + esc(p.title) + ' <span class="pill">' + p.words.length + '</span>' +
         (hechas ? ' <span class="pill">' + pct + '%</span>' : '') + '</span>' +
@@ -1473,7 +1482,7 @@ function packTile(p) {
 }
 
 function viewVocab() {
-  const todos = (typeof VOCAB_PACKS === 'undefined' ? [] : VOCAB_PACKS);
+  const todos = todosLosPacks();
   const total = todos.reduce((n, p) => n + p.words.length, 0);
   const mias  = todos.reduce((n, p) => n + packAprendidas(p), 0);
   const pct   = total ? Math.round(mias / total * 100) : 0;
@@ -1490,18 +1499,28 @@ function viewVocab() {
         'Desde ahí vuelve sola justo antes de que la olvides.</p>' +
     '</div>';
 
+  const ese = packsEsenciales();
+  if (ese.length) {
+    const nEse = ese.reduce((n, p) => n + p.words.length, 0);
+    html += '<div class="level-head">Las palabras esenciales · ' + nEse + '</div>' +
+      '<div class="notice" style="margin:0 0 12px"><b>' + ic('bolt') + ' Empieza por aquí</b>' +
+        'Estos packs no van por tema sino por lo mucho que se usa cada palabra. ' +
+        'Un tema lo puedes evitar; estas palabras no: son las que deciden si entiendes una conversación.</div>' +
+      '<div class="tile-list">' + ese.map(packTile).join('') + '</div>';
+  }
+
+  html += '<div class="level-head">Por temas de la vida diaria</div>' +
+    '<p class="small muted" style="margin:-6px 0 12px">Ordenados por nivel. Aquí está el vocabulario de la casa, la comida, la salud, los viajes y el trabajo.</p>';
   for (const l of LEVELS) {
     const ps = packsPorNivel(l.id);
     if (!ps.length) continue;
-    html += '<div class="level-head">' + esc(l.name) + '</div>' +
+    html += '<div class="level-head sub">' + esc(l.name) + '</div>' +
       '<div class="tile-list">' + ps.map(packTile).join('') + '</div>';
   }
   return html + '<div style="height:20px"></div>';
 }
 
-function packPorId(id) {
-  return (typeof VOCAB_PACKS === 'undefined' ? [] : VOCAB_PACKS).find(p => p.id === id) || null;
-}
+function packPorId(id) { return todosLosPacks().find(p => p.id === id) || null; }
 
 function viewPack() {
   const p = packPorId(V.pack);
@@ -1512,7 +1531,7 @@ function viewPack() {
   const faltan = p.words.length - hechas;
 
   return '<button class="back-link" data-act="tab" data-tab="vocab">' + ic('left') + ' Vocabulario</button>' +
-    '<h1>' + esc(p.title) + '</h1>' +
+    '<h1>' + esc(p.title) + (p.level === 'ESE' ? ' <span class="pill esencial">esencial</span>' : '') + '</h1>' +
     '<p class="muted" style="margin-top:-6px">' + esc(p.desc) + '</p>' +
 
     '<div class="row" style="gap:8px;flex-wrap:wrap;margin-bottom:14px">' +
