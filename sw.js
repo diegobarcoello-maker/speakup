@@ -11,13 +11,14 @@
    petición que no sea a este mismo sitio.
    ============================================================ */
 
-const VERSION = 'speakup-v13';
+const VERSION = 'speakup-v14';
 
 const ESENCIALES = [
   './',
   './index.html',
   './styles.css',
   './data.js',
+  './vocab.js',
   './app.js',
   './manifest.json',
   './icon-192.png',

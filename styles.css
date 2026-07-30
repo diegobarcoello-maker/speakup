@@ -879,3 +879,37 @@ body.con-teclado .bottomnav { transform: translateY(110%); }
 @media (min-width: 1400px) {
   .wrap { max-width: 1120px; }
 }
+
+/* ============================================================
+   VOCABULARIO POR TEMAS
+   ============================================================ */
+
+/* Fila con frase de ejemplo: la palabra manda, la frase acompaña. */
+.vocab-row-ej { align-items: flex-start; padding: 12px 0; }
+.vocab-row-ej .spk { margin-top: 2px; }
+.ej-en {
+  display: block; margin-top: 6px;
+  font-size: .88rem; color: var(--text-dim); font-style: italic;
+}
+.ej-es {
+  display: block; margin-top: 1px;
+  font-size: .82rem; color: var(--text-soft);
+}
+
+/* Palabra que ya está en el repaso: se marca sin gritar. */
+.vocab-row.sabida .vocab-en { color: var(--ok); }
+.tick { display: inline-flex; vertical-align: middle; color: var(--ok); }
+.tick svg { width: 15px; height: 15px; }
+
+/* Cabecera de la prueba rápida */
+.exhead {
+  display: flex; align-items: center; gap: 12px;
+  margin: 4px 0 14px;
+}
+.exhead .bar { flex: 1; }
+.bar-sm { height: 6px; }
+
+.big-score {
+  font-size: 3rem; font-weight: 800; letter-spacing: -.03em;
+  color: var(--brand); line-height: 1.1; margin-bottom: 4px;
+}

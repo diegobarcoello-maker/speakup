@@ -534,13 +534,15 @@ function levelUpModal(levelId) {
 }
 
 /* ══════════════════ 8. ENRUTADOR ══════════════════ */
-const V = { tab: 'home', unit: null, lesson: null, talk: null, pron: null, review: null };
+const V = { tab: 'home', unit: null, lesson: null, talk: null, pron: null, review: null, pack: null, packQuiz: null };
 let sayAllToken = 0;
 
 function go(tab) {
   V.tab = tab;
   V.unit = null;
   V.lesson = null;
+  V.pack = null;
+  V.packQuiz = null;
   sayAllToken++;            // detiene la lectura encadenada del vocabulario
   if (tab === 'review') V.review = null;   // recalcular las tarjetas pendientes al entrar
   stopListening();
@@ -583,13 +585,14 @@ function render() {
   if (V.tab === 'home')            html = viewHome();
   else if (V.tab === 'create')     html = viewCreate();
   else if (V.tab === 'lessons')    html = V.unit ? viewUnit() : viewLessons();
+  else if (V.tab === 'vocab')      html = V.pack ? viewPack() : viewVocab();
   else if (V.tab === 'talk')       html = viewTalk();
   else if (V.tab === 'pron')       html = viewAudio();
   else if (V.tab === 'review')     html = viewReview();
   else if (V.tab === 'settings')   html = viewSettings();
   root.innerHTML = '<div class="view">' + Sesion.barra() + html + '</div>';
 
-  const navTab = V.tab === 'create' ? 'lessons' : V.tab === 'mistakes' ? 'review' : V.tab;
+  const navTab = (V.tab === 'create' || V.tab === 'vocab') ? 'lessons' : V.tab === 'mistakes' ? 'review' : V.tab;
   document.querySelectorAll('.navbtn').forEach(b => {
     if (b.dataset.tab === navTab) b.setAttribute('aria-current', 'page');
     else b.removeAttribute('aria-current');
@@ -1016,7 +1019,16 @@ function unitTile(u) {
 
 function viewLessons() {
   const mine = S.customUnits || [];
-  let html = '<h1>Lecciones</h1><p class="muted" style="margin-top:-6px">Trece unidades que te llevan de A1 a B2, con peso extra en inglés de negocios y comercio exterior. Y las que crees tú.</p>' +
+  const totalVoc = (typeof VOCAB_PACKS === 'undefined' ? [] : VOCAB_PACKS).reduce((n, p) => n + p.words.length, 0);
+  let html = '<h1>Lecciones</h1><p class="muted" style="margin-top:-6px">' + UNITS.length + ' unidades que te llevan de A1 a B2, con peso extra en inglés de negocios y comercio exterior. Y las que crees tú.</p>' +
+    '<button class="tile" data-act="tab" data-tab="vocab" style="border-color:var(--brand)">' +
+      '<span class="tile-ico">' + ic('cards') + '</span>' +
+      '<span class="tile-body">' +
+        '<span class="tile-t">Vocabulario del día a día <span class="pill">' + totalVoc + ' palabras</span></span>' +
+        '<span class="tile-d">La casa, la familia, la comida, la salud, el clima, el dinero, los verbos y adjetivos más usados. Con frase de ejemplo y audio.</span>' +
+      '</span>' +
+      '<span class="tile-go">' + ic('right') + '</span>' +
+    '</button>' +
     '<button class="tile" data-act="open-create" style="border-style:dashed;border-color:var(--accent)">' +
       '<span class="tile-ico" style="background:var(--accent-soft);color:var(--accent)">' + ic('sparkle') + '</span>' +
       '<span class="tile-body">' +
@@ -1286,6 +1298,25 @@ function viewUnitStudy(u) {
     '</div>' +
   '</div>' +
 
+  (u.vocabPlus && u.vocabPlus.length
+    ? '<div class="card">' +
+        '<div class="card-title"><h3>Vocabulario ampliado</h3><span class="pill">' + u.vocabPlus.length + ' más</span>' +
+          '<button class="btn btn-sm btn-ghost" style="margin-left:auto" data-act="say-plus" data-id="' + u.id + '">' + ic('play') + ' Escuchar</button></div>' +
+        '<p class="small muted" style="margin-top:-6px">Palabras y expresiones del mismo tema que no caben en la lista corta, pero que vas a oír todo el tiempo.</p>' +
+        '<div class="vocab-list">' +
+          u.vocabPlus.map(v =>
+            '<div class="vocab-row' + (S.srs[v.en] ? ' sabida' : '') + '">' +
+              '<span><span class="vocab-en">' + esc(v.en) + '</span>' +
+                (S.srs[v.en] ? ' <span class="tick" title="Ya está en tu repaso">' + ic('check') + '</span>' : '') +
+                '<br><span class="vocab-es">' + esc(v.es) + '</span></span>' +
+              '<button class="spk" data-act="say" data-text="' + esc(v.en.replace(/^to /, '').replace(/\s*\(.*\)/, '')) + '" aria-label="Escuchar ' + esc(v.en) + '">' + ic('volume') + '</button>' +
+            '</div>'
+          ).join('') +
+        '</div>' +
+        '<button class="btn btn-soft btn-block btn-sm" style="margin-top:12px" data-act="unit-plus-srs" data-id="' + u.id + '">' + ic('cards') + ' Añadir estas al repaso</button>' +
+      '</div>'
+    : '') +
+
   '<div class="card">' +
     '<div class="card-title"><h3>Frases útiles</h3></div>' +
     u.phrases.map(p =>
@@ -1407,6 +1438,161 @@ function viewUnitDone(u) {
 function talkState() {
   if (!V.talk) V.talk = { mode: 'chat', scenario: null, msgs: [], busy: false, draft: '', rec: false, emailTask: null, emailText: '', emailResult: null, showHint: -1 };
   return V.talk;
+}
+
+/* ============================================================
+   VOCABULARIO POR TEMAS
+   Packs de vida cotidiana. No se bloquean por nivel: nadie
+   debería esperar 1.300 XP para aprender a decir "cocina".
+   ============================================================ */
+
+function packsPorNivel(id) {
+  return (typeof VOCAB_PACKS === 'undefined' ? [] : VOCAB_PACKS).filter(p => p.level === id);
+}
+
+/* cuántas palabras del pack ya están en tu repaso */
+function packAprendidas(p) {
+  let n = 0;
+  for (const w of p.words) if (S.srs[w.en]) n++;
+  return n;
+}
+
+function packTile(p) {
+  const hechas = packAprendidas(p);
+  const pct = Math.round(hechas / p.words.length * 100);
+  return '<button class="tile" data-act="open-pack" data-id="' + p.id + '">' +
+    '<span class="tile-ico"' + (pct === 100 ? ' style="background:var(--ok-soft);color:var(--ok)"' : '') + '>' +
+      ic(pct === 100 ? 'check' : 'cards') + '</span>' +
+    '<span class="tile-body">' +
+      '<span class="tile-t">' + esc(p.title) + ' <span class="pill">' + p.words.length + '</span>' +
+        (hechas ? ' <span class="pill">' + pct + '%</span>' : '') + '</span>' +
+      '<span class="tile-d">' + esc(p.desc) + '</span>' +
+    '</span>' +
+    '<span class="tile-go">' + ic('right') + '</span>' +
+  '</button>';
+}
+
+function viewVocab() {
+  const todos = (typeof VOCAB_PACKS === 'undefined' ? [] : VOCAB_PACKS);
+  const total = todos.reduce((n, p) => n + p.words.length, 0);
+  const mias  = todos.reduce((n, p) => n + packAprendidas(p), 0);
+  const pct   = total ? Math.round(mias / total * 100) : 0;
+
+  let html = '<button class="back-link" data-act="tab" data-tab="lessons">' + ic('left') + ' Lecciones</button>' +
+    '<h1>Vocabulario</h1>' +
+    '<p class="muted" style="margin-top:-6px">' + total + ' palabras del habla de todos los días, agrupadas por tema. ' +
+      'Cada una con una frase de ejemplo, porque es la frase la que se queda, no la palabra suelta.</p>' +
+
+    '<div class="card">' +
+      '<div class="row-between small muted" style="margin-bottom:6px"><span>Tu avance en vocabulario</span><span>' + mias + ' / ' + total + '</span></div>' +
+      '<div class="bar"><span style="width:' + pct + '%"></span></div>' +
+      '<p class="small muted" style="margin:10px 0 0">Una palabra cuenta cuando entra a tu repaso espaciado. ' +
+        'Desde ahí vuelve sola justo antes de que la olvides.</p>' +
+    '</div>';
+
+  for (const l of LEVELS) {
+    const ps = packsPorNivel(l.id);
+    if (!ps.length) continue;
+    html += '<div class="level-head">' + esc(l.name) + '</div>' +
+      '<div class="tile-list">' + ps.map(packTile).join('') + '</div>';
+  }
+  return html + '<div style="height:20px"></div>';
+}
+
+function packPorId(id) {
+  return (typeof VOCAB_PACKS === 'undefined' ? [] : VOCAB_PACKS).find(p => p.id === id) || null;
+}
+
+function viewPack() {
+  const p = packPorId(V.pack);
+  if (!p) return viewVocab();
+  if (V.packQuiz) return viewPackQuiz(p);
+
+  const hechas = packAprendidas(p);
+  const faltan = p.words.length - hechas;
+
+  return '<button class="back-link" data-act="tab" data-tab="vocab">' + ic('left') + ' Vocabulario</button>' +
+    '<h1>' + esc(p.title) + '</h1>' +
+    '<p class="muted" style="margin-top:-6px">' + esc(p.desc) + '</p>' +
+
+    '<div class="row" style="gap:8px;flex-wrap:wrap;margin-bottom:14px">' +
+      '<button class="btn btn-soft btn-sm" data-act="say-pack" data-id="' + p.id + '">' + ic('play') + ' Escuchar todo</button>' +
+      (faltan
+        ? '<button class="btn btn-primary btn-sm" data-act="pack-srs" data-id="' + p.id + '">' + ic('cards') + ' Añadir ' + faltan + ' al repaso</button>'
+        : '<span class="pill" style="background:var(--ok-soft);color:var(--ok)">' + ic('check') + ' Todas en tu repaso</span>') +
+      '<button class="btn btn-ghost btn-sm" data-act="pack-quiz" data-id="' + p.id + '">' + ic('target') + ' Ponerme a prueba</button>' +
+    '</div>' +
+
+    '<div class="card">' +
+      '<div class="card-title"><h3>' + p.words.length + ' palabras</h3>' +
+        (hechas ? '<span class="pill" style="margin-left:auto">' + hechas + ' en tu repaso</span>' : '') + '</div>' +
+      '<div class="vocab-list">' +
+        p.words.map(w =>
+          '<div class="vocab-row vocab-row-ej' + (S.srs[w.en] ? ' sabida' : '') + '">' +
+            '<span>' +
+              '<span class="vocab-en">' + esc(w.en) + '</span>' +
+              (S.srs[w.en] ? ' <span class="tick" title="Ya está en tu repaso">' + ic('check') + '</span>' : '') +
+              '<br><span class="vocab-es">' + esc(w.es) + '</span>' +
+              '<br><span class="ej-en">' + esc(w.ex) + '</span>' +
+              '<br><span class="ej-es">' + esc(w.exs) + '</span>' +
+            '</span>' +
+            '<button class="spk" data-act="say" data-text="' + esc(w.ex) + '" aria-label="Escuchar: ' + esc(w.ex) + '">' + ic('volume') + '</button>' +
+          '</div>'
+        ).join('') +
+      '</div>' +
+    '</div>' +
+    '<div style="height:20px"></div>';
+}
+
+/* ---- prueba rápida del pack: ves el español, eliges el inglés ---- */
+function iniciarPackQuiz(p) {
+  const barajado = p.words.slice().sort(() => Math.random() - 0.5).slice(0, Math.min(10, p.words.length));
+  V.packQuiz = { i: 0, aciertos: 0, preguntas: barajado.map(w => {
+    const otras = p.words.filter(o => o.en !== w.en).sort(() => Math.random() - 0.5).slice(0, 3);
+    const opts = otras.concat([w]).sort(() => Math.random() - 0.5);
+    return { es: w.es, en: w.en, opts: opts.map(o => o.en), a: opts.findIndex(o => o.en === w.en) };
+  }), elegida: null };
+}
+
+function viewPackQuiz(p) {
+  const q = V.packQuiz;
+  if (q.i >= q.preguntas.length) {
+    const pct = Math.round(q.aciertos / q.preguntas.length * 100);
+    return '<div class="card" style="text-align:center">' +
+      '<div class="big-score">' + pct + '%</div>' +
+      '<p><b>' + q.aciertos + ' de ' + q.preguntas.length + '</b> correctas en ' + esc(p.title) + '.</p>' +
+      '<p class="small muted">' + (pct >= 80
+        ? 'Muy bien. Estas palabras ya son tuyas: el repaso se encarga de que no se vayan.'
+        : 'Normal en la primera pasada. Vuelve a leer las frases de ejemplo y repite: así se fija.') + '</p>' +
+      '<button class="btn btn-primary btn-block" data-act="pack-quiz" data-id="' + p.id + '">Otra vez</button>' +
+      '<button class="btn btn-ghost btn-block" data-act="pack-salir-quiz" data-id="' + p.id + '">Volver al pack</button>' +
+    '</div>';
+  }
+  const pr = q.preguntas[q.i];
+  const respondida = q.elegida !== null;
+  return '<button class="back-link" data-act="pack-salir-quiz" data-id="' + p.id + '">' + ic('left') + ' Salir de la prueba</button>' +
+    '<div class="exhead"><span class="small muted">' + (q.i + 1) + ' de ' + q.preguntas.length + '</span>' +
+      '<div class="bar bar-sm"><span style="width:' + Math.round(q.i / q.preguntas.length * 100) + '%"></span></div></div>' +
+    '<div class="card">' +
+      '<p class="small muted" style="margin-bottom:4px">¿Cómo se dice en inglés?</p>' +
+      '<h2 style="margin-bottom:16px">' + esc(pr.es) + '</h2>' +
+      '<div class="opts">' +
+        pr.opts.map((o, i) => {
+          let cls = 'opt';
+          if (respondida) {
+            if (i === pr.a) cls += ' ok';
+            else if (i === q.elegida) cls += ' bad';
+          }
+          return '<button class="' + cls + '"' + (respondida ? ' disabled' : '') +
+            ' data-act="pack-answer" data-i="' + i + '">' + esc(o) + '</button>';
+        }).join('') +
+      '</div>' +
+      (respondida
+        ? '<div class="notice" style="margin-top:14px"><b>' +
+            (q.elegida === pr.a ? ic('check') + ' Correcto' : ic('x') + ' Era: ' + esc(pr.en)) + '</b></div>' +
+          '<button class="btn btn-primary btn-block" data-act="pack-next" data-autofocus>Siguiente ' + ic('right') + '</button>'
+        : '') +
+    '</div>';
 }
 
 function viewTalk() {
@@ -2445,6 +2631,90 @@ document.addEventListener('click', async (e) => {
   }
 
   /* --- lecciones --- */
+  if (act === 'open-pack') {
+    const p = packPorId(t.dataset.id);
+    if (!p) return;
+    V.tab = 'vocab'; V.pack = p.id; V.packQuiz = null;
+    window.scrollTo(0, 0); render(); return;
+  }
+
+  if (act === 'say-pack') {
+    const p = packPorId(t.dataset.id);
+    if (!p) return;
+    const token = ++sayAllToken;
+    let i = 0;
+    const next = () => {
+      if (token !== sayAllToken || i >= p.words.length) return;
+      Voice.speak(p.words[i++].ex);          // se lee la frase, no la palabra suelta
+      setTimeout(next, 2600);
+    };
+    next(); return;
+  }
+
+  if (act === 'pack-srs') {
+    const p = packPorId(t.dataset.id);
+    if (!p) return;
+    let n = 0;
+    for (const w of p.words) if (!S.srs[w.en]) { addSrs(w.en, w.es, p.id); n++; }
+    save();
+    toast(n + ' palabra' + (n === 1 ? '' : 's') + ' añadida' + (n === 1 ? '' : 's') + ' a tu repaso');
+    render(); return;
+  }
+
+  if (act === 'pack-quiz') {
+    const p = packPorId(t.dataset.id);
+    if (!p) return;
+    V.tab = 'vocab'; V.pack = p.id;
+    iniciarPackQuiz(p);
+    window.scrollTo(0, 0); render(); return;
+  }
+
+  if (act === 'pack-salir-quiz') {
+    V.packQuiz = null; window.scrollTo(0, 0); render(); return;
+  }
+
+  if (act === 'pack-answer') {
+    const q = V.packQuiz;
+    if (!q || q.elegida !== null) return;
+    q.elegida = Number(t.dataset.i);
+    if (q.elegida === q.preguntas[q.i].a) q.aciertos++;
+    render(); return;
+  }
+
+  if (act === 'pack-next') {
+    const q = V.packQuiz;
+    if (!q) return;
+    q.i++; q.elegida = null;
+    if (q.i >= q.preguntas.length) {
+      addXp(q.aciertos * 3);                 // 3 XP por acierto
+      save();
+    }
+    window.scrollTo(0, 0); render(); return;
+  }
+
+  if (act === 'unit-plus-srs') {
+    const u = unitById(t.dataset.id);
+    if (!u || !u.vocabPlus) return;
+    let n = 0;
+    for (const w of u.vocabPlus) if (!S.srs[w.en]) { addSrs(w.en, w.es, u.id); n++; }
+    save();
+    toast(n + ' palabra' + (n === 1 ? '' : 's') + ' añadida' + (n === 1 ? '' : 's') + ' a tu repaso');
+    render(); return;
+  }
+
+  if (act === 'say-plus') {
+    const u = unitById(t.dataset.id);
+    if (!u || !u.vocabPlus) return;
+    const token = ++sayAllToken;
+    let i = 0;
+    const next = () => {
+      if (token !== sayAllToken || i >= u.vocabPlus.length) return;
+      Voice.speak(u.vocabPlus[i++].en.replace(/^to /, '').replace(/\s*\(.*\)/, ''));
+      setTimeout(next, 1500);
+    };
+    next(); return;
+  }
+
   if (act === 'open-unit') {
     V.tab = 'lessons'; V.unit = t.dataset.id; V.lesson = { step: 'study' };
     window.scrollTo(0, 0); render(); return;

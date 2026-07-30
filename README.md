@@ -16,7 +16,8 @@ Funciona **entera dentro del navegador**: sin backend, sin compilación, sin ins
 |---|---|
 | **Mis 10 minutos** | Un botón que encadena la sesión del día sin que decidas nada: repaso pendiente → un bloque de lección → dos turnos de conversar. Una barra arriba lleva la cuenta y salta sola al siguiente paso. Al terminar, bonus de XP. |
 | **Inicio** | Meta diaria de XP, racha, palabras aprendidas frente a las que ya sabes producir, mapa de ruta A1 → A2 → B1 → B2, y una **gráfica de tu progreso** de los últimos 14 días con la media diaria y los días practicados. |
-| **Lecciones** | 22 unidades (4 de A1, 5 de A2, 7 de B1, 6 de B2) que cubren el temario completo de A1 a B2. Cada una trae un punto de gramática explicado a fondo en español, 1-2 puntos adicionales, una tabla de errores típicos del hispanohablante, 26-30 palabras de vocabulario con audio, 12 frases útiles y 11-12 ejercicios de 5 tipos. |
+| **Lecciones** | 22 unidades (4 de A1, 5 de A2, 7 de B1, 6 de B2) que cubren el temario completo de A1 a B2. Cada una trae un punto de gramática explicado a fondo en español, 1-2 puntos adicionales, una tabla de errores típicos del hispanohablante, 26-30 palabras de vocabulario con audio **más una lista ampliada de otras 23-32**, 12 frases útiles y 11-12 ejercicios de 5 tipos. |
+| **Vocabulario** | 22 packs temáticos del habla de todos los días con **1.038 palabras**: personas y familia, la casa, comida y bebida, el cuerpo y la salud, ropa y compras, la ciudad, el tiempo y las fechas, la rutina diaria, transporte, clima y naturaleza, emociones y carácter, trabajo y profesiones, dinero y banco, los 60 verbos y los 50 adjetivos más usados, tecnología, ocio y deporte, viaje y restaurante, conectores, expresiones cotidianas, phrasal verbs y comercio exterior. Cada palabra con traducción, **frase de ejemplo en inglés y español**, y audio de la frase completa. Un botón manda el pack entero al repaso espaciado, y una prueba rápida de 10 preguntas te dice cuánto se te quedó. |
 | **Crear lección** | Escribes un tema en español —*aduanas*, *cobranzas*, *reclamos de calidad*— y el tutor genera una unidad completa a tu nivel: vocabulario, frases, gramática y ejercicios. Se guarda junto a las demás. |
 | **Mis errores** | Cada corrección del tutor se guarda con su categoría gramatical. La app te muestra qué fallas más y genera una práctica hecha solo con tus errores reales. |
 | **Conversar** | 10 escenarios de roleplay con el tutor de IA. Responde en inglés, se puede escuchar, y cada turno trae una **nota de coach** que corrige en español y una pista de qué decir. Entrada por texto o por voz. |
@@ -30,7 +31,9 @@ Funciona **entera dentro del navegador**: sin backend, sin compilación, sin ins
 
 El nivel sube solo al acumular XP: **A1** 0 · **A2** 450 · **B1** 1300 · **B2** 2800.
 
-En total: **643 palabras de vocabulario**, 264 frases, 250 ejercicios, 110 errores típicos documentados y unos 47.000 caracteres de explicación gramatical en español. Las lecciones dan 3.160 XP, así que la ruta hasta B2 cierra con el contenido incluido, sin depender de nada externo.
+En total: **2.000 palabras y expresiones distintas** (643 en las listas base de las lecciones, 509 en las listas ampliadas y 1.038 en los packs temáticos), 264 frases, 250 ejercicios, 110 errores típicos documentados y unos 47.000 caracteres de explicación gramatical en español. Las lecciones dan 3.160 XP, así que la ruta hasta B2 cierra con el contenido incluido, sin depender de nada externo.
+
+El vocabulario está deliberadamente repartido entre dos mundos: el del trabajo —cotización, orden de compra, Incoterms, negociación— y el de la vida diaria —la cocina, el médico, el clima, la familia—, porque hablar inglés de verdad no es solo aguantar una reunión de ventas.
 
 ### Temario cubierto
 
