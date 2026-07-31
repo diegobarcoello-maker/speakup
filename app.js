@@ -124,6 +124,7 @@ const DEFAULT_STATE = {
   dialoguesDone: {}, // dialogueId -> { score, date }
   historia: {},      // 'YYYY-MM-DD' -> { xp, palabras }
   soundBest: {},     // id de sonido -> mejor porcentaje
+  vistas: {},        // qué tarjetas de ayuda ya se cerraron
   convTurns: 0,
   pronBest: 0,
   pronCount: 0,
@@ -590,6 +591,7 @@ function render() {
   else if (V.tab === 'pron')       html = viewAudio();
   else if (V.tab === 'review')     html = viewReview();
   else if (V.tab === 'settings')   html = viewSettings();
+  else if (V.tab === 'guia')       html = viewGuia();
   root.innerHTML = '<div class="view">' + Sesion.barra() + html + '</div>';
 
   const navTab = (V.tab === 'create' || V.tab === 'vocab') ? 'lessons' : V.tab === 'mistakes' ? 'review' : V.tab;
@@ -1017,10 +1019,81 @@ function unitTile(u) {
   '</button>';
 }
 
+/* ============================================================
+   AYUDA CONTEXTUAL
+
+   La primera vez que entras a una sección aparece una tarjeta
+   que explica para qué sirve y cómo se usa. La cierras y no
+   vuelve. Nada de tours con flechas: la ayuda llega cuando
+   hace falta, no antes.
+   ============================================================ */
+
+const AYUDAS = {
+  lessons: {
+    titulo: 'Cómo funcionan las lecciones',
+    puntos: [
+      'Cada unidad tiene cuatro partes: <b>gramática</b> explicada en español, <b>vocabulario</b> con audio, <b>frases útiles</b> y <b>ejercicios</b>.',
+      'Lee la gramática sin prisa y toca el altavoz de cada palabra para oírla. Escuchar mientras lees es lo que fija la pronunciación.',
+      'Al terminar los ejercicios, todo el vocabulario de la unidad entra solo a tu <b>Repaso</b>. No tienes que hacer nada.',
+      'Las unidades se desbloquean por nivel. No hace falta hacerlas en orden dentro de un mismo nivel.'
+    ]
+  },
+  vocab: {
+    titulo: 'Cómo sacarle partido al vocabulario',
+    puntos: [
+      'Empieza por <b>Las palabras esenciales</b>. No van por tema sino por lo mucho que se usan: son las que deciden si entiendes una conversación.',
+      'El audio lee <b>la frase completa</b>, no la palabra suelta. Escúchala entera: así aprendes cómo se usa, no solo qué significa.',
+      'El botón <b>Añadir al repaso</b> manda el pack entero a tu repaso espaciado. Hazlo con un pack a la vez, no con diez.',
+      '<b>Ponerme a prueba</b> te hace diez preguntas de español a inglés. Sirve para ver qué se quedó y qué no.'
+    ]
+  },
+  talk: {
+    titulo: 'Cómo conversar sin miedo',
+    puntos: [
+      'Elige un escenario y escribe en inglés como puedas. <b>Da igual si sale mal</b>: de eso se trata.',
+      'El tutor te responde en inglés y debajo te deja una <b>nota de coach en español</b> con lo que corregirías. Léela siempre.',
+      'Si te trabas, el botón de <b>pista</b> te da una frase para salir del paso.',
+      'También puedes hablar con el micrófono en vez de escribir, y practicar <b>correos de negocios</b> en la otra pestaña.'
+    ]
+  },
+  pron: {
+    titulo: 'Escuchar y pronunciar',
+    puntos: [
+      '<b>Diálogos</b>: dos personas hablando a velocidad normal, sin texto. Escuchas primero y respondes después. La transcripción sale al final a propósito: si lees mientras oyes, no entrenas el oído.',
+      '<b>Pronunciar</b>: oyes la frase, la dices con tu voz y te marca en verde y rojo qué palabras salieron bien.',
+      '<b>Sonidos</b>: los que el español no tiene y por eso cuestan. Cada uno explica qué hacer con la boca.',
+      'Si no te entiende el micrófono, no es que hables mal: prueba en un sitio silencioso y acércate al teléfono.'
+    ]
+  },
+  review: {
+    titulo: 'Por qué el repaso es lo más importante',
+    puntos: [
+      'Una palabra no se aprende viéndola una vez. Se aprende <b>recordándola justo antes de olvidarla</b>, y eso es lo que calcula esta sección.',
+      'Hay dos direcciones. <b>Reconocimiento</b>: ves el inglés y recuerdas el español. <b>Producción</b>: ves el español y tienes que escribir el inglés.',
+      'La de producción es la difícil y es <b>la que te hace hablar</b>. Se abre sola cuando aciertas dos veces la de reconocimiento.',
+      'Sé honesto al calificarte. Si marcas "lo sabía" cuando no lo sabías, el sistema deja de servirte.',
+      'Cinco minutos de repaso al día valen más que una hora el domingo.'
+    ]
+  }
+};
+
+function ayudaVista(id) { return !!(S.vistas && S.vistas[id]); }
+
+function ayudaCard(id) {
+  const a = AYUDAS[id];
+  if (!a || ayudaVista(id)) return '';
+  return '<div class="ayuda">' +
+    '<div class="ayuda-top">' + ic('bulb') + '<b>' + esc(a.titulo) + '</b></div>' +
+    '<ul class="ayuda-lista">' + a.puntos.map(p => '<li>' + p + '</li>').join('') + '</ul>' +
+    '<button class="btn btn-soft btn-sm btn-block" data-act="ayuda-ok" data-id="' + id + '">' +
+      ic('check') + ' Entendido, no mostrar más</button>' +
+  '</div>';
+}
+
 function viewLessons() {
   const mine = S.customUnits || [];
   const totalVoc = todosLosPacks().reduce((n, p) => n + p.words.length, 0);
-  let html = '<h1>Lecciones</h1><p class="muted" style="margin-top:-6px">' + UNITS.length + ' unidades que te llevan de A1 a B2, con peso extra en inglés de negocios y comercio exterior. Y las que crees tú.</p>' +
+  let html = ayudaCard('lessons') + '<h1>Lecciones</h1><p class="muted" style="margin-top:-6px">' + UNITS.length + ' unidades que te llevan de A1 a B2, con peso extra en inglés de negocios y comercio exterior. Y las que crees tú.</p>' +
     '<button class="tile" data-act="tab" data-tab="vocab" style="border-color:var(--brand)">' +
       '<span class="tile-ico">' + ic('cards') + '</span>' +
       '<span class="tile-body">' +
@@ -1488,6 +1561,7 @@ function viewVocab() {
   const pct   = total ? Math.round(mias / total * 100) : 0;
 
   let html = '<button class="back-link" data-act="tab" data-tab="lessons">' + ic('left') + ' Lecciones</button>' +
+    ayudaCard('vocab') +
     '<h1>Vocabulario</h1>' +
     '<p class="muted" style="margin-top:-6px">' + total + ' palabras del habla de todos los días, agrupadas por tema. ' +
       'Cada una con una frase de ejemplo, porque es la frase la que se queda, no la palabra suelta.</p>' +
@@ -1616,7 +1690,7 @@ function viewPackQuiz(p) {
 
 function viewTalk() {
   const T = talkState();
-  const tabs = '<div class="tabs" role="tablist">' +
+  const tabs = ayudaCard('talk') + '<div class="tabs" role="tablist">' +
     '<button class="tab" role="tab" aria-selected="' + (T.mode === 'chat') + '" data-act="talk-mode" data-mode="chat">' + ic('chat') + ' Conversar</button>' +
     '<button class="tab" role="tab" aria-selected="' + (T.mode === 'email') + '" data-act="talk-mode" data-mode="email">' + ic('mail') + ' Correo de negocios</button>' +
   '</div>';
@@ -1924,7 +1998,7 @@ function playLines(lines, rate, onDone, dlg) {
 
 function viewAudio() {
   const A = audioState();
-  const tabs = '<div class="tabs" role="tablist">' +
+  const tabs = ayudaCard('pron') + '<div class="tabs" role="tablist">' +
     '<button class="tab" role="tab" aria-selected="' + (A.tab === 'dialogs') + '" data-act="audio-tab" data-t="dialogs">' + ic('headphones') + ' Diálogos</button>' +
     '<button class="tab" role="tab" aria-selected="' + (A.tab === 'pron') + '" data-act="audio-tab" data-t="pron">' + ic('mic') + ' Pronunciar</button>' +
     '<button class="tab" role="tab" aria-selected="' + (A.tab === 'sounds') + '" data-act="audio-tab" data-t="sounds">' + ic('ear') + ' Sonidos</button>' +
@@ -2250,7 +2324,7 @@ function reviewState() {
 function viewReview() {
   if (!V.reviewTab) V.reviewTab = 'vocab';
   const n = S.mistakes.length;
-  const tabs = '<div class="tabs" role="tablist">' +
+  const tabs = ayudaCard('review') + '<div class="tabs" role="tablist">' +
     '<button class="tab" role="tab" aria-selected="' + (V.reviewTab === 'vocab') + '" data-act="review-tab" data-t="vocab">' + ic('cards') + ' Vocabulario</button>' +
     '<button class="tab" role="tab" aria-selected="' + (V.reviewTab === 'errors') + '" data-act="review-tab" data-t="errors">' + ic('note') + ' Mis errores' + (n ? ' (' + n + ')' : '') + '</button>' +
   '</div>';
@@ -2471,11 +2545,94 @@ function viewVocabReview() {
     : '<button class="btn btn-primary btn-block" style="margin-bottom:22px" data-act="flip">Ver traducción</button>');
 }
 
+/* ============================================================
+   GUÍA DE USO
+   No es una lista de botones: es el método. Qué hacer cada día
+   y por qué, que es lo que de verdad hace falta saber.
+   ============================================================ */
+function viewGuia() {
+  return '<button class="back-link" data-act="tab" data-tab="settings">' + ic('left') + ' Ajustes</button>' +
+  '<h1>Cómo usar SpeakUp</h1>' +
+  '<p class="muted" style="margin-top:-6px">Lo importante no es conocer los botones, sino tener un método. Este es el que funciona.</p>' +
+
+  '<div class="card">' +
+    '<div class="card-title">' + ic('bolt') + '<h3>Si solo lees una cosa, que sea esta</h3></div>' +
+    '<p><b>Abre la app y toca «Mis 10 minutos».</b> Te arma la sesión del día: un poco de repaso, un poco de lección y un poco de escucha. No tienes que decidir nada.</p>' +
+    '<p class="small muted" style="margin-bottom:0">Diez minutos todos los días rinden mucho más que dos horas el domingo. El idioma no se aprende por acumulación, se aprende por repetición espaciada. Si algún día no puedes, haz cinco minutos de repaso y ya: lo que mata el progreso es cortar la racha, no acortar la sesión.</p>' +
+  '</div>' +
+
+  '<div class="card">' +
+    '<div class="card-title">' + ic('compass') + '<h3>Qué hace cada sección</h3></div>' +
+    '<div class="guia-item"><b>' + ic('book') + ' Lecciones</b>' +
+      '<span>22 unidades de A1 a B2. Gramática explicada en español, vocabulario con audio, frases útiles y ejercicios. Aquí es donde entiendes <i>por qué</i> se dice así.</span></div>' +
+    '<div class="guia-item"><b>' + ic('cards') + ' Vocabulario</b>' +
+      '<span>36 packs con más de 1.700 palabras. Empieza por los <b>esenciales</b>: van por frecuencia, no por tema. Son las palabras que deciden si entiendes una conversación.</span></div>' +
+    '<div class="guia-item"><b>' + ic('chat') + ' Conversar</b>' +
+      '<span>Roleplay con el tutor. Escribes en inglés, te responde en inglés y te deja una nota de coach en español. Es donde se te quita el miedo.</span></div>' +
+    '<div class="guia-item"><b>' + ic('headphones') + ' Escuchar</b>' +
+      '<span>Diálogos a velocidad real, práctica de pronunciación con tu voz y los sonidos que el español no tiene.</span></div>' +
+    '<div class="guia-item"><b>' + ic('refresh') + ' Repaso</b>' +
+      '<span>La más importante y la menos vistosa. Te devuelve cada palabra justo antes de que la olvides.</span></div>' +
+  '</div>' +
+
+  '<div class="card">' +
+    '<div class="card-title">' + ic('refresh') + '<h3>Por qué el repaso lo es todo</h3></div>' +
+    '<p>Una palabra no se aprende viéndola una vez. Se aprende <b>recordándola con esfuerzo</b>, y cuanto más cerca estés de olvidarla, más se fija cuando la recuerdas. Eso es lo que calcula el repaso: no te muestra las palabras al azar, te las muestra en el momento exacto.</p>' +
+    '<p>Va en dos direcciones y no son lo mismo:</p>' +
+    '<ul class="guia-lista">' +
+      '<li><b>Reconocimiento</b> — ves el inglés y recuerdas el español. Es la fácil, y es la que te permite <i>entender</i>.</li>' +
+      '<li><b>Producción</b> — ves el español y tienes que <b>escribir</b> el inglés. Es la difícil, y es la que te permite <i>hablar</i>. Se abre sola cuando aciertas dos veces la de reconocimiento.</li>' +
+    '</ul>' +
+    '<div class="notice"><b>' + ic('bulb') + ' Califícate con honestidad</b>Si marcas «lo sabía» cuando en realidad dudaste, el sistema te espacia esa palabra demasiado y la vas a olvidar. Marcar «casi» no es un fracaso: es la información que hace que esto funcione.</div>' +
+  '</div>' +
+
+  '<div class="card">' +
+    '<div class="card-title">' + ic('target') + '<h3>Un plan de semana que sí se sostiene</h3></div>' +
+    '<div class="guia-item"><b>De lunes a viernes · 10 minutos</b>' +
+      '<span>«Mis 10 minutos» y ya está. Si te sobra ánimo, un pack de vocabulario esencial.</span></div>' +
+    '<div class="guia-item"><b>Dos veces por semana · 10 minutos más</b>' +
+      '<span>Una conversación en <b>Conversar</b>. Elige el escenario que más se parezca a tu trabajo real.</span></div>' +
+    '<div class="guia-item"><b>Una vez por semana</b>' +
+      '<span>Un diálogo de <b>Escuchar</b> completo, sin mirar la transcripción hasta el final.</span></div>' +
+    '<div class="guia-item"><b>Cuando tengas un rato muerto</b>' +
+      '<span>Repaso. Funciona sin internet, así que sirve en una sala de espera o en el aeropuerto.</span></div>' +
+  '</div>' +
+
+  '<div class="card">' +
+    '<div class="card-title">' + ic('bulb') + '<h3>Cosas que ayudan más de lo que parece</h3></div>' +
+    '<ul class="guia-lista">' +
+      '<li><b>Di las cosas en voz alta.</b> Aunque estés solo. Leer en silencio no entrena la boca, y hablar es un acto físico.</li>' +
+      '<li><b>Equivocarte es el ejercicio</b>, no el error. En Conversar escribe como te salga: la nota de coach es más útil cuanto peor lo hayas hecho.</li>' +
+      '<li><b>No traduzcas palabra por palabra.</b> Por eso cada palabra viene con una frase de ejemplo: aprende el trozo entero.</li>' +
+      '<li><b>Tu cuaderno de errores</b> (en Repaso) guarda cada fallo. Revísalo cada dos semanas: vas a ver que repites siempre los mismos tres.</li>' +
+      '<li><b>El asistente flotante</b> está en todas las pantallas. Si algo no lo entiendes, pregúntale ahí mismo en español.</li>' +
+    '</ul>' +
+  '</div>' +
+
+  '<div class="card">' +
+    '<div class="card-title">' + ic('lock') + '<h3>Tus datos y tu progreso</h3></div>' +
+    '<p class="small">Todo vive en este navegador. No hay cuentas ni servidores, y nadie más ve lo que haces. La contra es que si borras los datos del sitio, se pierde.</p>' +
+    '<p class="small" style="margin-bottom:0"><b>Haz una copia de seguridad de vez en cuando</b> desde Ajustes → Copia de seguridad. Con ese archivo puedes pasar tu progreso al teléfono o a otro equipo.</p>' +
+  '</div>' +
+
+  '<button class="btn btn-ghost btn-block" data-act="ayudas-reset">' + ic('refresh') + ' Volver a mostrar las ayudas de cada sección</button>' +
+  '<div style="height:24px"></div>';
+}
+
 /* ══════════════════ 15. AJUSTES ══════════════════ */
 function viewSettings() {
   const st = S.settings;
   const voices = Voice.englishVoices();
   return '<h1>Ajustes</h1>' +
+
+  '<button class="tile" data-act="tab" data-tab="guia" style="border-color:var(--brand)">' +
+    '<span class="tile-ico">' + ic('bulb') + '</span>' +
+    '<span class="tile-body">' +
+      '<span class="tile-t">Cómo usar SpeakUp</span>' +
+      '<span class="tile-d">El método: qué hacer cada día, por qué el repaso importa tanto y qué hace cada sección.</span>' +
+    '</span>' +
+    '<span class="tile-go">' + ic('right') + '</span>' +
+  '</button>' +
 
   '<div class="card">' +
     '<div class="card-title"><h3>Tu perfil</h3></div>' +
@@ -2650,6 +2807,19 @@ document.addEventListener('click', async (e) => {
   }
 
   /* --- lecciones --- */
+  if (act === 'ayuda-ok') {
+    if (!S.vistas) S.vistas = {};
+    S.vistas[t.dataset.id] = true;
+    save(); render(); return;
+  }
+
+  if (act === 'ayudas-reset') {
+    S.vistas = {};
+    save();
+    toast('Las tarjetas de ayuda volverán a aparecer');
+    render(); return;
+  }
+
   if (act === 'open-pack') {
     const p = packPorId(t.dataset.id);
     if (!p) return;

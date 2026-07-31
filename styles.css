@@ -937,3 +937,50 @@ body.con-teclado .bottomnav { transform: translateY(110%); }
   background: var(--accent-soft); color: var(--accent);
   font-size: .68rem; vertical-align: middle;
 }
+
+/* ============================================================
+   AYUDA CONTEXTUAL
+   Aparece una vez, se cierra y no vuelve.
+   ============================================================ */
+.ayuda {
+  background: var(--brand-soft);
+  border: 1px solid color-mix(in srgb, var(--brand) 28%, transparent);
+  border-radius: var(--radius);
+  padding: 16px 16px 14px;
+  margin-bottom: 16px;
+  animation: fade .3s ease;
+}
+.ayuda-top {
+  display: flex; align-items: center; gap: 8px;
+  color: var(--brand-ink); font-size: 1.02rem; margin-bottom: 10px;
+}
+.ayuda-top svg { width: 19px; height: 19px; flex: none; }
+[data-theme="dark"] .ayuda-top { color: var(--brand); }
+
+.ayuda-lista { margin: 0 0 14px; padding-left: 20px; }
+.ayuda-lista li {
+  margin-bottom: 8px; font-size: .9rem; line-height: 1.55;
+  color: var(--text);
+}
+.ayuda-lista li:last-child { margin-bottom: 0; }
+.ayuda-lista b { color: var(--brand-ink); }
+[data-theme="dark"] .ayuda-lista b { color: var(--brand); }
+.ayuda .btn-soft { background: var(--surface); }
+
+/* ---------- Guía de uso ---------- */
+.guia-item {
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+}
+.guia-item:first-of-type { border-top: 0; padding-top: 0; }
+.guia-item b {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 4px; color: var(--text);
+}
+.guia-item b svg { width: 17px; height: 17px; color: var(--brand); flex: none; }
+.guia-item span {
+  display: block; font-size: .88rem; color: var(--text-dim); line-height: 1.55;
+}
+.guia-lista { margin: 0 0 14px; padding-left: 20px; }
+.guia-lista li { margin-bottom: 9px; font-size: .92rem; line-height: 1.6; }
+.guia-lista li:last-child { margin-bottom: 0; }
