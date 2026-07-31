@@ -626,6 +626,15 @@ function afterRender() {
 
 /* El teclado del móvil tapa lo que está anclado abajo. Con esto el botón
    del asistente y su panel se levantan por encima del teclado. */
+function vigilarTour() {
+  document.addEventListener('keydown', e => {
+    if (!Tour.abierto) return;
+    if (e.key === 'ArrowRight' || e.key === 'Enter' || e.key === ' ') { e.preventDefault(); Tour.siguiente(); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); Tour.anterior(); }
+    else if (e.key === 'Escape')    { e.preventDefault(); Tour.cerrar(); }
+  });
+}
+
 function vigilarTeclado() {
   const vv = window.visualViewport;
   if (!vv) return;
@@ -881,6 +890,203 @@ function graficaProgreso(dias) {
    tarjeta desaparece y no vuelve.
    ============================================================ */
 
+/* ============================================================
+   RECORRIDO
+
+   Una ventana que va pasando tarjeta a tarjeta. Cada una: un
+   icono grande, un titular y dos líneas. Nada más. Se avanza
+   con el botón, con las flechas del teclado o deslizando con
+   el dedo, y cada paso suena.
+
+   El sonido se genera aquí mismo con el navegador: no hay
+   archivos de audio que descargar.
+   ============================================================ */
+
+const Sonido = {
+  ctx: null,
+  activo() { return S.settings.sonido !== false; },
+  motor() {
+    if (!Sonido.ctx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      try { Sonido.ctx = new AC(); } catch (e) { return null; }
+    }
+    if (Sonido.ctx.state === 'suspended') { try { Sonido.ctx.resume(); } catch (e) {} }
+    return Sonido.ctx;
+  },
+  /* una nota corta y redonda, sin filo: seno + envolvente suave */
+  nota(hz, cuando, dur, vol) {
+    const ctx = Sonido.motor();
+    if (!ctx) return;
+    const t = ctx.currentTime + (cuando || 0);
+    const osc = ctx.createOscillator();
+    const gan = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(hz, t);
+    gan.gain.setValueAtTime(0.0001, t);
+    gan.gain.exponentialRampToValueAtTime(vol || 0.07, t + 0.02);
+    gan.gain.exponentialRampToValueAtTime(0.0001, t + (dur || 0.18));
+    osc.connect(gan); gan.connect(ctx.destination);
+    osc.start(t); osc.stop(t + (dur || 0.18) + 0.05);
+  },
+  avanzar() { if (Sonido.activo()) Sonido.nota(587.33, 0, 0.16); },        // re
+  volver()  { if (Sonido.activo()) Sonido.nota(392.00, 0, 0.16, 0.05); },  // sol grave
+  abrir()   { if (Sonido.activo()) { Sonido.nota(523.25, 0, 0.20); Sonido.nota(784, 0.06, 0.22, 0.05); } },
+  final()   {
+    if (!Sonido.activo()) return;
+    [523.25, 659.25, 783.99, 1046.5].forEach((hz, i) => Sonido.nota(hz, i * 0.09, 0.35, 0.07));
+  },
+  logro()   { if (Sonido.activo()) { Sonido.nota(659.25, 0, 0.16); Sonido.nota(987.77, 0.08, 0.26, 0.06); } }
+};
+
+const PASOS_TOUR = [
+  {
+    icono: 'chat', color: 'brand',
+    titulo: 'Esto no es una lista de lecciones',
+    texto: 'Es un profesor. Te explica en español, te hace practicar en inglés y te corrige.',
+    pie: 'De A1 a B2, con peso extra en negocios y comercio exterior.'
+  },
+  {
+    icono: 'bolt', color: 'accent',
+    titulo: 'Mis 10 minutos',
+    texto: 'El botón grande del inicio. Te arma la sesión del día y no tienes que decidir nada.',
+    pie: 'Si solo usas una cosa de la app, que sea esta.'
+  },
+  {
+    icono: 'book', color: 'brand',
+    titulo: 'Lecciones',
+    texto: '22 unidades con gramática en español, vocabulario con audio y ejercicios.',
+    pie: 'Al terminar una, su vocabulario entra solo a tu repaso.'
+  },
+  {
+    icono: 'cards', color: 'accent',
+    titulo: 'Vocabulario',
+    texto: '36 packs y más de 1.700 palabras, cada una con su frase de ejemplo y su audio.',
+    pie: 'Empieza por «Las palabras esenciales»: van por frecuencia, no por tema.'
+  },
+  {
+    icono: 'chat', color: 'brand',
+    titulo: 'Conversar',
+    texto: 'Roleplay con el tutor. Escribes en inglés y te responde en inglés.',
+    pie: 'Debajo te deja una nota de coach en español. Da igual si lo haces mal: para eso está.'
+  },
+  {
+    icono: 'headphones', color: 'brand',
+    titulo: 'Escuchar',
+    texto: 'Diálogos a velocidad real, sin texto. Y práctica de pronunciación con tu propia voz.',
+    pie: 'La transcripción sale al final a propósito: si lees mientras oyes, no entrenas el oído.'
+  },
+  {
+    icono: 'refresh', color: 'ok',
+    titulo: 'Repaso',
+    texto: 'La sección menos vistosa y la más importante. Te devuelve cada palabra justo antes de que la olvides.',
+    pie: 'Cinco minutos al día valen más que una hora el domingo.'
+  },
+  {
+    icono: 'mic', color: 'accent',
+    titulo: 'Y el asistente, siempre a mano',
+    texto: 'El botón redondo que te sigue por todas las pantallas. Pregúntale en español lo que sea.',
+    pie: 'Cuándo se usa do o does, por qué esa frase suena rara, lo que necesites.'
+  },
+  {
+    icono: 'trophy', color: 'ok',
+    titulo: 'Ya está',
+    texto: 'No hay más que saber. Abre la app, toca «Mis 10 minutos» y deja que ella se encargue del resto.',
+    pie: 'Este recorrido lo tienes siempre en la pestaña Guía.',
+    final: true
+  }
+];
+
+const Tour = {
+  abierto: false,
+  i: 0,
+  dirX: 0,
+
+  abrir() {
+    Tour.abierto = true; Tour.i = 0;
+    Sonido.abrir();
+    renderTour();
+  },
+  cerrar() {
+    Tour.abierto = false;
+    if (!S.hitos) S.hitos = {};
+    S.hitos.tourVisto = true; save();
+    renderTour(); render();
+  },
+  ir(n) {
+    const destino = Math.max(0, Math.min(PASOS_TOUR.length - 1, n));
+    if (destino === Tour.i) return;
+    Tour.dirX = destino > Tour.i ? 1 : -1;
+    const ultima = destino === PASOS_TOUR.length - 1;
+    Tour.i = destino;
+    if (ultima) Sonido.final();
+    else if (Tour.dirX > 0) Sonido.avanzar();
+    else Sonido.volver();
+    renderTour();
+  },
+  siguiente() { Tour.i >= PASOS_TOUR.length - 1 ? Tour.cerrar() : Tour.ir(Tour.i + 1); },
+  anterior()  { Tour.ir(Tour.i - 1); }
+};
+
+function renderTour() {
+  let caja = document.getElementById('tour');
+  if (!caja) {
+    caja = document.createElement('div');
+    caja.id = 'tour';
+    document.body.appendChild(caja);
+  }
+  if (!Tour.abierto) { caja.innerHTML = ''; document.body.classList.remove('con-tour'); return; }
+  document.body.classList.add('con-tour');
+
+  const p = PASOS_TOUR[Tour.i];
+  const ultimo = Tour.i === PASOS_TOUR.length - 1;
+
+  caja.innerHTML =
+    '<div class="tour-bg">' +
+      '<div class="tour-card" role="dialog" aria-modal="true" aria-label="Recorrido por SpeakUp">' +
+
+        '<button class="tour-x" data-act="tour-cerrar" aria-label="Cerrar el recorrido">' + ic('x') + '</button>' +
+        '<button class="tour-son" data-act="tour-sonido" aria-label="' +
+          (Sonido.activo() ? 'Silenciar' : 'Activar sonido') + '" title="' +
+          (Sonido.activo() ? 'Silenciar' : 'Activar sonido') + '">' + ic(Sonido.activo() ? 'volume' : 'mic') + '</button>' +
+
+        '<div class="tour-cuerpo' + (Tour.dirX < 0 ? ' izq' : '') + '" key="' + Tour.i + '">' +
+          '<span class="tour-ico ' + p.color + '">' + ic(p.icono) + '</span>' +
+          '<h2>' + esc(p.titulo) + '</h2>' +
+          '<p class="tour-txt">' + esc(p.texto) + '</p>' +
+          '<p class="tour-pie">' + esc(p.pie) + '</p>' +
+        '</div>' +
+
+        '<div class="tour-puntos">' +
+          PASOS_TOUR.map((_, i) =>
+            '<button class="' + (i === Tour.i ? 'on' : i < Tour.i ? 'ya' : '') + '"' +
+            ' data-act="tour-ir" data-i="' + i + '" aria-label="Paso ' + (i + 1) + '"></button>').join('') +
+        '</div>' +
+
+        '<div class="tour-pies">' +
+          '<button class="btn btn-ghost btn-sm"' + (Tour.i === 0 ? ' disabled' : '') +
+            ' data-act="tour-atras">' + ic('left') + ' Atrás</button>' +
+          '<span class="tiny muted">' + (Tour.i + 1) + ' / ' + PASOS_TOUR.length + '</span>' +
+          '<button class="btn btn-primary btn-sm" data-act="tour-siguiente" data-autofocus>' +
+            (ultimo ? 'Empezar' : 'Siguiente') + ' ' + ic('right') + '</button>' +
+        '</div>' +
+
+      '</div>' +
+    '</div>';
+
+  // deslizar con el dedo, como en cualquier carrusel
+  const card = caja.querySelector('.tour-card');
+  let x0 = null;
+  card.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; }, { passive: true });
+  card.addEventListener('touchend', e => {
+    if (x0 === null) return;
+    const dx = e.changedTouches[0].clientX - x0;
+    x0 = null;
+    if (Math.abs(dx) < 45) return;
+    dx < 0 ? Tour.siguiente() : Tour.anterior();
+  }, { passive: true });
+}
+
 const MISIONES = [
   {
     id: 'oir',
@@ -964,9 +1170,11 @@ function revisarMisiones() {
   if (faltan === 0) {
     S.hitos.pasosListos = true;
     save();
+    Sonido.final();
     setTimeout(() => modalHecho(), 400);
   } else {
     save();
+    Sonido.logro();
     toast('¡Hecho! «' + nueva.titulo + '» · +25 XP');
   }
 }
@@ -2703,80 +2911,71 @@ function viewVocabReview() {
    ============================================================ */
 function viewGuia() {
   const listo = !!(S.hitos && S.hitos.pasosListos);
+
+  /* El texto largo vive plegado: está para consultarlo, no para leerlo de un tirón. */
+  const plegable = (titulo, icono, cuerpo) =>
+    '<details class="plie">' +
+      '<summary>' + ic(icono) + '<span>' + esc(titulo) + '</span>' + ic('right') + '</summary>' +
+      '<div class="plie-cuerpo">' + cuerpo + '</div>' +
+    '</details>';
+
   return '' +
   '<h1>Guía</h1>' +
-  '<p class="muted" style="margin-top:-6px">' + (listo
-    ? 'Ya hiciste los primeros pasos. Esto queda aquí por si algún día quieres consultar el detalle.'
-    : 'No hace falta leer nada. Ve haciendo estos seis pasos y aprendes usándola.') + '</p>' +
+  '<p class="muted" style="margin-top:-6px">Un recorrido de dos minutos y seis cosas para probar. Nada que estudiar.</p>' +
+
+  '<button class="tour-lanzar" data-act="tour-abrir">' +
+    '<span class="tour-lanzar-ico">' + ic('play') + '</span>' +
+    '<span class="tour-lanzar-txt">' +
+      '<b>Ver el recorrido</b>' +
+      '<span>Nueve tarjetas que te enseñan la app entera. Dos minutos.</span>' +
+    '</span>' +
+    '<span class="tile-go">' + ic('right') + '</span>' +
+  '</button>' +
 
   (listo
     ? '<div class="card" style="border-color:var(--ok)">' +
         '<div class="card-title" style="color:var(--ok)">' + ic('check') + '<h3>Primeros pasos completados</h3></div>' +
-        '<p class="small muted" style="margin-bottom:0">Probaste las seis cosas que hacen falta. Si quieres volver a hacerlos, hay un botón al final de esta página.</p>' +
+        '<p class="small muted" style="margin-bottom:0">Probaste las seis cosas que hacen falta. Si quieres rehacerlos, tienes el botón al final.</p>' +
       '</div>'
     : cardPasos().replace('home-wide', '')) +
 
-  '<div class="card">' +
-    '<div class="card-title">' + ic('bolt') + '<h3>Y a partir de ahí, esto es todo lo que hay que saber</h3></div>' +
-    '<p><b>Abre la app y toca «Mis 10 minutos».</b> Te arma la sesión del día: un poco de repaso, un poco de lección y un poco de escucha. No tienes que decidir nada.</p>' +
-    '<p class="small muted" style="margin-bottom:0">Diez minutos todos los días rinden mucho más que dos horas el domingo. El idioma no se aprende por acumulación, se aprende por repetición espaciada. Si algún día no puedes, haz cinco minutos de repaso y ya: lo que mata el progreso es cortar la racha, no acortar la sesión.</p>' +
-  '</div>' +
+  '<div class="level-head">Si quieres el detalle</div>' +
+  '<p class="small muted" style="margin:-6px 0 12px">Está aquí por si algún día lo necesitas. No hace falta leerlo para usar la app.</p>' +
 
-  '<div class="card">' +
-    '<div class="card-title">' + ic('compass') + '<h3>Qué hace cada sección</h3></div>' +
-    '<div class="guia-item"><b>' + ic('book') + ' Lecciones</b>' +
-      '<span>22 unidades de A1 a B2. Gramática explicada en español, vocabulario con audio, frases útiles y ejercicios. Aquí es donde entiendes <i>por qué</i> se dice así.</span></div>' +
-    '<div class="guia-item"><b>' + ic('cards') + ' Vocabulario</b>' +
-      '<span>36 packs con más de 1.700 palabras. Empieza por los <b>esenciales</b>: van por frecuencia, no por tema. Son las palabras que deciden si entiendes una conversación.</span></div>' +
-    '<div class="guia-item"><b>' + ic('chat') + ' Conversar</b>' +
-      '<span>Roleplay con el tutor. Escribes en inglés, te responde en inglés y te deja una nota de coach en español. Es donde se te quita el miedo.</span></div>' +
-    '<div class="guia-item"><b>' + ic('headphones') + ' Escuchar</b>' +
-      '<span>Diálogos a velocidad real, práctica de pronunciación con tu voz y los sonidos que el español no tiene.</span></div>' +
-    '<div class="guia-item"><b>' + ic('refresh') + ' Repaso</b>' +
-      '<span>La más importante y la menos vistosa. Te devuelve cada palabra justo antes de que la olvides.</span></div>' +
-  '</div>' +
+  plegable('Qué hace cada sección', 'compass',
+    '<div class="guia-item"><b>' + ic('book') + ' Lecciones</b><span>22 unidades de A1 a B2. Gramática en español, vocabulario con audio, frases y ejercicios.</span></div>' +
+    '<div class="guia-item"><b>' + ic('cards') + ' Vocabulario</b><span>36 packs, más de 1.700 palabras. Empieza por los <b>esenciales</b>: van por frecuencia, no por tema.</span></div>' +
+    '<div class="guia-item"><b>' + ic('chat') + ' Conversar</b><span>Roleplay con el tutor, con nota de coach en español debajo de cada respuesta.</span></div>' +
+    '<div class="guia-item"><b>' + ic('headphones') + ' Escuchar</b><span>Diálogos a velocidad real, pronunciación con tu voz y los sonidos que el español no tiene.</span></div>' +
+    '<div class="guia-item"><b>' + ic('refresh') + ' Repaso</b><span>Te devuelve cada palabra justo antes de que la olvides.</span></div>') +
 
-  '<div class="card">' +
-    '<div class="card-title">' + ic('refresh') + '<h3>Por qué el repaso lo es todo</h3></div>' +
-    '<p>Una palabra no se aprende viéndola una vez. Se aprende <b>recordándola con esfuerzo</b>, y cuanto más cerca estés de olvidarla, más se fija cuando la recuerdas. Eso es lo que calcula el repaso: no te muestra las palabras al azar, te las muestra en el momento exacto.</p>' +
-    '<p>Va en dos direcciones y no son lo mismo:</p>' +
+  plegable('Por qué el repaso lo es todo', 'refresh',
+    '<p class="small">Una palabra no se aprende viéndola una vez. Se aprende <b>recordándola con esfuerzo</b>, y cuanto más cerca estés de olvidarla, más se fija cuando la recuerdas. Eso es lo que calcula el repaso.</p>' +
     '<ul class="guia-lista">' +
-      '<li><b>Reconocimiento</b> — ves el inglés y recuerdas el español. Es la fácil, y es la que te permite <i>entender</i>.</li>' +
-      '<li><b>Producción</b> — ves el español y tienes que <b>escribir</b> el inglés. Es la difícil, y es la que te permite <i>hablar</i>. Se abre sola cuando aciertas dos veces la de reconocimiento.</li>' +
+      '<li><b>Reconocimiento</b> — ves el inglés y recuerdas el español. Es la que te permite <i>entender</i>.</li>' +
+      '<li><b>Producción</b> — ves el español y <b>escribes</b> el inglés. Es la que te permite <i>hablar</i>.</li>' +
     '</ul>' +
-    '<div class="notice"><b>' + ic('bulb') + ' Califícate con honestidad</b>Si marcas «lo sabía» cuando en realidad dudaste, el sistema te espacia esa palabra demasiado y la vas a olvidar. Marcar «casi» no es un fracaso: es la información que hace que esto funcione.</div>' +
-  '</div>' +
+    '<p class="small" style="margin-bottom:0"><b>Califícate con honestidad.</b> Marcar «casi» no es un fracaso: es la información que hace que esto funcione.</p>') +
 
-  '<div class="card">' +
-    '<div class="card-title">' + ic('target') + '<h3>Un plan de semana que sí se sostiene</h3></div>' +
-    '<div class="guia-item"><b>De lunes a viernes · 10 minutos</b>' +
-      '<span>«Mis 10 minutos» y ya está. Si te sobra ánimo, un pack de vocabulario esencial.</span></div>' +
-    '<div class="guia-item"><b>Dos veces por semana · 10 minutos más</b>' +
-      '<span>Una conversación en <b>Conversar</b>. Elige el escenario que más se parezca a tu trabajo real.</span></div>' +
-    '<div class="guia-item"><b>Una vez por semana</b>' +
-      '<span>Un diálogo de <b>Escuchar</b> completo, sin mirar la transcripción hasta el final.</span></div>' +
-    '<div class="guia-item"><b>Cuando tengas un rato muerto</b>' +
-      '<span>Repaso. Funciona sin internet, así que sirve en una sala de espera o en el aeropuerto.</span></div>' +
-  '</div>' +
+  plegable('Un plan de semana que sí se sostiene', 'target',
+    '<div class="guia-item"><b>Lunes a viernes · 10 min</b><span>«Mis 10 minutos» y ya está.</span></div>' +
+    '<div class="guia-item"><b>Dos veces por semana · 10 min más</b><span>Una conversación, con el escenario más parecido a tu trabajo real.</span></div>' +
+    '<div class="guia-item"><b>Una vez por semana</b><span>Un diálogo completo, sin mirar la transcripción hasta el final.</span></div>' +
+    '<div class="guia-item"><b>Ratos muertos</b><span>Repaso. Funciona sin internet.</span></div>') +
 
-  '<div class="card">' +
-    '<div class="card-title">' + ic('bulb') + '<h3>Cosas que ayudan más de lo que parece</h3></div>' +
+  plegable('Consejos que ayudan más de lo que parece', 'bulb',
     '<ul class="guia-lista">' +
-      '<li><b>Di las cosas en voz alta.</b> Aunque estés solo. Leer en silencio no entrena la boca, y hablar es un acto físico.</li>' +
-      '<li><b>Equivocarte es el ejercicio</b>, no el error. En Conversar escribe como te salga: la nota de coach es más útil cuanto peor lo hayas hecho.</li>' +
-      '<li><b>No traduzcas palabra por palabra.</b> Por eso cada palabra viene con una frase de ejemplo: aprende el trozo entero.</li>' +
-      '<li><b>Tu cuaderno de errores</b> (en Repaso) guarda cada fallo. Revísalo cada dos semanas: vas a ver que repites siempre los mismos tres.</li>' +
-      '<li><b>El asistente flotante</b> está en todas las pantallas. Si algo no lo entiendes, pregúntale ahí mismo en español.</li>' +
-    '</ul>' +
-  '</div>' +
+      '<li><b>Di las cosas en voz alta</b>, aunque estés solo. Hablar es un acto físico.</li>' +
+      '<li><b>Equivocarte es el ejercicio</b>, no el error.</li>' +
+      '<li><b>No traduzcas palabra por palabra.</b> Aprende el trozo entero.</li>' +
+      '<li><b>Tu cuaderno de errores</b> guarda cada fallo. Míralo cada dos semanas.</li>' +
+    '</ul>') +
 
-  '<div class="card">' +
-    '<div class="card-title">' + ic('lock') + '<h3>Tus datos y tu progreso</h3></div>' +
-    '<p class="small">Todo vive en este navegador. No hay cuentas ni servidores, y nadie más ve lo que haces. La contra es que si borras los datos del sitio, se pierde.</p>' +
-    '<p class="small" style="margin-bottom:0"><b>Haz una copia de seguridad de vez en cuando</b> desde Ajustes → Copia de seguridad. Con ese archivo puedes pasar tu progreso al teléfono o a otro equipo.</p>' +
-  '</div>' +
+  plegable('Tus datos y tu progreso', 'lock',
+    '<p class="small">Todo vive en este navegador. No hay cuentas ni servidores, y nadie más ve lo que haces. La contra: si borras los datos del sitio, se pierde.</p>' +
+    '<p class="small" style="margin-bottom:0"><b>Haz copia de seguridad de vez en cuando</b> desde Ajustes. Con ese archivo pasas tu progreso a otro equipo.</p>') +
 
-  '<div class="btn-row">' +
+  '<div class="btn-row" style="margin-top:16px">' +
     '<button class="btn btn-ghost btn-sm" data-act="pasos-reset">' + ic('refresh') + ' Rehacer los primeros pasos</button>' +
     '<button class="btn btn-ghost btn-sm" data-act="ayudas-reset">' + ic('refresh') + ' Volver a mostrar las ayudas</button>' +
   '</div>' +
@@ -2913,7 +3112,12 @@ document.addEventListener('click', async (e) => {
   }
 
   /* --- navegación --- */
-  if (act === 'tab') { go(t.dataset.tab); return; }
+  if (act === 'tab') {
+    go(t.dataset.tab);
+    // la primera vez que entras a la Guía, el recorrido se abre solo
+    if (t.dataset.tab === 'guia' && !(S.hitos && S.hitos.tourVisto)) Tour.abrir();
+    return;
+  }
   if (act === 'go-mistakes') { V.reviewTab = 'errors'; go('review'); return; }
 
   /* --- audio --- */
@@ -2962,6 +3166,18 @@ document.addEventListener('click', async (e) => {
   }
 
   /* --- lecciones --- */
+  if (act === 'tour-abrir')     { Tour.abrir(); return; }
+  if (act === 'tour-cerrar')    { Tour.cerrar(); return; }
+  if (act === 'tour-siguiente') { Tour.siguiente(); return; }
+  if (act === 'tour-atras')     { Tour.anterior(); return; }
+  if (act === 'tour-ir')        { Tour.ir(Number(t.dataset.i)); return; }
+  if (act === 'tour-sonido') {
+    S.settings.sonido = !Sonido.activo();
+    save();
+    if (Sonido.activo()) Sonido.avanzar();
+    renderTour(); return;
+  }
+
   if (act === 'paso-ir') {
     const m = MISIONES.find(x => x.id === t.dataset.id);
     if (!m) return;
@@ -3922,6 +4138,7 @@ function boot() {
   Voice.init();
   App.init();
   vigilarTeclado();
+  vigilarTour();
   ensureDay();
   applyTheme();
   try {
