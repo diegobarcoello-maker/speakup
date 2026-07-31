@@ -859,8 +859,21 @@ body.con-teclado .bottomnav { transform: translateY(110%); }
   }
   [data-theme="dark"] .navbtn[aria-current="page"] { color: var(--brand); }
 
-  .topbar { z-index: 60; }
-  .topbar-in { max-width: none; padding-left: 24px; padding-right: 24px; }
+  /* La franja superior va de borde a borde, por encima del menú lateral.
+     Sin esto quedaba una banda clara a la izquierda, del ancho del menú. */
+  .topbar {
+    z-index: 60;
+    margin-left: -224px;
+    background: var(--bg);                 /* opaca: debajo pasa el menú lateral */
+    backdrop-filter: none;
+  }
+  .topbar-in { max-width: none; padding-left: 248px; padding-right: 24px; }
+
+  /* Antes de empezar no hay menú lateral, así que no hay nada que compensar:
+     la franja y el contenido ocupan el ancho completo y quedan centrados. */
+  body.previo { padding-left: 0; }
+  body.previo .topbar { margin-left: 0; }
+  body.previo .topbar-in { padding-left: 24px; }
 
   .wrap { max-width: 1000px; padding: 0 28px; }
   main { padding-top: 26px; }
