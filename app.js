@@ -582,6 +582,8 @@ function render() {
   document.getElementById('topstats').hidden = false;
   paintStats();
 
+  revisarMisiones();
+
   let html = '';
   if (V.tab === 'home')            html = viewHome();
   else if (V.tab === 'create')     html = viewCreate();
@@ -869,6 +871,158 @@ function graficaProgreso(dias) {
 }
 
 /* ══════════════════ 10. INICIO ══════════════════ */
+/* ============================================================
+   PRIMEROS PASOS
+
+   El tutorial de verdad: seis misiones que NO se completan
+   leyendo, sino haciendo. Se muestra una a la vez, con un
+   botón que te lleva al sitio exacto, y se marca sola en
+   cuanto haces la acción. Cuando terminas las seis, la
+   tarjeta desaparece y no vuelve.
+   ============================================================ */
+
+const MISIONES = [
+  {
+    id: 'oir',
+    titulo: 'Escucha tu primera palabra',
+    texto: 'Entra en una lección y toca el altavoz 🔊 de cualquier palabra.',
+    porque: 'Si solo lees, aprendes a escribir inglés. Para hablarlo hay que oírlo desde el primer día.',
+    boton: 'Ir a la primera lección',
+    ir: () => { V.tab = 'lessons'; V.unit = 'a1-1'; },
+    hecho: () => !!(S.hitos && S.hitos.oir)
+  },
+  {
+    id: 'leccion',
+    titulo: 'Termina tu primera lección',
+    texto: 'Lee la gramática, mira el vocabulario y haz los ejercicios hasta el final.',
+    porque: 'Al acabarla, todo su vocabulario entra solo a tu repaso. Ahí empieza a trabajar la app por ti.',
+    boton: 'Seguir con la lección',
+    ir: () => { V.tab = 'lessons'; V.unit = 'a1-1'; },
+    hecho: () => Object.keys(S.completed).length > 0
+  },
+  {
+    id: 'pack',
+    titulo: 'Añade un pack de vocabulario al repaso',
+    texto: 'Ve a Vocabulario, abre cualquier pack y toca «Añadir al repaso».',
+    porque: 'Empieza por «Las palabras esenciales»: van por frecuencia, así que son las que más te van a servir.',
+    boton: 'Ir a Vocabulario',
+    ir: () => { V.tab = 'vocab'; },
+    hecho: () => Object.values(S.srs).some(c => /^[ev]-/.test(c.unit || ''))
+  },
+  {
+    id: 'repaso',
+    titulo: 'Haz tu primer repaso',
+    texto: 'Califica cinco tarjetas con honestidad. «Casi» no es un fracaso.',
+    porque: 'Es la sección que decide si de verdad aprendes. Cinco minutos al día valen más que una hora el domingo.',
+    boton: 'Ir a Repaso',
+    ir: () => { V.tab = 'review'; },
+    hecho: () => Object.values(S.srs).filter(c => c.reps > 0).length >= 5
+  },
+  {
+    id: 'dialogo',
+    titulo: 'Escucha un diálogo entero',
+    texto: 'En Escuchar, abre un diálogo y respóndelo sin mirar la transcripción.',
+    porque: 'Es gente hablando a velocidad real. Cuesta al principio; ahí está justamente el entrenamiento.',
+    boton: 'Ir a Escuchar',
+    ir: () => { V.tab = 'pron'; },
+    hecho: () => Object.keys(S.dialoguesDone).length > 0
+  },
+  {
+    id: 'hablar',
+    titulo: 'Suelta tu primera frase',
+    texto: hayTutor()
+      ? 'En Conversar, elige un escenario y escribe algo en inglés. Da igual si sale mal.'
+      : 'En Escuchar → Pronunciar, di una frase con tu voz y mira tu puntaje.',
+    porque: hayTutor()
+      ? 'El tutor te responde en inglés y te deja una nota de coach en español. Cuanto peor lo hagas, más útil es.'
+      : 'Hablar es un acto físico: hay que entrenar la boca, no solo la cabeza.',
+    boton: hayTutor() ? 'Ir a Conversar' : 'Ir a Pronunciar',
+    ir: () => { if (hayTutor()) { V.tab = 'talk'; } else { V.tab = 'pron'; audioState().tab = 'pron'; } },
+    hecho: () => S.convTurns > 0 || S.pronCount > 0
+  }
+];
+
+function hito(id) {
+  if (!S.hitos) S.hitos = {};
+  if (S.hitos[id]) return;
+  S.hitos[id] = true;
+  save();
+}
+
+/* Comprueba si se acaba de completar una misión y lo celebra. */
+function revisarMisiones() {
+  if (!S.hitos) S.hitos = {};
+  if (S.hitos.pasosListos) return;
+  let nueva = null;
+  for (const m of MISIONES) {
+    const clave = 'm_' + m.id;
+    if (!S.hitos[clave] && m.hecho()) { S.hitos[clave] = true; nueva = m; }
+  }
+  if (!nueva) return;
+  addXp(25);
+  const faltan = MISIONES.filter(m => !S.hitos['m_' + m.id]).length;
+  if (faltan === 0) {
+    S.hitos.pasosListos = true;
+    save();
+    setTimeout(() => modalHecho(), 400);
+  } else {
+    save();
+    toast('¡Hecho! «' + nueva.titulo + '» · +25 XP');
+  }
+}
+
+function misionesHechas() { return MISIONES.filter(m => S.hitos && S.hitos['m_' + m.id]).length; }
+function misionActual()   { return MISIONES.find(m => !(S.hitos && S.hitos['m_' + m.id])) || null; }
+
+/* La tarjeta del inicio: una misión a la vez, no una lista abrumadora. */
+function cardPasos() {
+  if (S.hitos && S.hitos.pasosListos) return '';
+  const m = misionActual();
+  if (!m) return '';
+  const hechas = misionesHechas(), total = MISIONES.length;
+
+  return '<div class="card home-wide pasos">' +
+    '<div class="row-between" style="margin-bottom:10px">' +
+      '<b class="small">Primeros pasos</b>' +
+      '<span class="small muted">' + hechas + ' de ' + total + '</span>' +
+    '</div>' +
+    '<div class="pasos-puntos">' +
+      MISIONES.map((x, i) => {
+        const ok = S.hitos && S.hitos['m_' + x.id];
+        return '<i class="' + (ok ? 'ok' : x.id === m.id ? 'cur' : '') + '" title="' + esc(x.titulo) + '"></i>';
+      }).join('') +
+    '</div>' +
+    '<div class="pasos-cuerpo">' +
+      '<span class="pasos-num">' + (hechas + 1) + '</span>' +
+      '<div>' +
+        '<b>' + esc(m.titulo) + '</b>' +
+        '<p class="small" style="margin:2px 0 6px">' + esc(m.texto) + '</p>' +
+        '<p class="tiny muted" style="margin:0">' + ic('bulb') + ' ' + esc(m.porque) + '</p>' +
+      '</div>' +
+    '</div>' +
+    '<div class="btn-row" style="margin-top:12px">' +
+      '<button class="btn btn-primary btn-sm" data-act="paso-ir" data-id="' + m.id + '">' + esc(m.boton) + ' ' + ic('right') + '</button>' +
+      '<button class="btn btn-ghost btn-sm" data-act="pasos-saltar">Ya sé usarla</button>' +
+    '</div>' +
+  '</div>';
+}
+
+function modalHecho() {
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg';
+  bg.innerHTML =
+    '<div class="modal" role="dialog" aria-modal="true" aria-label="Primeros pasos completados">' +
+      '<div style="color:var(--ok);margin-bottom:8px">' + ic('trophy', 'ic-lg') + '</div>' +
+      '<h2>Ya sabes usar SpeakUp</h2>' +
+      '<p class="muted small">Has probado las seis cosas que hacen falta. De aquí en adelante solo tienes que abrir la app y tocar <b>«Mis 10 minutos»</b>: te arma la sesión del día y no decides nada.</p>' +
+      '<p class="tiny muted">Si alguna vez quieres el detalle de algo, lo tienes en la pestaña <b>Guía</b>.</p>' +
+      '<button class="btn btn-primary btn-block" data-act="closemodal">Vamos allá</button>' +
+    '</div>';
+  bg.addEventListener('click', e => { if (e.target === bg || e.target.closest('[data-act="closemodal"]')) bg.remove(); });
+  document.body.appendChild(bg);
+  bg.querySelector('button').focus();
+}
+
 function viewHome() {
   const lv = currentLevel(), nx = nextLevel();
   const goal = S.settings.dailyGoal || 50;
@@ -905,6 +1059,8 @@ function viewHome() {
         '</span>' +
         '<span class="tile-go">' + ic('right') + '</span>' +
       '</button>') +
+
+  cardPasos() +
 
   '<div class="card home-wide">' +
     '<div class="row-between" style="margin-bottom:9px">' +
@@ -1030,52 +1186,47 @@ function unitTile(u) {
 
 const AYUDAS = {
   lessons: {
-    titulo: 'Cómo funcionan las lecciones',
+    titulo: 'Lecciones, en tres líneas',
     puntos: [
-      'Cada unidad tiene cuatro partes: <b>gramática</b> explicada en español, <b>vocabulario</b> con audio, <b>frases útiles</b> y <b>ejercicios</b>.',
-      'Lee la gramática sin prisa y toca el altavoz de cada palabra para oírla. Escuchar mientras lees es lo que fija la pronunciación.',
-      'Al terminar los ejercicios, todo el vocabulario de la unidad entra solo a tu <b>Repaso</b>. No tienes que hacer nada.',
-      'Las unidades se desbloquean por nivel. No hace falta hacerlas en orden dentro de un mismo nivel.'
+      'Gramática en español, vocabulario con audio, frases y ejercicios.',
+      'Toca el altavoz de cada palabra. Oírla vale más que leerla.',
+      'Al terminar, su vocabulario entra solo a tu <b>Repaso</b>.'
     ]
   },
   vocab: {
-    titulo: 'Cómo sacarle partido al vocabulario',
+    titulo: 'Vocabulario, en tres líneas',
     puntos: [
-      'Empieza por <b>Las palabras esenciales</b>. No van por tema sino por lo mucho que se usan: son las que deciden si entiendes una conversación.',
-      'El audio lee <b>la frase completa</b>, no la palabra suelta. Escúchala entera: así aprendes cómo se usa, no solo qué significa.',
-      'El botón <b>Añadir al repaso</b> manda el pack entero a tu repaso espaciado. Hazlo con un pack a la vez, no con diez.',
-      '<b>Ponerme a prueba</b> te hace diez preguntas de español a inglés. Sirve para ver qué se quedó y qué no.'
+      'Empieza por <b>Las palabras esenciales</b>: van por frecuencia, no por tema.',
+      'El audio lee la frase entera, no la palabra suelta.',
+      '<b>Añadir al repaso</b> manda el pack completo. Uno a la vez, no diez.'
     ]
   },
   talk: {
-    titulo: 'Cómo conversar sin miedo',
+    titulo: 'Conversar, en tres líneas',
     puntos: [
-      'Elige un escenario y escribe en inglés como puedas. <b>Da igual si sale mal</b>: de eso se trata.',
-      'El tutor te responde en inglés y debajo te deja una <b>nota de coach en español</b> con lo que corregirías. Léela siempre.',
-      'Si te trabas, el botón de <b>pista</b> te da una frase para salir del paso.',
-      'También puedes hablar con el micrófono en vez de escribir, y practicar <b>correos de negocios</b> en la otra pestaña.'
+      'Escribe en inglés como puedas. <b>Da igual si sale mal</b>: de eso se trata.',
+      'Debajo de cada respuesta tienes la <b>nota de coach en español</b>.',
+      'Si te trabas, el botón de pista te saca del paso.'
     ]
   },
   pron: {
-    titulo: 'Escuchar y pronunciar',
+    titulo: 'Escuchar, en tres líneas',
     puntos: [
-      '<b>Diálogos</b>: dos personas hablando a velocidad normal, sin texto. Escuchas primero y respondes después. La transcripción sale al final a propósito: si lees mientras oyes, no entrenas el oído.',
-      '<b>Pronunciar</b>: oyes la frase, la dices con tu voz y te marca en verde y rojo qué palabras salieron bien.',
-      '<b>Sonidos</b>: los que el español no tiene y por eso cuestan. Cada uno explica qué hacer con la boca.',
-      'Si no te entiende el micrófono, no es que hables mal: prueba en un sitio silencioso y acércate al teléfono.'
+      '<b>Diálogos</b>: voz real, sin texto. La transcripción sale al final a propósito.',
+      '<b>Pronunciar</b>: dices la frase y te marca en verde y rojo qué salió bien.',
+      '<b>Sonidos</b>: los que el español no tiene y por eso cuestan.'
     ]
   },
   review: {
-    titulo: 'Por qué el repaso es lo más importante',
+    titulo: 'Repaso, en tres líneas',
     puntos: [
-      'Una palabra no se aprende viéndola una vez. Se aprende <b>recordándola justo antes de olvidarla</b>, y eso es lo que calcula esta sección.',
-      'Hay dos direcciones. <b>Reconocimiento</b>: ves el inglés y recuerdas el español. <b>Producción</b>: ves el español y tienes que escribir el inglés.',
-      'La de producción es la difícil y es <b>la que te hace hablar</b>. Se abre sola cuando aciertas dos veces la de reconocimiento.',
-      'Sé honesto al calificarte. Si marcas "lo sabía" cuando no lo sabías, el sistema deja de servirte.',
-      'Cinco minutos de repaso al día valen más que una hora el domingo.'
+      'Te devuelve cada palabra <b>justo antes de que la olvides</b>.',
+      '<b>Reconocimiento</b> te hace entender. <b>Producción</b> te hace hablar.',
+      'Califícate con honestidad: «casi» no es un fracaso, es la información que hace que funcione.'
     ]
   }
 };
+
 
 function ayudaVista(id) { return !!(S.vistas && S.vistas[id]); }
 
@@ -2551,12 +2702,22 @@ function viewVocabReview() {
    y por qué, que es lo que de verdad hace falta saber.
    ============================================================ */
 function viewGuia() {
-  return '<button class="back-link" data-act="tab" data-tab="settings">' + ic('left') + ' Ajustes</button>' +
-  '<h1>Cómo usar SpeakUp</h1>' +
-  '<p class="muted" style="margin-top:-6px">Lo importante no es conocer los botones, sino tener un método. Este es el que funciona.</p>' +
+  const listo = !!(S.hitos && S.hitos.pasosListos);
+  return '' +
+  '<h1>Guía</h1>' +
+  '<p class="muted" style="margin-top:-6px">' + (listo
+    ? 'Ya hiciste los primeros pasos. Esto queda aquí por si algún día quieres consultar el detalle.'
+    : 'No hace falta leer nada. Ve haciendo estos seis pasos y aprendes usándola.') + '</p>' +
+
+  (listo
+    ? '<div class="card" style="border-color:var(--ok)">' +
+        '<div class="card-title" style="color:var(--ok)">' + ic('check') + '<h3>Primeros pasos completados</h3></div>' +
+        '<p class="small muted" style="margin-bottom:0">Probaste las seis cosas que hacen falta. Si quieres volver a hacerlos, hay un botón al final de esta página.</p>' +
+      '</div>'
+    : cardPasos().replace('home-wide', '')) +
 
   '<div class="card">' +
-    '<div class="card-title">' + ic('bolt') + '<h3>Si solo lees una cosa, que sea esta</h3></div>' +
+    '<div class="card-title">' + ic('bolt') + '<h3>Y a partir de ahí, esto es todo lo que hay que saber</h3></div>' +
     '<p><b>Abre la app y toca «Mis 10 minutos».</b> Te arma la sesión del día: un poco de repaso, un poco de lección y un poco de escucha. No tienes que decidir nada.</p>' +
     '<p class="small muted" style="margin-bottom:0">Diez minutos todos los días rinden mucho más que dos horas el domingo. El idioma no se aprende por acumulación, se aprende por repetición espaciada. Si algún día no puedes, haz cinco minutos de repaso y ya: lo que mata el progreso es cortar la racha, no acortar la sesión.</p>' +
   '</div>' +
@@ -2615,7 +2776,10 @@ function viewGuia() {
     '<p class="small" style="margin-bottom:0"><b>Haz una copia de seguridad de vez en cuando</b> desde Ajustes → Copia de seguridad. Con ese archivo puedes pasar tu progreso al teléfono o a otro equipo.</p>' +
   '</div>' +
 
-  '<button class="btn btn-ghost btn-block" data-act="ayudas-reset">' + ic('refresh') + ' Volver a mostrar las ayudas de cada sección</button>' +
+  '<div class="btn-row">' +
+    '<button class="btn btn-ghost btn-sm" data-act="pasos-reset">' + ic('refresh') + ' Rehacer los primeros pasos</button>' +
+    '<button class="btn btn-ghost btn-sm" data-act="ayudas-reset">' + ic('refresh') + ' Volver a mostrar las ayudas</button>' +
+  '</div>' +
   '<div style="height:24px"></div>';
 }
 
@@ -2624,15 +2788,6 @@ function viewSettings() {
   const st = S.settings;
   const voices = Voice.englishVoices();
   return '<h1>Ajustes</h1>' +
-
-  '<button class="tile" data-act="tab" data-tab="guia" style="border-color:var(--brand)">' +
-    '<span class="tile-ico">' + ic('bulb') + '</span>' +
-    '<span class="tile-body">' +
-      '<span class="tile-t">Cómo usar SpeakUp</span>' +
-      '<span class="tile-d">El método: qué hacer cada día, por qué el repaso importa tanto y qué hace cada sección.</span>' +
-    '</span>' +
-    '<span class="tile-go">' + ic('right') + '</span>' +
-  '</button>' +
 
   '<div class="card">' +
     '<div class="card-title"><h3>Tu perfil</h3></div>' +
@@ -2762,8 +2917,8 @@ document.addEventListener('click', async (e) => {
   if (act === 'go-mistakes') { V.reviewTab = 'errors'; go('review'); return; }
 
   /* --- audio --- */
-  if (act === 'say')      { Voice.speak(t.dataset.text); return; }
-  if (act === 'say-slow') { Voice.speak(t.dataset.text, 0.62); return; }
+  if (act === 'say')      { Voice.speak(t.dataset.text); hito('oir'); return; }
+  if (act === 'say-slow') { Voice.speak(t.dataset.text, 0.62); hito('oir'); return; }
   if (act === 'say-all') {
     const u = unitById(t.dataset.id);
     if (!u) return;
@@ -2807,6 +2962,29 @@ document.addEventListener('click', async (e) => {
   }
 
   /* --- lecciones --- */
+  if (act === 'paso-ir') {
+    const m = MISIONES.find(x => x.id === t.dataset.id);
+    if (!m) return;
+    V.lesson = null; V.pack = null; V.packQuiz = null;
+    m.ir();
+    window.scrollTo(0, 0); render(); return;
+  }
+
+  if (act === 'pasos-saltar') {
+    if (!S.hitos) S.hitos = {};
+    S.hitos.pasosListos = true;
+    save();
+    toast('De acuerdo. Los tienes en la pestaña Guía si cambias de idea.');
+    render(); return;
+  }
+
+  if (act === 'pasos-reset') {
+    S.hitos = { oir: S.hitos && S.hitos.oir };
+    save();
+    toast('Primeros pasos reiniciados');
+    render(); return;
+  }
+
   if (act === 'actualizar') { Actualizacion.aplicar(); return; }
 
   if (act === 'aviso-cerrar') {
@@ -3761,12 +3939,12 @@ function boot() {
     }
     // atajos del icono instalado: ?ir=review, ?ir=talk, ?ir=pron
     const destino = p.get('ir');
-    if (destino && ['home', 'lessons', 'talk', 'pron', 'review'].indexOf(destino) >= 0 && S.onboarded) V.tab = destino;
+    if (destino && ['home', 'lessons', 'talk', 'pron', 'review', 'guia'].indexOf(destino) >= 0 && S.onboarded) V.tab = destino;
   } catch (e) {}
   document.getElementById('nav').innerHTML =
     '<div class="bottomnav-in">' +
       [['home', 'home', 'Inicio'], ['lessons', 'book', 'Lecciones'], ['talk', 'chat', 'Conversar'],
-       ['pron', 'headphones', 'Escuchar'], ['review', 'cards', 'Repaso']]
+       ['pron', 'headphones', 'Escuchar'], ['review', 'cards', 'Repaso'], ['guia', 'bulb', 'Guía']]
       .map(([tab, icon, label]) =>
         '<button class="navbtn" data-act="tab" data-tab="' + tab + '">' + ic(icon) + '<span>' + label + '</span></button>'
       ).join('') +
