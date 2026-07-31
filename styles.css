@@ -984,3 +984,41 @@ body.con-teclado .bottomnav { transform: translateY(110%); }
 .guia-lista { margin: 0 0 14px; padding-left: 20px; }
 .guia-lista li { margin-bottom: 9px; font-size: .92rem; line-height: 1.6; }
 .guia-lista li:last-child { margin-bottom: 0; }
+
+/* ============================================================
+   AVISO DE VERSIÓN NUEVA
+   Solo aparece si estabas a mitad de algo. Si no, la app se
+   actualiza sola y nunca ves esta barra.
+   ============================================================ */
+.aviso-barra {
+  position: fixed; z-index: 90;
+  left: 12px; right: 12px;
+  bottom: calc(96px + env(safe-area-inset-bottom) + var(--teclado, 0px));
+  display: flex; align-items: center; gap: 10px;
+  background: var(--brand-ink); color: #fff;
+  border-radius: var(--radius);
+  padding: 10px 10px 10px 14px;
+  box-shadow: var(--shadow-lg);
+  animation: sube .3s ease both;
+}
+.aviso-barra > span {
+  flex: 1; display: flex; align-items: center; gap: 8px;
+  font-size: .88rem; font-weight: 600;
+}
+.aviso-barra > span svg { width: 17px; height: 17px; flex: none; }
+.aviso-barra .btn {
+  background: #fff; color: var(--brand-ink);
+  border: 0; font-weight: 700; flex: none;
+}
+.aviso-barra .btn:hover { background: rgba(255,255,255,.88); }
+.aviso-x {
+  appearance: none; border: 0; background: transparent; cursor: pointer;
+  color: rgba(255,255,255,.7); padding: 4px; display: flex; flex: none;
+  border-radius: 6px;
+}
+.aviso-x:hover { color: #fff; background: rgba(255,255,255,.14); }
+.aviso-x svg { width: 17px; height: 17px; }
+
+@media (min-width: 1024px) {
+  .aviso-barra { left: auto; right: 24px; width: 380px; bottom: 24px; }
+}

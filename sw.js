@@ -11,7 +11,7 @@
    petición que no sea a este mismo sitio.
    ============================================================ */
 
-const VERSION = 'speakup-v18';
+const VERSION = 'speakup-v19';
 
 const ESENCIALES = [
   './',
@@ -36,7 +36,10 @@ self.addEventListener('install', evento => {
       try { await cache.add(new Request(ruta, { cache: 'reload' })); }
       catch (e) { console.warn('[sw] no se pudo guardar', ruta, e); }
     }));
-    self.skipWaiting();
+    /* Antes aquí se llamaba a skipWaiting() y la versión nueva entraba de
+       golpe, con la página vieja todavía en pantalla. Ahora esperamos a que
+       la app diga cuándo: así no se cambian los archivos debajo de los pies
+       de alguien que está a mitad de un ejercicio. */
   })());
 });
 

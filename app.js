@@ -2807,6 +2807,16 @@ document.addEventListener('click', async (e) => {
   }
 
   /* --- lecciones --- */
+  if (act === 'actualizar') { Actualizacion.aplicar(); return; }
+
+  if (act === 'aviso-cerrar') {
+    // se queda esperando: entrará sola la próxima vez que abras la app
+    Actualizacion.esperando = null;
+    renderAviso();
+    toast('De acuerdo. Se actualizará la próxima vez que abras la app.');
+    return;
+  }
+
   if (act === 'ayuda-ok') {
     if (!S.vistas) S.vistas = {};
     S.vistas[t.dataset.id] = true;
@@ -3519,6 +3529,108 @@ function renderAsk() {
 }
 
 /* ══════════════════ 17. INSTALAR Y FUNCIONAR SIN CONEXIÓN ══════════════════ */
+/* ============================================================
+   ACTUALIZACIÓN AUTOMÁTICA
+
+   Antes había que cerrar y abrir la app dos veces: la primera
+   descargaba la versión nueva y la segunda la mostraba. Ahora
+   la app se da cuenta sola y se refresca en el momento.
+
+   La única cautela: si estás a mitad de un ejercicio, de una
+   conversación o grabando, no se recarga por las bravas. Se
+   avisa con una barra abajo y decides tú.
+   ============================================================ */
+
+const Actualizacion = {
+  reg: null,
+  esperando: null,      // el service worker nuevo, instalado pero en espera
+  pedida: false,        // ¿la recarga la pedimos nosotros?
+  ultimaBusqueda: 0,
+
+  init(reg) {
+    Actualizacion.reg = reg;
+
+    // ¿ya había una versión nueva esperando de una sesión anterior?
+    if (reg.waiting && navigator.serviceWorker.controller) Actualizacion.lista(reg.waiting);
+
+    reg.addEventListener('updatefound', () => {
+      const nuevo = reg.installing;
+      if (!nuevo) return;
+      nuevo.addEventListener('statechange', () => {
+        // solo si ya había una versión antes: en la primera instalación no hay nada que avisar
+        if (nuevo.state === 'installed' && navigator.serviceWorker.controller) Actualizacion.lista(nuevo);
+      });
+    });
+
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!Actualizacion.pedida) return;      // no recargar en la primera instalación
+      Actualizacion.pedida = false;
+      window.location.reload();
+    });
+
+    // buscar versión nueva al volver a la app, que es cuando toca
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') Actualizacion.buscar();
+    });
+    window.addEventListener('focus', Actualizacion.buscar);
+    setInterval(Actualizacion.buscar, 30 * 60 * 1000);
+  },
+
+  buscar() {
+    if (!Actualizacion.reg) return;
+    const ahora = Date.now();
+    if (ahora - Actualizacion.ultimaBusqueda < 60000) return;   // como mucho una vez por minuto
+    Actualizacion.ultimaBusqueda = ahora;
+    Actualizacion.reg.update().catch(() => {});
+  },
+
+  /* ¿está el usuario metido en algo que no conviene interrumpir? */
+  ocupado() {
+    if (V.lesson) return true;                                   // haciendo ejercicios
+    if (V.packQuiz) return true;                                 // en la prueba de un pack
+    if (V.review && V.review.queue && V.review.i < V.review.queue.length) return true;
+    if (V.talk && V.talk.scenario) return true;                  // conversando
+    if (V.audio && V.audio.id) return true;                      // en un diálogo
+    if (typeof Sesion !== 'undefined' && Sesion.activa) return true;   // en «Mis 10 minutos»
+    if (typeof Ask !== 'undefined' && Ask.abierto) return true;  // preguntando algo
+    if ((V.talk && V.talk.rec) || (V.pron && V.pron.rec)) return true;   // grabando
+    return false;
+  },
+
+  lista(sw) {
+    Actualizacion.esperando = sw;
+    if (Actualizacion.ocupado()) { renderAviso(); return; }
+    Actualizacion.aplicar();
+  },
+
+  aplicar() {
+    const sw = Actualizacion.esperando;
+    if (!sw) return;
+    Actualizacion.esperando = null;
+    Actualizacion.pedida = true;
+    try { sw.postMessage('saltar-espera'); }
+    catch (e) { Actualizacion.pedida = false; window.location.reload(); }
+    renderAviso();
+  }
+};
+
+/* Barra discreta para cuando no se puede recargar sin molestar */
+function renderAviso() {
+  let caja = document.getElementById('aviso');
+  if (!caja) {
+    caja = document.createElement('div');
+    caja.id = 'aviso';
+    document.body.appendChild(caja);
+  }
+  caja.innerHTML = Actualizacion.esperando
+    ? '<div class="aviso-barra" role="status">' +
+        '<span>' + ic('bolt') + ' Hay una versión nueva de SpeakUp</span>' +
+        '<button class="btn btn-sm" data-act="actualizar">Actualizar</button>' +
+        '<button class="aviso-x" data-act="aviso-cerrar" aria-label="Ahora no">' + ic('x') + '</button>' +
+      '</div>'
+    : '';
+}
+
 const App = {
   invitacion: null,          // el evento que Chrome guarda para poder instalar
   instalada: false,
@@ -3548,17 +3660,9 @@ const App = {
 
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js').then(reg => {
-          reg.addEventListener('updatefound', () => {
-            const nuevo = reg.installing;
-            if (!nuevo) return;
-            nuevo.addEventListener('statechange', () => {
-              if (nuevo.state === 'installed' && navigator.serviceWorker.controller) {
-                toast('Hay una versión nueva. Se aplicará al reabrir la app.');
-              }
-            });
-          });
-        }).catch(e => console.warn('No se pudo activar el modo sin conexión:', e));
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => Actualizacion.init(reg))
+          .catch(e => console.warn('No se pudo activar el modo sin conexión:', e));
       });
     }
   },
