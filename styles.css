@@ -973,11 +973,16 @@ body.con-teclado .bottomnav { transform: translateY(110%); }
   border-top: 1px solid var(--border);
 }
 .guia-item:first-of-type { border-top: 0; padding-top: 0; }
-.guia-item b {
+/* Solo el título de cada apartado va en fila con su icono.
+   Los <b> que aparecen dentro del texto deben seguir siendo inline;
+   con display:flex se salían a su propia línea. */
+.guia-item > b:first-child {
   display: flex; align-items: center; gap: 8px;
   margin-bottom: 4px; color: var(--text);
 }
-.guia-item b svg { width: 17px; height: 17px; color: var(--brand); flex: none; }
+.guia-item > b:first-child svg { width: 17px; height: 17px; color: var(--brand); flex: none; }
+.guia-item span b { color: var(--brand-ink); }
+[data-theme="dark"] .guia-item span b { color: var(--brand); }
 .guia-item span {
   display: block; font-size: .88rem; color: var(--text-dim); line-height: 1.55;
 }
