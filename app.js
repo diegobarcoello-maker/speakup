@@ -3660,7 +3660,10 @@ const App = {
 
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
+        /* updateViaCache: 'none' obliga al navegador a pedir sw.js a la red
+           siempre. Sin esto se lo guardaba en su caché y la app tardaba
+           hasta diez minutos en enterarse de que había versión nueva. */
+        navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
           .then(reg => Actualizacion.init(reg))
           .catch(e => console.warn('No se pudo activar el modo sin conexión:', e));
       });
