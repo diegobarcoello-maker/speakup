@@ -136,6 +136,9 @@ const DEFAULT_STATE = {
     codigo: '',        // código de acceso del equipo
     model: 'claude-sonnet-5',
     dailyGoal: 50,
+    recordatorio: false,
+    recordatorioHora: '19:00',
+    sonido: true,
     voiceURI: ''
   }
 };
@@ -573,7 +576,8 @@ function render() {
     document.getElementById('nav').hidden = true;
     document.getElementById('topstats').hidden = true;
     // el engranaje debe funcionar también antes de empezar: ahí está el botón de instalar
-    root.innerHTML = '<div class="view">' + (V.tab === 'settings' ? viewSettingsPrevio() : viewOnboarding()) + '</div>';
+    root.innerHTML = '<div class="view">' +
+      (Test.activo ? viewTest() : V.tab === 'settings' ? viewSettingsPrevio() : viewOnboarding()) + '</div>';
     renderAsk();
     afterRender();
     return;
@@ -585,7 +589,8 @@ function render() {
   revisarMisiones();
 
   let html = '';
-  if (V.tab === 'home')            html = viewHome();
+  if (Test.activo)                 html = viewTest();
+  else if (V.tab === 'home')       html = viewHome();
   else if (V.tab === 'create')     html = viewCreate();
   else if (V.tab === 'lessons')    html = V.unit ? viewUnit() : viewLessons();
   else if (V.tab === 'vocab')      html = V.pack ? viewPack() : viewVocab();
@@ -681,7 +686,18 @@ function viewOnboarding() {
   return '<div class="onb">' +
     '<button class="back-link" data-act="onb-back">' + ic('left') + ' Atrás</button>' +
     '<h1>¿Desde dónde empezamos?</h1>' +
-    '<p class="muted">Elige con sinceridad. Siempre puedes cambiarlo después en Ajustes.</p>' +
+    '<p class="muted">Si no lo tienes claro, haz la prueba: son diez minutos y te ahorra empezar donde no toca.</p>' +
+
+    '<button class="tile" data-act="test-empezar" style="border-color:var(--brand)">' +
+      '<span class="tile-ico" style="background:var(--brand-soft)">' + ic('compass') + '</span>' +
+      '<span class="tile-body">' +
+        '<span class="tile-t">Hacer la prueba de nivel <span class="pill">recomendado</span></span>' +
+        '<span class="tile-d">24 preguntas de menos a más. Te dice exactamente dónde estás.</span>' +
+      '</span>' +
+      '<span class="tile-go">' + ic('right') + '</span>' +
+    '</button>' +
+
+    '<div class="level-head">O elígelo tú</div>' +
     '<div class="tile-list">' +
       LEVELS.map(l =>
         '<button class="tile" data-act="onb-level" data-level="' + l.id + '">' +
@@ -902,6 +918,145 @@ function graficaProgreso(dias) {
    archivos de audio que descargar.
    ============================================================ */
 
+/* ============================================================
+   RECORDATORIO DIARIO
+
+   Lo que decide si aprendes un idioma no es el contenido, es
+   la racha. Y una racha se protege con un aviso.
+
+   Aquí hay dos caminos, porque ninguno funciona en todas
+   partes:
+
+   1. Aviso del navegador. Funciona mientras el navegador
+      siga vivo, y en Android suele bastar. En iPhone, Apple
+      no permite avisos programados sin un servidor detrás,
+      así que ahí no es fiable y lo decimos claramente.
+
+   2. Evento de calendario. Se descarga un archivo .ics con
+      una cita diaria que se repite. Esto SÍ funciona en
+      cualquier teléfono, porque el aviso lo da el calendario
+      y no la app. Es el camino recomendado.
+   ============================================================ */
+
+const Recordatorio = {
+  timer: null,
+
+  hora()    { return S.settings.recordatorioHora || '19:00'; },
+  activo()  { return !!S.settings.recordatorio; },
+  soportado(){ return typeof Notification !== 'undefined'; },
+  permiso() { return Recordatorio.soportado() ? Notification.permission : 'unsupported'; },
+
+  async activar() {
+    if (!Recordatorio.soportado()) { render(); return false; }
+    let p = Notification.permission;
+    if (p === 'default') {
+      try { p = await Notification.requestPermission(); } catch (e) { p = 'denied'; }
+    }
+    if (p !== 'granted') {
+      toast('Tu navegador no dio permiso para avisarte', 'err');
+      render();
+      return false;
+    }
+    S.settings.recordatorio = true;
+    save();
+    Recordatorio.programar();
+    toast('Listo. Te avisaré a las ' + Recordatorio.hora());
+    render();
+    return true;
+  },
+
+  desactivar() {
+    S.settings.recordatorio = false;
+    save();
+    if (Recordatorio.timer) { clearTimeout(Recordatorio.timer); Recordatorio.timer = null; }
+    render();
+  },
+
+  /* Cuánto falta, en milisegundos, para la próxima vez que den esa hora */
+  faltan() {
+    const [h, m] = Recordatorio.hora().split(':').map(Number);
+    const ahora = new Date();
+    const objetivo = new Date();
+    objetivo.setHours(h, m, 0, 0);
+    if (objetivo <= ahora) objetivo.setDate(objetivo.getDate() + 1);
+    return objetivo - ahora;
+  },
+
+  programar() {
+    if (Recordatorio.timer) { clearTimeout(Recordatorio.timer); Recordatorio.timer = null; }
+    if (!Recordatorio.activo() || Recordatorio.permiso() !== 'granted') return;
+    const espera = Recordatorio.faltan();
+    // setTimeout se vuelve poco fiable con esperas enormes: lo troceamos
+    const tramo = Math.min(espera, 1000 * 60 * 60 * 6);
+    Recordatorio.timer = setTimeout(() => {
+      if (tramo < espera) { Recordatorio.programar(); return; }
+      Recordatorio.avisar();
+      Recordatorio.programar();
+    }, tramo);
+  },
+
+  avisar() {
+    if (!Recordatorio.activo() || Recordatorio.permiso() !== 'granted') return;
+    ensureDay();
+    if (S.dailyXp >= (S.settings.dailyGoal || 50)) return;   // ya cumpliste hoy: no molestamos
+    const texto = S.streak > 1
+      ? 'Llevas ' + S.streak + ' días seguidos. No la rompas hoy.'
+      : 'Diez minutos y la meta de hoy está hecha.';
+    try {
+      new Notification('SpeakUp · tu inglés de hoy', {
+        body: texto,
+        icon: 'icon-192.png',
+        badge: 'icon-192.png',
+        tag: 'speakup-diario'
+      });
+    } catch (e) {}
+  },
+
+  /* El camino que sí funciona en cualquier teléfono */
+  calendario() {
+    const [h, m] = Recordatorio.hora().split(':').map(Number);
+    const d = new Date();
+    d.setHours(h, m, 0, 0);
+    if (d <= new Date()) d.setDate(d.getDate() + 1);
+    const dos = n => String(n).padStart(2, '0');
+    const local = x => x.getFullYear() + dos(x.getMonth() + 1) + dos(x.getDate()) +
+                       'T' + dos(x.getHours()) + dos(x.getMinutes()) + '00';
+    const fin = new Date(d.getTime() + 10 * 60000);
+    const ics = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//SpeakUp//ES',
+      'CALSCALE:GREGORIAN',
+      'BEGIN:VEVENT',
+      'UID:speakup-' + Date.now() + '@speakup',
+      'DTSTAMP:' + local(new Date()),
+      'DTSTART:' + local(d),
+      'DTEND:' + local(fin),
+      'RRULE:FREQ=DAILY',
+      'SUMMARY:SpeakUp - 10 minutos de ingles',
+      'DESCRIPTION:Abre SpeakUp y toca Mis 10 minutos.\\nhttps://diegobarcoello-maker.github.io/speakup/',
+      'URL:https://diegobarcoello-maker.github.io/speakup/',
+      'BEGIN:VALARM',
+      'TRIGGER:-PT0M',
+      'ACTION:DISPLAY',
+      'DESCRIPTION:SpeakUp - 10 minutos de ingles',
+      'END:VALARM',
+      'END:VEVENT',
+      'END:VCALENDAR'
+    ].join('\r\n');
+
+    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'speakup-recordatorio.ics';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { a.remove(); URL.revokeObjectURL(url); }, 1000);
+    toast('Ábrelo y acepta: quedará en tu calendario todos los días');
+  }
+};
+
 const Sonido = {
   ctx: null,
   activo() { return S.settings.sonido !== false; },
@@ -996,6 +1151,151 @@ const PASOS_TOUR = [
     final: true
   }
 ];
+
+/* ============================================================
+   PRUEBA DE NIVEL
+
+   24 preguntas, seis por nivel, de menos a más. El resultado
+   no es un porcentaje: es dónde empezar. La regla es simple —
+   te colocamos en el nivel más alto donde acertaste al menos
+   cuatro de seis, sin saltarte ninguno por el camino.
+   ============================================================ */
+
+const Test = {
+  activo: false, i: 0, elegida: null, respuestas: [],
+
+  empezar() {
+    Test.activo = true; Test.i = 0; Test.elegida = null; Test.respuestas = [];
+    window.scrollTo(0, 0); render();
+  },
+  salir() { Test.activo = false; window.scrollTo(0, 0); render(); },
+
+  responder(i) {
+    if (Test.elegida !== null) return;
+    Test.elegida = i;
+    Test.respuestas.push(i === TEST_NIVEL[Test.i].a);
+    if (Sonido.activo()) (i === TEST_NIVEL[Test.i].a ? Sonido.avanzar() : Sonido.volver());
+    render();
+  },
+  siguiente() {
+    Test.i++; Test.elegida = null;
+    window.scrollTo(0, 0); render();
+  },
+
+  /* Aciertos por nivel */
+  marcador() {
+    const m = { A1: 0, A2: 0, B1: 0, B2: 0 };
+    TEST_NIVEL.forEach((q, i) => { if (Test.respuestas[i]) m[q.nivel]++; });
+    return m;
+  },
+  /* El nivel más alto superado sin dejarse ninguno atrás */
+  resultado() {
+    const m = Test.marcador();
+    let nivel = 'A1';
+    for (const id of ['A1', 'A2', 'B1', 'B2']) {
+      if (m[id] >= 4) nivel = id; else break;
+    }
+    return { nivel, marcador: m, total: Test.respuestas.filter(Boolean).length };
+  },
+
+  aplicar() {
+    const r = Test.resultado();
+    const lv = LEVELS.find(l => l.id === r.nivel);
+    if (lv) { S.xp = Math.max(S.xp, lv.xp); }
+    if (!S.hitos) S.hitos = {};
+    S.hitos.testHecho = r.nivel;
+    save();
+    Test.activo = false;
+    Sonido.final();
+    if (!S.onboarded) {
+      S.onboarded = true;
+      const campo = document.getElementById('onbname');
+      if (campo && campo.value.trim()) S.name = campo.value.trim();
+      save();
+    }
+    toast('Tu punto de partida es ' + r.nivel);
+    go('lessons');
+  }
+};
+
+function viewTest() {
+  /* Resultado */
+  if (Test.i >= TEST_NIVEL.length) {
+    const r = Test.resultado();
+    const lv = LEVELS.find(l => l.id === r.nivel);
+    const filas = ['A1', 'A2', 'B1', 'B2'].map(id => {
+      const n = r.marcador[id], ok = n >= 4;
+      return '<div class="nivel-fila">' +
+        '<b>' + id + '</b>' +
+        '<div class="bar bar-sm" style="flex:1"><span style="width:' + Math.round(n / 6 * 100) + '%' +
+          (ok ? ';background:var(--ok)' : '') + '"></span></div>' +
+        '<span class="tiny ' + (ok ? '' : 'muted') + '">' + n + '/6</span>' +
+      '</div>';
+    }).join('');
+
+    return '<div class="card center">' +
+      '<div style="color:var(--brand)">' + ic('compass', 'ic-lg') + '</div>' +
+      '<p class="small muted" style="margin:10px 0 2px">Tu punto de partida</p>' +
+      '<div class="big-score">' + esc(r.nivel) + '</div>' +
+      '<p class="small">' + esc(lv ? lv.desc : '') + '</p>' +
+      '<p class="tiny muted">' + r.total + ' de ' + TEST_NIVEL.length + ' correctas</p>' +
+    '</div>' +
+
+    '<div class="card">' +
+      '<div class="card-title"><h3>Cómo te fue en cada nivel</h3></div>' +
+      filas +
+      '<p class="tiny muted" style="margin:12px 0 0">Te colocamos en el nivel más alto donde acertaste al menos 4 de 6, sin saltarte ninguno. ' +
+        'Si un nivel te falló, empezar ahí es lo que te conviene aunque el siguiente te saliera bien.</p>' +
+    '</div>' +
+
+    '<button class="btn btn-primary btn-block" data-act="test-aplicar">Empezar en ' + esc(r.nivel) + ' ' + ic('right') + '</button>' +
+    '<button class="btn btn-ghost btn-block" data-act="test-salir">Dejarlo como está</button>' +
+    '<div style="height:20px"></div>';
+  }
+
+  /* Pregunta */
+  const q = TEST_NIVEL[Test.i];
+  const resp = Test.elegida !== null;
+  return '<button class="back-link" data-act="test-salir">' + ic('left') + ' Salir de la prueba</button>' +
+    '<div class="exhead">' +
+      '<span class="small muted">' + (Test.i + 1) + ' de ' + TEST_NIVEL.length + '</span>' +
+      '<div class="bar bar-sm"><span style="width:' + Math.round(Test.i / TEST_NIVEL.length * 100) + '%"></span></div>' +
+    '</div>' +
+    '<div class="card">' +
+      '<p class="small muted" style="margin-bottom:4px">Elige la opción correcta</p>' +
+      '<h2 style="margin-bottom:16px">' + esc(q.q) + '</h2>' +
+      '<div class="opts">' +
+        q.opts.map((o, i) => {
+          let cls = 'opt';
+          if (resp) { if (i === q.a) cls += ' ok'; else if (i === Test.elegida) cls += ' bad'; }
+          return '<button class="' + cls + '"' + (resp ? ' disabled' : '') +
+            ' data-act="test-responder" data-i="' + i + '">' + esc(o) + '</button>';
+        }).join('') +
+      '</div>' +
+      (resp
+        ? '<div class="notice" style="margin-top:14px"><b>' +
+            (Test.elegida === q.a ? ic('check') + ' Correcto' : ic('x') + ' Era: ' + esc(q.opts[q.a])) + '</b>' +
+            esc(q.why) + '</div>' +
+          '<button class="btn btn-primary btn-block" data-act="test-siguiente" data-autofocus>' +
+            (Test.i === TEST_NIVEL.length - 1 ? 'Ver mi nivel' : 'Siguiente') + ' ' + ic('right') + '</button>'
+        : '') +
+    '</div>' +
+    '<p class="tiny muted center">Si no la sabes, no pasa nada: eso también es información.</p>';
+}
+
+function cardTest() {
+  const hecho = S.hitos && S.hitos.testHecho;
+  return '<button class="tile" data-act="test-empezar"' + (hecho ? '' : ' style="border-color:var(--brand)"') + '>' +
+    '<span class="tile-ico"' + (hecho ? '' : ' style="background:var(--brand-soft)"') + '>' + ic('compass') + '</span>' +
+    '<span class="tile-body">' +
+      '<span class="tile-t">Prueba de nivel' + (hecho ? ' <span class="pill">' + esc(hecho) + '</span>' : '') + '</span>' +
+      '<span class="tile-d">' + (hecho
+        ? 'Ya la hiciste. Puedes repetirla cuando sientas que has avanzado.'
+        : '24 preguntas, unos diez minutos. Para no empezar donde no toca.') + '</span>' +
+    '</span>' +
+    '<span class="tile-go">' + ic('right') + '</span>' +
+  '</button>';
+}
 
 const Tour = {
   abierto: false,
@@ -2932,6 +3232,8 @@ function viewGuia() {
     '<span class="tile-go">' + ic('right') + '</span>' +
   '</button>' +
 
+  cardTest() +
+
   (listo
     ? '<div class="card" style="border-color:var(--ok)">' +
         '<div class="card-title" style="color:var(--ok)">' + ic('check') + '<h3>Primeros pasos completados</h3></div>' +
@@ -3064,6 +3366,34 @@ function viewSettings() {
   '<button class="btn btn-primary btn-block" data-act="save-settings">Guardar cambios</button>' +
 
   '<div class="card" style="margin-top:14px">' +
+    '<div class="card-title">' +
+      '<span style="color:' + (Recordatorio.activo() ? 'var(--ok)' : 'var(--text-dim)') + '">' +
+        ic(Recordatorio.activo() ? 'check' : 'flame') + '</span>' +
+      '<h3>Recordatorio diario</h3>' +
+      (Recordatorio.activo() ? '<span class="pill" style="margin-left:auto;background:var(--ok-soft);color:var(--ok)">activo</span>' : '') +
+    '</div>' +
+    '<p class="small muted" style="margin-top:-4px">Lo que decide si aprendes inglés no es el contenido: es la racha. Un aviso a la misma hora todos los días es lo que la sostiene.</p>' +
+
+    '<div class="field"><label for="setrec">Hora del aviso</label>' +
+      '<input type="time" id="setrec" value="' + esc(Recordatorio.hora()) + '">' +
+      '<div class="hint">Se guarda con el botón de arriba. No te avisará si ya cumpliste la meta del día.</div></div>' +
+
+    (Recordatorio.soportado()
+      ? (Recordatorio.activo()
+          ? '<div class="btn-row">' +
+              '<button class="btn btn-ghost btn-sm" data-act="rec-probar">' + ic('bolt') + ' Probar el aviso</button>' +
+              '<button class="btn btn-ghost btn-sm" data-act="rec-apagar" style="color:var(--err)">Desactivar</button>' +
+            '</div>'
+          : '<button class="btn btn-soft btn-block btn-sm" data-act="rec-activar">' + ic('flame') + ' Activar el aviso del navegador</button>')
+      : '<div class="notice"><b>' + ic('lock') + ' Este navegador no permite avisos</b>Usa la opción del calendario, que funciona igual.</div>') +
+
+    '<div class="notice" style="margin-top:12px"><b>' + ic('bulb') + ' Lo más fiable: tu calendario</b>' +
+      'El aviso del navegador solo llega si el navegador sigue vivo, y en iPhone no es de fiar. ' +
+      'Con el botón de abajo te descargas una cita diaria: el aviso lo da tu propio teléfono y no falla nunca.</div>' +
+    '<button class="btn btn-ghost btn-block btn-sm" data-act="rec-calendario">' + ic('download') + ' Añadirlo a mi calendario</button>' +
+  '</div>' +
+
+  '<div class="card" style="margin-top:14px">' +
     '<div class="card-title"><h3>Copia de seguridad</h3></div>' +
     '<p class="small muted">Tu progreso vive solo en este navegador. Exporta un archivo e impórtalo en tu teléfono o en otro equipo para seguir donde ibas.</p>' +
     '<div class="btn-row">' +
@@ -3166,6 +3496,22 @@ document.addEventListener('click', async (e) => {
   }
 
   /* --- lecciones --- */
+  if (act === 'test-empezar')   { Test.empezar(); return; }
+  if (act === 'test-salir')     { Test.salir(); return; }
+  if (act === 'test-responder') { Test.responder(Number(t.dataset.i)); return; }
+  if (act === 'test-siguiente') { Test.siguiente(); return; }
+  if (act === 'test-aplicar')   { Test.aplicar(); return; }
+
+  if (act === 'rec-activar')  { Recordatorio.activar(); return; }
+  if (act === 'rec-apagar')   { Recordatorio.desactivar(); return; }
+  if (act === 'rec-calendario') { Recordatorio.calendario(); return; }
+  if (act === 'rec-probar')   {
+    if (Recordatorio.permiso() !== 'granted') { toast('Primero activa el aviso'); return; }
+    try { new Notification('SpeakUp', { body: 'Así te avisaré cada día a las ' + Recordatorio.hora() + '.', icon: 'icon-192.png' }); }
+    catch (e) { toast('Tu navegador bloqueó el aviso', 'err'); }
+    return;
+  }
+
   if (act === 'tour-abrir')     { Tour.abrir(); return; }
   if (act === 'tour-cerrar')    { Tour.cerrar(); return; }
   if (act === 'tour-siguiente') { Tour.siguiente(); return; }
@@ -3629,6 +3975,8 @@ document.addEventListener('click', async (e) => {
     S.settings.proxyUrl = (g('setproxy') || '').trim();
     S.settings.model = g('setmodel') || 'claude-sonnet-5';
     S.settings.theme = g('settheme') || 'auto';
+    const hr = g('setrec');
+    if (hr) { S.settings.recordatorioHora = hr; Recordatorio.programar(); }
     const lv = LEVELS.find(l => l.id === g('setlevel'));
     if (lv && lv.id !== currentLevel().id) S.xp = lv.xp;
     save(); applyTheme(); render();
@@ -4139,6 +4487,7 @@ function boot() {
   App.init();
   vigilarTeclado();
   vigilarTour();
+  Recordatorio.programar();
   ensureDay();
   applyTheme();
   try {

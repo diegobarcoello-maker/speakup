@@ -1189,3 +1189,11 @@ body.con-tour { overflow: hidden; }
 @media (min-width: 1024px) {
   .tour-card { max-width: 460px; padding: 34px 30px 22px; }
 }
+
+/* Resultado de la prueba de nivel */
+.nivel-fila {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 0;
+}
+.nivel-fila b { width: 26px; flex: none; font-size: .9rem; }
+.nivel-fila .tiny { width: 30px; text-align: right; flex: none; }

@@ -4005,6 +4005,499 @@ const DIALOGUES = [
     { q: '¿Qué pregunta él al reclutador?', opts: ['Cuánto paga el puesto', 'Cómo se vería el éxito en seis meses', 'Cuándo empieza'], a: 1, why: 'Es una pregunta excelente: demuestra que piensa en resultados, no en condiciones.' }
   ],
   dictation: 9
+},
+{
+  id: "dlg-11", level: "A1", title: "Pedir en un restaurante",
+  context: "Estás cenando fuera. El mesero se acerca a tomar tu pedido.",
+  speakers: { A: "Mesero", B: "Tú" },
+  lines: [
+    { who: "A", en: "Good evening. Are you ready to order?", es: "Buenas noches. ¿Está listo para pedir?" },
+    { who: "B", en: "Yes, please. What do you recommend?", es: "Sí, por favor. ¿Qué me recomienda?" },
+    { who: "A", en: "The grilled chicken is very good tonight.", es: "El pollo a la plancha está muy bueno esta noche." },
+    { who: "B", en: "I will have that. Does it come with rice?", es: "Voy a pedir eso. ¿Viene con arroz?" },
+    { who: "A", en: "Yes, with rice and salad. Anything to drink?", es: "Sí, con arroz y ensalada. ¿Algo de beber?" },
+    { who: "B", en: "Just water, please. No ice.", es: "Solo agua, por favor. Sin hielo." },
+    { who: "A", en: "Perfect. It will be about fifteen minutes.", es: "Perfecto. Serán unos quince minutos." },
+    { who: "B", en: "That is fine. Thank you.", es: "Está bien. Gracias." }
+  ],
+  questions: [
+    { q: "¿Qué le recomienda el mesero?", opts: ["Pescado", "Pollo a la plancha", "Ensalada"], a: 1,
+      why: "Dice \"The grilled chicken is very good tonight\". Grilled = a la plancha." },
+    { q: "¿Qué pide de beber?", opts: ["Agua sin hielo", "Una cerveza", "Jugo"], a: 0,
+      why: "\"Just water, please. No ice.\" Just = solo." },
+    { q: "¿Cuánto va a tardar?", opts: ["Cinco minutos", "Quince minutos", "Media hora"], a: 1,
+      why: "\"About fifteen minutes\". About = aproximadamente." }
+  ],
+  dictation: 4
+},
+{
+  id: "dlg-12", level: "A1", title: "En la farmacia",
+  context: "Te duele la cabeza y entras a una farmacia.",
+  speakers: { A: "Farmacéutica", B: "Tú" },
+  lines: [
+    { who: "A", en: "Hello. How can I help you?", es: "Hola. ¿En qué puedo ayudarle?" },
+    { who: "B", en: "I have a headache. Do you have something for it?", es: "Tengo dolor de cabeza. ¿Tiene algo para eso?" },
+    { who: "A", en: "Yes. Do you have any allergies?", es: "Sí. ¿Tiene alguna alergia?" },
+    { who: "B", en: "No, I do not think so.", es: "No, creo que no." },
+    { who: "A", en: "Take one of these every eight hours.", es: "Tome una de estas cada ocho horas." },
+    { who: "B", en: "With food or without food?", es: "¿Con comida o sin comida?" },
+    { who: "A", en: "With food is better. That is four dollars.", es: "Con comida es mejor. Son cuatro dólares." },
+    { who: "B", en: "Here you are. Thank you very much.", es: "Aquí tiene. Muchas gracias." }
+  ],
+  questions: [
+    { q: "¿Qué le duele?", opts: ["El estómago", "La cabeza", "La garganta"], a: 1,
+      why: "\"I have a headache\". Head = cabeza, ache = dolor." },
+    { q: "¿Cada cuánto debe tomarla?", opts: ["Cada ocho horas", "Cada cuatro horas", "Una vez al día"], a: 0,
+      why: "\"Every eight hours\". Fíjate en el número, que es lo que suele perderse." },
+    { q: "¿Cuánto cuesta?", opts: ["Cuatro dólares", "Catorce dólares", "Cuarenta dólares"], a: 0,
+      why: "\"Four dollars\". Cuidado: four (4), fourteen (14) y forty (40) suenan parecido." }
+  ],
+  dictation: 4
+},
+{
+  id: "dlg-13", level: "A1", title: "Un taxi al aeropuerto",
+  context: "Sales del hotel y tomas un taxi.",
+  speakers: { A: "Taxista", B: "Tú" },
+  lines: [
+    { who: "A", en: "Good morning. Where to?", es: "Buenos días. ¿A dónde?" },
+    { who: "B", en: "To the airport, please. Terminal two.", es: "Al aeropuerto, por favor. Terminal dos." },
+    { who: "A", en: "No problem. Do you have a flight soon?", es: "Sin problema. ¿Tiene un vuelo pronto?" },
+    { who: "B", en: "Yes, at eleven. Are we going to make it?", es: "Sí, a las once. ¿Vamos a llegar?" },
+    { who: "A", en: "Easily. It takes about thirty minutes.", es: "De sobra. Toma unos treinta minutos." },
+    { who: "B", en: "Good. How much is it, more or less?", es: "Bien. ¿Cuánto es, más o menos?" },
+    { who: "A", en: "Around twenty-five dollars.", es: "Alrededor de veinticinco dólares." },
+    { who: "B", en: "Can I pay by card?", es: "¿Puedo pagar con tarjeta?" },
+    { who: "A", en: "Of course. No problem at all.", es: "Por supuesto. Ningún problema." }
+  ],
+  questions: [
+    { q: "¿A qué terminal va?", opts: ["Terminal uno", "Terminal dos", "Terminal tres"], a: 1,
+      why: "\"Terminal two\". Los números de terminal y puerta son un clásico de examen." },
+    { q: "¿A qué hora es su vuelo?", opts: ["A las once", "A las once y media", "A la una"], a: 0,
+      why: "\"At eleven\". Eleven (11) suena distinto a seven (7); presta atención al inicio." },
+    { q: "¿Cómo va a pagar?", opts: ["En efectivo", "Con tarjeta", "No se dice"], a: 1,
+      why: "Pregunta \"Can I pay by card?\" y le dicen que sí." }
+  ],
+  dictation: 4
+},
+{
+  id: "dlg-14", level: "A1", title: "Presentarte a un vecino nuevo",
+  context: "Te acabas de mudar y te encuentras al vecino en el pasillo.",
+  speakers: { A: "Vecino", B: "Tú" },
+  lines: [
+    { who: "A", en: "Hi. Are you the new neighbor?", es: "Hola. ¿Eres el vecino nuevo?" },
+    { who: "B", en: "Yes, I am. I moved in on Saturday.", es: "Sí. Me mudé el sábado." },
+    { who: "A", en: "Welcome. I am Tom, from apartment five.", es: "Bienvenido. Soy Tom, del departamento cinco." },
+    { who: "B", en: "Nice to meet you, Tom. I am Diego.", es: "Encantado, Tom. Soy Diego." },
+    { who: "A", en: "Where are you from, Diego?", es: "¿De dónde eres, Diego?" },
+    { who: "B", en: "From Ecuador. I work in sales here.", es: "De Ecuador. Trabajo en ventas aquí." },
+    { who: "A", en: "Nice. If you need anything, just knock.", es: "Qué bien. Si necesitas algo, solo toca." },
+    { who: "B", en: "Thank you. That is very kind.", es: "Gracias. Muy amable." }
+  ],
+  questions: [
+    { q: "¿Cuándo se mudó?", opts: ["El viernes", "El sábado", "El domingo"], a: 1,
+      why: "\"I moved in on Saturday\". Los días de la semana caen mucho en escucha." },
+    { q: "¿En qué departamento vive Tom?", opts: ["El tres", "El cinco", "El nueve"], a: 1,
+      why: "\"I am Tom, from apartment five\"." },
+    { q: "¿En qué trabaja Diego?", opts: ["En ventas", "En un banco", "Es ingeniero"], a: 0,
+      why: "\"I work in sales here\"." }
+  ],
+  dictation: 4
+},
+{
+  id: "dlg-15", level: "A2", title: "Cita con el médico",
+  context: "Llevas tres días con fiebre y vas al médico.",
+  speakers: { A: "Doctora", B: "Tú" },
+  lines: [
+    { who: "A", en: "Good morning. What brings you in today?", es: "Buenos días. ¿Qué lo trae por aquí hoy?" },
+    { who: "B", en: "I have had a fever since Monday.", es: "Tengo fiebre desde el lunes." },
+    { who: "A", en: "Any other symptoms? Cough, sore throat?", es: "¿Algún otro síntoma? ¿Tos, dolor de garganta?" },
+    { who: "B", en: "A little cough, and I feel very tired.", es: "Un poco de tos, y me siento muy cansado." },
+    { who: "A", en: "Have you taken anything for it?", es: "¿Ha tomado algo para eso?" },
+    { who: "B", en: "Only paracetamol, twice a day.", es: "Solo paracetamol, dos veces al día." },
+    { who: "A", en: "It looks like a virus. Rest and drink water.", es: "Parece un virus. Descanse y tome agua." },
+    { who: "B", en: "Should I stay home from work?", es: "¿Debería quedarme en casa sin ir al trabajo?" },
+    { who: "A", en: "Yes, for two or three days. Come back if it gets worse.", es: "Sí, dos o tres días. Vuelva si empeora." },
+    { who: "B", en: "Understood. Thank you, doctor.", es: "Entendido. Gracias, doctora." }
+  ],
+  questions: [
+    { q: "¿Desde cuándo tiene fiebre?", opts: ["Desde el lunes", "Desde el miércoles", "Desde ayer"], a: 0,
+      why: "\"Since Monday\". \"Since\" marca el punto de inicio: desde." },
+    { q: "¿Qué ha tomado?", opts: ["Nada", "Paracetamol", "Antibióticos"], a: 1,
+      why: "\"Only paracetamol, twice a day\"." },
+    { q: "¿Qué le recomienda la doctora?", opts: ["Descansar y tomar agua", "Hacer ejercicio", "Ir al hospital"], a: 0,
+      why: "\"Rest and drink water\"." },
+    { q: "¿Cuántos días debe faltar al trabajo?", opts: ["Uno", "Dos o tres", "Una semana"], a: 1,
+      why: "\"For two or three days\"." }
+  ],
+  dictation: 5
+},
+{
+  id: "dlg-16", level: "A2", title: "Check-in en el hotel",
+  context: "Llegas al hotel después de un vuelo largo.",
+  speakers: { A: "Recepcionista", B: "Tú" },
+  lines: [
+    { who: "A", en: "Good evening. Do you have a reservation?", es: "Buenas noches. ¿Tiene reserva?" },
+    { who: "B", en: "Yes, under the name Barros. Three nights.", es: "Sí, a nombre de Barros. Tres noches." },
+    { who: "A", en: "Let me check. Yes, a single room, non-smoking.", es: "Déjeme revisar. Sí, habitación simple, para no fumadores." },
+    { who: "B", en: "That is right. Is breakfast included?", es: "Correcto. ¿Está incluido el desayuno?" },
+    { who: "A", en: "It is, from six thirty to ten.", es: "Lo está, de seis y media a diez." },
+    { who: "B", en: "And what time is check out?", es: "¿Y a qué hora es la salida?" },
+    { who: "A", en: "Noon. You can leave your bags here after that.", es: "Al mediodía. Puede dejar sus maletas aquí después." },
+    { who: "B", en: "Perfect. Is there wifi in the room?", es: "Perfecto. ¿Hay wifi en la habitación?" },
+    { who: "A", en: "Yes, the password is on your key card.", es: "Sí, la clave está en su tarjeta llave." },
+    { who: "B", en: "Great. Thank you very much.", es: "Genial. Muchas gracias." }
+  ],
+  questions: [
+    { q: "¿Cuántas noches se queda?", opts: ["Dos", "Tres", "Cuatro"], a: 1,
+      why: "\"Three nights\"." },
+    { q: "¿A qué hora empieza el desayuno?", opts: ["A las seis", "A las seis y media", "A las siete"], a: 1,
+      why: "\"From six thirty to ten\". Six thirty = 6:30." },
+    { q: "¿A qué hora es la salida?", opts: ["A las diez", "Al mediodía", "A las dos"], a: 1,
+      why: "\"Noon\" = mediodía. Es una palabra que se pierde si no la conoces." },
+    { q: "¿Dónde está la clave del wifi?", opts: ["En la puerta", "En la tarjeta llave", "La dice el recepcionista"], a: 1,
+      why: "\"The password is on your key card\"." }
+  ],
+  dictation: 5
+},
+{
+  id: "dlg-17", level: "A2", title: "En el banco",
+  context: "Vas a abrir una cuenta durante un viaje largo de trabajo.",
+  speakers: { A: "Empleado", B: "Tú" },
+  lines: [
+    { who: "A", en: "Good morning. How can I help you today?", es: "Buenos días. ¿En qué le ayudo hoy?" },
+    { who: "B", en: "I would like to open an account.", es: "Me gustaría abrir una cuenta." },
+    { who: "A", en: "Sure. Do you have your passport with you?", es: "Claro. ¿Trae su pasaporte?" },
+    { who: "B", en: "Yes, here it is. Do I need anything else?", es: "Sí, aquí está. ¿Necesito algo más?" },
+    { who: "A", en: "A proof of address. A utility bill works.", es: "Un comprobante de domicilio. Una factura de servicios sirve." },
+    { who: "B", en: "I have one on my phone. Is that all right?", es: "Tengo una en el teléfono. ¿Está bien así?" },
+    { who: "A", en: "That is fine. Is there a minimum deposit?", es: "Está bien. ¿Le explico el depósito mínimo?" },
+    { who: "B", en: "Yes, please. How much is it?", es: "Sí, por favor. ¿De cuánto es?" },
+    { who: "A", en: "One hundred dollars, and no monthly fee.", es: "Cien dólares, y sin cargo mensual." },
+    { who: "B", en: "That works for me. Let us do it.", es: "Eso me sirve. Hagámoslo." }
+  ],
+  questions: [
+    { q: "¿Qué quiere hacer el cliente?", opts: ["Pedir un préstamo", "Abrir una cuenta", "Cambiar dinero"], a: 1,
+      why: "\"I would like to open an account\"." },
+    { q: "¿Qué documentos necesita?", opts: ["Solo el pasaporte", "Pasaporte y comprobante de domicilio", "Solo el comprobante"], a: 1,
+      why: "Pide el pasaporte y luego \"a proof of address\"." },
+    { q: "¿Cuál es el depósito mínimo?", opts: ["Cien dólares", "Ciento cincuenta", "Mil dólares"], a: 0,
+      why: "\"One hundred dollars\"." },
+    { q: "¿Hay cargo mensual?", opts: ["Sí", "No", "No se dice"], a: 1,
+      why: "\"and no monthly fee\". Fee = cargo o tarifa." }
+  ],
+  dictation: 5
+},
+{
+  id: "dlg-18", level: "A2", title: "Un problema con el pedido",
+  context: "Un cliente llama porque llegó menos mercadería de la que pidió.",
+  speakers: { A: "Cliente", B: "Tú" },
+  lines: [
+    { who: "A", en: "Hi, I am calling about order 4127.", es: "Hola, llamo por el pedido 4127." },
+    { who: "B", en: "Of course. What seems to be the problem?", es: "Por supuesto. ¿Cuál parece ser el problema?" },
+    { who: "A", en: "We ordered fifty units and only forty arrived.", es: "Pedimos cincuenta unidades y solo llegaron cuarenta." },
+    { who: "B", en: "I am sorry about that. Let me check the packing list.", es: "Lamento eso. Déjeme revisar la lista de empaque." },
+    { who: "A", en: "The driver said the rest was coming later.", es: "El conductor dijo que el resto venía después." },
+    { who: "B", en: "You are right. Ten units ship on Thursday.", es: "Tiene razón. Diez unidades salen el jueves." },
+    { who: "A", en: "Why were we not told before?", es: "¿Por qué no nos avisaron antes?" },
+    { who: "B", en: "That was our mistake. I will confirm it by email today.", es: "Ese fue nuestro error. Lo confirmo por correo hoy." },
+    { who: "A", en: "Please do. We need them by Friday.", es: "Por favor hágalo. Los necesitamos para el viernes." },
+    { who: "B", en: "Understood. You will have them Friday morning.", es: "Entendido. Los tendrá el viernes en la mañana." }
+  ],
+  questions: [
+    { q: "¿Cuántas unidades pidieron?", opts: ["Cuarenta", "Cincuenta", "Sesenta"], a: 1,
+      why: "\"We ordered fifty units\". Fifty (50) y fifteen (15) se confunden: el acento cambia." },
+    { q: "¿Cuántas llegaron?", opts: ["Cuarenta", "Cincuenta", "Treinta"], a: 0,
+      why: "\"only forty arrived\"." },
+    { q: "¿Cuándo salen las que faltan?", opts: ["El miércoles", "El jueves", "El viernes"], a: 1,
+      why: "\"Ten units ship on Thursday\"." },
+    { q: "¿Qué se compromete a hacer el vendedor?", opts: ["Devolver el dinero", "Confirmarlo por correo hoy", "Llamar mañana"], a: 1,
+      why: "\"I will confirm it by email today\"." }
+  ],
+  dictation: 5
+},
+{
+  id: "dlg-19", level: "A2", title: "Quedar con un compañero",
+  context: "Un compañero de trabajo te propone almorzar.",
+  speakers: { A: "Compañera", B: "Tú" },
+  lines: [
+    { who: "A", en: "Are you free for lunch today?", es: "¿Estás libre para almorzar hoy?" },
+    { who: "B", en: "I think so. What time were you thinking?", es: "Creo que sí. ¿A qué hora pensabas?" },
+    { who: "A", en: "Around one. I have a call until then.", es: "Cerca de la una. Tengo una llamada hasta esa hora." },
+    { who: "B", en: "One works. Where do you want to go?", es: "La una me sirve. ¿Dónde quieres ir?" },
+    { who: "A", en: "There is a new place across the street.", es: "Hay un lugar nuevo al otro lado de la calle." },
+    { who: "B", en: "I have not tried it. Is it expensive?", es: "No lo he probado. ¿Es caro?" },
+    { who: "A", en: "Not really. About ten dollars for lunch.", es: "No mucho. Unos diez dólares el almuerzo." },
+    { who: "B", en: "Sounds good. See you at the entrance.", es: "Suena bien. Nos vemos en la entrada." }
+  ],
+  questions: [
+    { q: "¿A qué hora quedan?", opts: ["A las doce", "A la una", "A las dos"], a: 1,
+      why: "\"Around one\"." },
+    { q: "¿Por qué no puede antes?", opts: ["Tiene una reunión", "Tiene una llamada", "Está de viaje"], a: 1,
+      why: "\"I have a call until then\"." },
+    { q: "¿Dónde está el restaurante?", opts: ["Al otro lado de la calle", "En el edificio", "A diez minutos"], a: 0,
+      why: "\"Across the street\" = al otro lado de la calle." }
+  ],
+  dictation: 4
+},
+{
+  id: "dlg-20", level: "B1", title: "Reclamo por un cobro",
+  context: "Revisas la factura y hay un cargo que no reconoces.",
+  speakers: { A: "Atención al cliente", B: "Tú" },
+  lines: [
+    { who: "A", en: "Thank you for calling. How can I help?", es: "Gracias por llamar. ¿En qué le ayudo?" },
+    { who: "B", en: "There is a charge on my invoice I do not recognize.", es: "Hay un cargo en mi factura que no reconozco." },
+    { who: "A", en: "Could you give me the invoice number?", es: "¿Me da el número de factura?" },
+    { who: "B", en: "It is 8890. The charge is eighty dollars.", es: "Es 8890. El cargo es de ochenta dólares." },
+    { who: "A", en: "I see it. That is an express shipping fee.", es: "Lo veo. Es un cargo por envío urgente." },
+    { who: "B", en: "We never asked for express shipping.", es: "Nunca pedimos envío urgente." },
+    { who: "A", en: "Let me look at the order... You are right, it was applied by mistake.", es: "Déjeme mirar el pedido... Tiene razón, se aplicó por error." },
+    { who: "B", en: "So can you remove it?", es: "¿Entonces lo puede quitar?" },
+    { who: "A", en: "I will issue a credit note today. It will show up in two business days.", es: "Emitiré una nota de crédito hoy. Aparecerá en dos días hábiles." },
+    { who: "B", en: "Thank you. Could you send me written confirmation?", es: "Gracias. ¿Me puede enviar confirmación por escrito?" },
+    { who: "A", en: "Of course. Check your email within the hour.", es: "Por supuesto. Revise su correo dentro de una hora." }
+  ],
+  questions: [
+    { q: "¿Cuál es el número de factura?", opts: ["8890", "8980", "8908"], a: 0,
+      why: "\"It is 8890\". Los números largos se dicen dígito a dígito." },
+    { q: "¿De qué era el cargo?", opts: ["Impuestos", "Envío urgente", "Seguro"], a: 1,
+      why: "\"That is an express shipping fee\"." },
+    { q: "¿Qué va a hacer la empresa?", opts: ["Devolver el pedido", "Emitir una nota de crédito", "Nada"], a: 1,
+      why: "\"I will issue a credit note today\"." },
+    { q: "¿En cuánto tiempo se refleja?", opts: ["Hoy mismo", "Dos días hábiles", "Una semana"], a: 1,
+      why: "\"In two business days\". Business days = días hábiles, no naturales." }
+  ],
+  dictation: 5
+},
+{
+  id: "dlg-21", level: "B1", title: "En la aduana",
+  context: "Llegas a otro país con muestras de producto.",
+  speakers: { A: "Oficial de aduanas", B: "Tú" },
+  lines: [
+    { who: "A", en: "Passport, please. What is the purpose of your visit?", es: "Pasaporte, por favor. ¿Cuál es el motivo de su visita?" },
+    { who: "B", en: "Business. I am attending a trade fair.", es: "Negocios. Voy a una feria comercial." },
+    { who: "A", en: "How long will you be staying?", es: "¿Cuánto tiempo se va a quedar?" },
+    { who: "B", en: "Five days. I fly back on Sunday.", es: "Cinco días. Vuelo de regreso el domingo." },
+    { who: "A", en: "Do you have anything to declare?", es: "¿Tiene algo que declarar?" },
+    { who: "B", en: "Yes, I am carrying product samples.", es: "Sí, llevo muestras de producto." },
+    { who: "A", en: "What kind of samples, and what is their value?", es: "¿Qué tipo de muestras y cuál es su valor?" },
+    { who: "B", en: "Hardware fittings. About two hundred dollars.", es: "Accesorios de ferretería. Unos doscientos dólares." },
+    { who: "A", en: "Are they for sale?", es: "¿Son para vender?" },
+    { who: "B", en: "No, they are for display only. They go back with me.", es: "No, son solo para exhibición. Vuelven conmigo." },
+    { who: "A", en: "All right. Fill out this form and go to the green line.", es: "De acuerdo. Llene este formulario y vaya a la fila verde." }
+  ],
+  questions: [
+    { q: "¿Cuál es el motivo del viaje?", opts: ["Turismo", "Negocios", "Estudios"], a: 1,
+      why: "\"Business. I am attending a trade fair\"." },
+    { q: "¿Cuántos días se queda?", opts: ["Tres", "Cinco", "Siete"], a: 1,
+      why: "\"Five days. I fly back on Sunday\"." },
+    { q: "¿Qué lleva?", opts: ["Regalos", "Muestras de producto", "Nada"], a: 1,
+      why: "\"I am carrying product samples\"." },
+    { q: "¿Las va a vender?", opts: ["Sí", "No, son para exhibición", "No lo dice"], a: 1,
+      why: "\"They are for display only. They go back with me\"." }
+  ],
+  dictation: 5
+},
+{
+  id: "dlg-22", level: "B1", title: "Alquilar un carro",
+  context: "Necesitas un carro para visitar clientes en otra ciudad.",
+  speakers: { A: "Empleada", B: "Tú" },
+  lines: [
+    { who: "A", en: "Hello. Do you have a reservation with us?", es: "Hola. ¿Tiene reserva con nosotros?" },
+    { who: "B", en: "No, I do not. Do you have anything available?", es: "No. ¿Tiene algo disponible?" },
+    { who: "A", en: "We have a compact and a mid-size. For how long?", es: "Tenemos un compacto y uno mediano. ¿Por cuánto tiempo?" },
+    { who: "B", en: "Four days. Which one is cheaper?", es: "Cuatro días. ¿Cuál es más barato?" },
+    { who: "A", en: "The compact, at forty a day, plus insurance.", es: "El compacto, a cuarenta al día, más el seguro." },
+    { who: "B", en: "Is the insurance obligatory?", es: "¿El seguro es obligatorio?" },
+    { who: "A", en: "Basic coverage is. Full coverage is optional.", es: "La cobertura básica sí. La cobertura total es opcional." },
+    { who: "B", en: "I will take full coverage. I do not know the roads here.", es: "Voy a tomar la cobertura total. No conozco las vías de aquí." },
+    { who: "A", en: "Wise choice. Do you want to add a second driver?", es: "Buena elección. ¿Quiere añadir un segundo conductor?" },
+    { who: "B", en: "No, it is just me. What about the fuel policy?", es: "No, voy solo. ¿Y la política de combustible?" },
+    { who: "A", en: "Bring it back full, or we charge you for the difference.", es: "Devuélvalo lleno, o le cobramos la diferencia." }
+  ],
+  questions: [
+    { q: "¿Por cuántos días lo quiere?", opts: ["Tres", "Cuatro", "Cinco"], a: 1,
+      why: "\"Four days\"." },
+    { q: "¿Cuánto cuesta el compacto al día?", opts: ["Cuarenta", "Catorce", "Cuatro"], a: 0,
+      why: "\"At forty a day\". Ojo: forty (40) y fourteen (14)." },
+    { q: "¿Qué seguro elige?", opts: ["Solo el básico", "Cobertura total", "Ninguno"], a: 1,
+      why: "\"I will take full coverage\"." },
+    { q: "¿Cómo debe devolver el tanque?", opts: ["Vacío", "Lleno", "Como esté"], a: 1,
+      why: "\"Bring it back full\"." }
+  ],
+  dictation: 5
+},
+{
+  id: "dlg-23", level: "B1", title: "Una reunión que se complica",
+  context: "Presentas resultados y tu jefe cuestiona las cifras.",
+  speakers: { A: "Jefe", B: "Tú" },
+  lines: [
+    { who: "A", en: "These numbers are lower than last quarter. What happened?", es: "Estas cifras son más bajas que el trimestre pasado. ¿Qué pasó?" },
+    { who: "B", en: "Two of our biggest clients delayed their orders.", es: "Dos de nuestros clientes más grandes retrasaron sus pedidos." },
+    { who: "A", en: "Delayed, or cancelled?", es: "¿Retrasaron o cancelaron?" },
+    { who: "B", en: "Delayed. Both confirmed for next month.", es: "Retrasaron. Ambos confirmaron para el próximo mes." },
+    { who: "A", en: "Do you have that in writing?", es: "¿Lo tiene por escrito?" },
+    { who: "B", en: "Yes, I can forward the emails today.", es: "Sí, puedo reenviar los correos hoy." },
+    { who: "A", en: "Please do. And what are you doing about coverage?", es: "Por favor hágalo. ¿Y qué está haciendo con la cobertura?" },
+    { who: "B", en: "We added twelve new accounts in the south.", es: "Añadimos doce cuentas nuevas en el sur." },
+    { who: "A", en: "That is good, but they are small. It will not cover the gap.", es: "Eso está bien, pero son pequeñas. No va a cubrir la brecha." },
+    { who: "B", en: "I know. That is why I am proposing a volume discount for June.", es: "Lo sé. Por eso propongo un descuento por volumen para junio." },
+    { who: "A", en: "Send me the numbers before Friday and we will decide.", es: "Mándeme los números antes del viernes y decidimos." }
+  ],
+  questions: [
+    { q: "¿Qué pasó con los dos clientes grandes?", opts: ["Cancelaron", "Retrasaron sus pedidos", "Cambiaron de proveedor"], a: 1,
+      why: "\"Delayed. Both confirmed for next month\". Delay = retrasar, cancel = cancelar." },
+    { q: "¿Qué pide el jefe como prueba?", opts: ["Una llamada", "Tenerlo por escrito", "Nada"], a: 1,
+      why: "\"Do you have that in writing?\"" },
+    { q: "¿Cuántas cuentas nuevas añadieron?", opts: ["Dos", "Doce", "Veinte"], a: 1,
+      why: "\"We added twelve new accounts\". Twelve (12), no twenty (20)." },
+    { q: "¿Qué propone el vendedor?", opts: ["Bajar la meta", "Un descuento por volumen", "Contratar más gente"], a: 1,
+      why: "\"A volume discount for June\"." }
+  ],
+  dictation: 5
+},
+{
+  id: "dlg-24", level: "B1", title: "Charla informal en el ascensor",
+  context: "Te encuentras a un colega y hablan de cualquier cosa.",
+  speakers: { A: "Colega", B: "Tú" },
+  lines: [
+    { who: "A", en: "Morning. Terrible weather, isn't it?", es: "Buenos días. Un clima terrible, ¿no?" },
+    { who: "B", en: "It really is. It has been raining all week.", es: "De verdad que sí. Ha estado lloviendo toda la semana." },
+    { who: "A", en: "And they say it will get worse this weekend.", es: "Y dicen que va a empeorar este fin de semana." },
+    { who: "B", en: "That ruins my plans. I was going to the coast.", es: "Eso arruina mis planes. Iba a ir a la costa." },
+    { who: "A", en: "Oh, that is a shame. With family?", es: "Ay, qué pena. ¿Con la familia?" },
+    { who: "B", en: "Yes, my wife and the kids. We go every year.", es: "Sí, mi esposa y los niños. Vamos todos los años." },
+    { who: "A", en: "You could go next weekend instead.", es: "Podrías ir el fin de semana siguiente en su lugar." },
+    { who: "B", en: "Maybe. Let us see how it looks on Thursday.", es: "Tal vez. Veamos cómo se ve el jueves." },
+    { who: "A", en: "Well, this is my floor. Have a good one.", es: "Bueno, este es mi piso. Que te vaya bien." },
+    { who: "B", en: "You too. See you around.", es: "Igualmente. Nos vemos." }
+  ],
+  questions: [
+    { q: "¿Cuánto lleva lloviendo?", opts: ["Dos días", "Toda la semana", "Todo el mes"], a: 1,
+      why: "\"It has been raining all week\"." },
+    { q: "¿Qué planes tenía?", opts: ["Ir a la costa", "Quedarse en casa", "Viajar por trabajo"], a: 0,
+      why: "\"I was going to the coast\"." },
+    { q: "¿Con quién iba a ir?", opts: ["Solo", "Con su esposa y los niños", "Con colegas"], a: 1,
+      why: "\"My wife and the kids\"." },
+    { q: "¿Cuándo decidirá?", opts: ["El jueves", "El viernes", "El sábado"], a: 0,
+      why: "\"Let us see how it looks on Thursday\"." }
+  ],
+  dictation: 5
+},
+{
+  id: "dlg-25", level: "B2", title: "Negociar plazos de pago",
+  context: "El cliente quiere pagar a 60 días y tú trabajas a 30.",
+  speakers: { A: "Cliente", B: "Tú" },
+  lines: [
+    { who: "A", en: "We are interested, but your payment terms are tight for us.", es: "Estamos interesados, pero sus condiciones de pago nos quedan justas." },
+    { who: "B", en: "What terms would work on your side?", es: "¿Qué condiciones les funcionarían?" },
+    { who: "A", en: "Sixty days from invoice date.", es: "Sesenta días desde la fecha de factura." },
+    { who: "B", en: "That is double our standard. I would need something in return.", es: "Eso es el doble de lo estándar. Necesitaría algo a cambio." },
+    { who: "A", en: "Such as?", es: "¿Como qué?" },
+    { who: "B", en: "A committed annual volume, or a partial payment upfront.", es: "Un volumen anual comprometido, o un pago parcial por adelantado." },
+    { who: "A", en: "We could commit to a thousand units a year.", es: "Podríamos comprometernos a mil unidades al año." },
+    { who: "B", en: "With that volume, I can offer forty-five days.", es: "Con ese volumen, puedo ofrecer cuarenta y cinco días." },
+    { who: "A", en: "Forty-five is closer. Could you do fifty with a signed contract?", es: "Cuarenta y cinco está más cerca. ¿Podría hacer cincuenta con contrato firmado?" },
+    { who: "B", en: "If the contract is annual and binding, yes.", es: "Si el contrato es anual y vinculante, sí." },
+    { who: "A", en: "Then let us draw it up. Send me a draft this week.", es: "Entonces preparémoslo. Mándeme un borrador esta semana." }
+  ],
+  questions: [
+    { q: "¿Qué plazo pide el cliente?", opts: ["Treinta días", "Cuarenta y cinco", "Sesenta días"], a: 2,
+      why: "\"Sixty days from invoice date\"." },
+    { q: "¿Qué pide el vendedor a cambio?", opts: ["Nada", "Volumen comprometido o anticipo", "Un precio mayor"], a: 1,
+      why: "\"A committed annual volume, or a partial payment upfront\"." },
+    { q: "¿En qué plazo quedan?", opts: ["Cuarenta y cinco", "Cincuenta", "Sesenta"], a: 1,
+      why: "Acaban en cincuenta días, con contrato anual y vinculante." },
+    { q: "¿Qué condición pone el vendedor?", opts: ["Pago por adelantado", "Contrato anual y vinculante", "Nada"], a: 1,
+      why: "\"If the contract is annual and binding, yes\"." }
+  ],
+  dictation: 5
+},
+{
+  id: "dlg-26", level: "B2", title: "Entrevista de trabajo difícil",
+  context: "Te preguntan por un fracaso.",
+  speakers: { A: "Entrevistadora", B: "Tú" },
+  lines: [
+    { who: "A", en: "Tell me about a time something went wrong on your watch.", es: "Cuénteme de una vez en que algo salió mal bajo su responsabilidad." },
+    { who: "B", en: "Two years ago I lost our second largest account.", es: "Hace dos años perdí nuestra segunda cuenta más grande." },
+    { who: "A", en: "What happened, exactly?", es: "¿Qué pasó, exactamente?" },
+    { who: "B", en: "We had three late deliveries in a row. I found out too late.", es: "Tuvimos tres entregas tardías seguidas. Me enteré demasiado tarde." },
+    { who: "A", en: "Why did you find out late?", es: "¿Por qué se enteró tarde?" },
+    { who: "B", en: "I was relying on monthly reports instead of talking to the client.", es: "Me estaba apoyando en informes mensuales en vez de hablar con el cliente." },
+    { who: "A", en: "And what did you change afterwards?", es: "¿Y qué cambió después?" },
+    { who: "B", en: "I set up a call with every key account every two weeks. No exceptions.", es: "Establecí una llamada con cada cuenta clave cada dos semanas. Sin excepciones." },
+    { who: "A", en: "Did it make a difference?", es: "¿Marcó la diferencia?" },
+    { who: "B", en: "Yes. We have not lost a key account since, and two came back.", es: "Sí. No hemos perdido una cuenta clave desde entonces, y dos volvieron." },
+    { who: "A", en: "That is a good answer. Most people blame the client.", es: "Esa es una buena respuesta. La mayoría culpa al cliente." }
+  ],
+  questions: [
+    { q: "¿Qué salió mal?", opts: ["Perdió a un vendedor", "Perdió una cuenta grande", "Perdió dinero"], a: 1,
+      why: "\"I lost our second largest account\"." },
+    { q: "¿Cuál fue la causa de fondo?", opts: ["Precios altos", "No hablaba con el cliente", "Mala calidad"], a: 1,
+      why: "Se apoyaba en informes mensuales en vez de hablar directamente." },
+    { q: "¿Qué cambió después?", opts: ["Bajó los precios", "Llamadas cada dos semanas", "Cambió de proveedor"], a: 1,
+      why: "\"A call with every key account every two weeks\"." },
+    { q: "¿Qué resultado tuvo?", opts: ["Ninguno", "No perdió más cuentas y dos volvieron", "Perdió otra cuenta"], a: 1,
+      why: "\"We have not lost a key account since, and two came back\"." }
+  ],
+  dictation: 5
+},
+{
+  id: "dlg-27", level: "B2", title: "Explicar un retraso al cliente",
+  context: "Tienes que dar una mala noticia sin perder al cliente.",
+  speakers: { A: "Cliente", B: "Tú" },
+  lines: [
+    { who: "A", en: "I understand there is a problem with our shipment.", es: "Entiendo que hay un problema con nuestro envío." },
+    { who: "B", en: "There is, and I would rather tell you straight.", es: "Lo hay, y prefiero decírselo directo." },
+    { who: "A", en: "Go ahead.", es: "Adelante." },
+    { who: "B", en: "Our supplier had a fire at their plant. Production is down for three weeks.", es: "Nuestro proveedor tuvo un incendio en su planta. La producción está parada tres semanas." },
+    { who: "A", en: "Three weeks? We have customers waiting.", es: "¿Tres semanas? Tenemos clientes esperando." },
+    { who: "B", en: "I know. Here is what I can do: I have forty units in our own stock.", es: "Lo sé. Esto es lo que puedo hacer: tengo cuarenta unidades en nuestro propio inventario." },
+    { who: "A", en: "That covers about half of our order.", es: "Eso cubre cerca de la mitad de nuestro pedido." },
+    { who: "B", en: "Correct. I can ship those tomorrow at no extra freight cost.", es: "Correcto. Puedo enviar esas mañana sin costo de flete adicional." },
+    { who: "A", en: "And the rest?", es: "¿Y el resto?" },
+    { who: "B", en: "The rest in three to four weeks. I will update you every Friday.", es: "El resto en tres o cuatro semanas. Lo actualizo cada viernes." },
+    { who: "A", en: "I appreciate the honesty. Send the forty and keep me posted.", es: "Aprecio la honestidad. Mande las cuarenta y manténgame informado." }
+  ],
+  questions: [
+    { q: "¿Qué causó el retraso?", opts: ["Un incendio en la planta del proveedor", "Un problema de transporte", "Falta de pago"], a: 0,
+      why: "\"Our supplier had a fire at their plant\"." },
+    { q: "¿Cuántas unidades puede enviar ya?", opts: ["Veinte", "Cuarenta", "Cincuenta"], a: 1,
+      why: "\"I have forty units in our own stock\"." },
+    { q: "¿Quién paga el flete de esas unidades?", opts: ["El cliente", "El proveedor, sin costo extra", "A medias"], a: 1,
+      why: "\"At no extra freight cost\"." },
+    { q: "¿Cada cuánto informará?", opts: ["Cada día", "Cada viernes", "Al final"], a: 1,
+      why: "\"I will update you every Friday\"." }
+  ],
+  dictation: 5
+},
+{
+  id: "dlg-28", level: "B2", title: "Una discrepancia en la factura final",
+  context: "Cierre de año y los números no cuadran entre las dos empresas.",
+  speakers: { A: "Contadora del cliente", B: "Tú" },
+  lines: [
+    { who: "A", en: "Our records show a difference of twelve hundred dollars.", es: "Nuestros registros muestran una diferencia de mil doscientos dólares." },
+    { who: "B", en: "In whose favour?", es: "¿A favor de quién?" },
+    { who: "A", en: "Ours. We believe we were overcharged.", es: "Nuestro. Creemos que se nos cobró de más." },
+    { who: "B", en: "Let us go through it line by line. Which invoices are involved?", es: "Vayamos línea por línea. ¿Qué facturas están implicadas?" },
+    { who: "A", en: "Three from November, all with the express surcharge.", es: "Tres de noviembre, todas con el recargo urgente." },
+    { who: "B", en: "Those were expedited at your request, in writing.", es: "Esas se aceleraron a petición suya, por escrito." },
+    { who: "A", en: "Two of them, yes. The third we never requested.", es: "Dos de ellas, sí. La tercera nunca la pedimos." },
+    { who: "B", en: "Then that one is on us. That would be four hundred dollars.", es: "Entonces esa es nuestra. Serían cuatrocientos dólares." },
+    { who: "A", en: "And the remaining eight hundred?", es: "¿Y los ochocientos restantes?" },
+    { who: "B", en: "Those stand, and I can send you the written requests.", es: "Esos se mantienen, y le puedo enviar las solicitudes por escrito." },
+    { who: "A", en: "Fair enough. Issue a credit note for four hundred and we are settled.", es: "Me parece justo. Emita una nota de crédito por cuatrocientos y quedamos a mano." }
+  ],
+  questions: [
+    { q: "¿De cuánto es la discrepancia inicial?", opts: ["Mil doscientos", "Doscientos", "Dos mil"], a: 0,
+      why: "\"A difference of twelve hundred dollars\". Twelve hundred = 1.200." },
+    { q: "¿Cuántas facturas están implicadas?", opts: ["Dos", "Tres", "Cuatro"], a: 1,
+      why: "\"Three from November\"." },
+    { q: "¿Cuántos recargos reconoce el cliente?", opts: ["Ninguno", "Dos", "Los tres"], a: 1,
+      why: "\"Two of them, yes. The third we never requested\"." },
+    { q: "¿En cuánto quedan?", opts: ["Cuatrocientos", "Ochocientos", "Mil doscientos"], a: 0,
+      why: "Acuerdan una nota de crédito por cuatrocientos." }
+  ],
+  dictation: 5
 }
 ];
 
@@ -4191,3 +4684,59 @@ const PRONUNCIATION_SETS = {
     "Would you consider sixty-day payment terms?"
   ]
 };
+
+/* ============================================================
+   PRUEBA DE NIVEL
+   24 preguntas de dificultad creciente, seis por nivel. No es
+   un examen: es para no empezar donde no toca.
+   ============================================================ */
+const TEST_NIVEL = [
+  { nivel: "A1", q: "She ___ from Ecuador.", opts: ["is", "are", "be"], a: 0,
+    why: "Con \"she\" el verbo to be es \"is\"." },
+  { nivel: "A1", q: "___ is your name?", opts: ["How", "What", "Where"], a: 1,
+    why: "Se pregunta el nombre con \"what\", no con \"how\"." },
+  { nivel: "A1", q: "I have ___ brother and two sisters.", opts: ["a", "an", "one of"], a: 0,
+    why: "\"A\" delante de consonante: a brother." },
+  { nivel: "A1", q: "They ___ like coffee.", opts: ["no", "not", "do not"], a: 2,
+    why: "La negación del presente simple es \"do not\" / \"don't\"." },
+  { nivel: "A1", q: "This is ___ office.", opts: ["my", "me", "I"], a: 0,
+    why: "\"My\" es el posesivo; \"me\" es objeto y \"I\" sujeto." },
+  { nivel: "A1", q: "What time ___ the meeting start?", opts: ["do", "does", "is"], a: 1,
+    why: "Con \"the meeting\" (tercera persona) el auxiliar es \"does\"." },
+  { nivel: "A2", q: "I ___ to Quito last week.", opts: ["go", "went", "have gone"], a: 1,
+    why: "\"Last week\" es pasado terminado: pasado simple, went." },
+  { nivel: "A2", q: "There ___ many clients waiting.", opts: ["is", "are", "has"], a: 1,
+    why: "\"Clients\" es plural: there are." },
+  { nivel: "A2", q: "This model is ___ than the other one.", opts: ["cheap", "cheaper", "the cheapest"], a: 1,
+    why: "Comparación entre dos: cheaper than." },
+  { nivel: "A2", q: "How ___ milk do we need?", opts: ["many", "much", "some"], a: 1,
+    why: "\"Milk\" es incontable: much." },
+  { nivel: "A2", q: "I am going ___ visit a client tomorrow.", opts: ["to", "for", "at"], a: 0,
+    why: "\"Be going to + verbo\" para planes." },
+  { nivel: "A2", q: "She ___ work on Sundays.", opts: ["does not have to", "must not", "has not"], a: 0,
+    why: "\"No es necesario\" = don't have to. \"Must not\" sería prohibido." },
+  { nivel: "B1", q: "I ___ here for five years.", opts: ["work", "worked", "have worked"], a: 2,
+    why: "\"For five years\" y sigue: present perfect." },
+  { nivel: "B1", q: "If we lower the price, sales ___.", opts: ["increase", "will increase", "would increase"], a: 1,
+    why: "Primer condicional: if + presente, will + verbo." },
+  { nivel: "B1", q: "The order ___ yesterday.", opts: ["shipped", "was shipped", "has shipped"], a: 1,
+    why: "Pasiva en pasado: was shipped." },
+  { nivel: "B1", q: "He suggested ___ the meeting.", opts: ["to postpone", "postponing", "postpone"], a: 1,
+    why: "Después de \"suggest\" va gerundio." },
+  { nivel: "B1", q: "That is the supplier ___ we visited in June.", opts: ["who", "which", "whose"], a: 1,
+    why: "\"Supplier\" es empresa/cosa: which. (También valdría \"that\".)" },
+  { nivel: "B1", q: "You ___ have told me earlier.", opts: ["should", "must", "can"], a: 0,
+    why: "Reproche por algo no hecho: should have + participio." },
+  { nivel: "B2", q: "Had we known about the delay, we ___ the client.", opts: ["would call", "would have called", "called"], a: 1,
+    why: "Tercer condicional: would have + participio." },
+  { nivel: "B2", q: "He denied ___ the email.", opts: ["to receive", "receiving", "receive"], a: 1,
+    why: "\"Deny\" va con gerundio: denied receiving." },
+  { nivel: "B2", q: "She said she ___ the report the day before.", opts: ["finished", "had finished", "has finished"], a: 1,
+    why: "Estilo indirecto: el pasado se retrasa a pasado perfecto." },
+  { nivel: "B2", q: "___ the weather, the shipment left on time.", opts: ["Despite", "Although", "However"], a: 0,
+    why: "\"Despite\" va con sustantivo. \"Although\" pediría sujeto y verbo." },
+  { nivel: "B2", q: "The issue is being ___ by the legal team.", opts: ["look", "looked", "looked into"], a: 2,
+    why: "\"Look into\" = investigar. La pasiva conserva la preposición." },
+  { nivel: "B2", q: "Not only ___ the price, but they also cut the lead time.", opts: ["they raised", "did they raise", "raised they"], a: 1,
+    why: "Tras \"not only\" al inicio hay inversión: did they raise." },
+];
