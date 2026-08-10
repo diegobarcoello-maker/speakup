@@ -1,6 +1,6 @@
 /* SpeakUp Kids — funciona sin internet, que es justo lo que hace falta
    en un carro, en una sala de espera o donde no hay señal. */
-const VERSION = 'kids-v1';
+const VERSION = 'kids-v2';
 const ESENCIALES = ['./','./index.html','./styles.css','./art.js','./data.js','./app.js','./manifest.json','./icon.svg'];
 
 self.addEventListener('install', e => {
