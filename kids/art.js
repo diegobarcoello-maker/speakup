@@ -27,6 +27,14 @@ const el = (x,y,rx,ry,f,extra) => '<ellipse cx="'+x+'" cy="'+y+'" rx="'+rx+'" ry
 const re = (x,y,w,h,f,r) => '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="'+(r||0)+'" fill="'+f+'"/>';
 const pa = (d,f,extra) => '<path d="'+d+'" fill="'+(f||'none')+'"'+(extra||'')+'/>';
 const li = (x1,y1,x2,y2,s,w) => '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+s+'" stroke-width="'+(w||3)+'" stroke-linecap="round"/>';
+/* Contorno oscuro: sin él, las formas planas se confunden entre sí.
+   Es el truco que más mejora un dibujo infantil. */
+const O = 'stroke="#4a3b2f" stroke-width="2.6" stroke-linejoin="round"';
+const cio = (x,y,r,f) => '<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="'+f+'" '+O+'/>';
+const elo = (x,y,rx,ry,f) => '<ellipse cx="'+x+'" cy="'+y+'" rx="'+rx+'" ry="'+ry+'" fill="'+f+'" '+O+'/>';
+const pao = (d,f) => '<path d="'+d+'" fill="'+f+'" '+O+'/>';
+const reo = (x,y,w,h,f,r) => '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="'+(r||0)+'" fill="'+f+'" '+O+'/>';
+
 /* dos ojitos y una sonrisa: lo que convierte una forma en un personaje */
 const cara = (x,y,sep,rad) => {
   const r = rad || 2.6;
@@ -38,97 +46,126 @@ const ART = {
 
 /* ---------- ANIMALES ---------- */
 cat: svg(
-  el(50,58,26,23,C.naranja) +
-  pa('M28 42 L26 22 L44 34 Z', C.naranja) + pa('M72 42 L74 22 L56 34 Z', C.naranja) +
-  pa('M30 40 L29 28 L40 36 Z', C.rosa) + pa('M70 40 L71 28 L60 36 Z', C.rosa) +
-  cara(50,52,11) +
-  ci(50,60,3.4,C.rosa) +
-  li(24,56,12,52,C.negro,2) + li(24,62,12,62,C.negro,2) +
-  li(76,56,88,52,C.negro,2) + li(76,62,88,62,C.negro,2)
+  el(50,74,20,10,'#c97b2e') +
+  elo(50,52,30,26,C.naranja) +
+  pao('M26 34 L22 12 L44 26 Z', C.naranja) + pao('M74 34 L78 12 L56 26 Z', C.naranja) +
+  pa('M29 31 L27 19 L38 26 Z', C.rosa) + pa('M71 31 L73 19 L62 26 Z', C.rosa) +
+  ci(40,46,4.2,C.negro) + ci(60,46,4.2,C.negro) +
+  ci(41.5,44.5,1.5,C.blanco) + ci(61.5,44.5,1.5,C.blanco) +
+  pao('M50 56 l-5 -4 h10 Z', C.rosa) +
+  pa('M50 60 q-6 6 -11 1', 'none', ' stroke="#4a3b2f" stroke-width="2.4" stroke-linecap="round"') +
+  pa('M50 60 q6 6 11 1', 'none', ' stroke="#4a3b2f" stroke-width="2.4" stroke-linecap="round"') +
+  li(24,52,8,47,'#4a3b2f',2) + li(24,58,8,59,'#4a3b2f',2) +
+  li(76,52,92,47,'#4a3b2f',2) + li(76,58,92,59,'#4a3b2f',2)
 ),
 dog: svg(
-  el(50,58,26,23,C.cafe) +
-  el(24,52,9,17,C.cafeO) + el(76,52,9,17,C.cafeO) +
-  cara(50,52,11) +
-  el(50,64,7,5.5,C.negro) +
-  pa('M43 72 Q50 78 57 72', C.rosa)
+  elo(50,74,20,10,'#8a5622') +
+  elo(50,52,29,25,C.cafe) +
+  elo(23,50,9,17,C.cafeO) + elo(77,50,9,17,C.cafeO) +
+  ci(40,46,4.2,C.negro) + ci(60,46,4.2,C.negro) +
+  ci(41.5,44.5,1.5,C.blanco) + ci(61.5,44.5,1.5,C.blanco) +
+  elo(50,60,8,6.5,C.negro) +
+  pa('M50 66 v5', 'none', ' stroke="#4a3b2f" stroke-width="2.4" stroke-linecap="round"') +
+  pa('M42 72 q8 7 16 0', 'none', ' stroke="#4a3b2f" stroke-width="2.4" stroke-linecap="round"') +
+  pao('M46 72 q4 8 8 0 Z', C.rosa)
 ),
 bird: svg(
-  el(52,58,22,20,C.azul) +
-  ci(40,42,14,C.azul) +
-  pa('M28 42 L14 47 L28 50 Z', C.amar) +
-  ci(37,39,2.6,C.negro) +
-  pa('M56 52 Q70 46 74 60 Q62 64 56 52 Z', C.azulO) +
-  li(46,78,44,90,C.amar,3) + li(56,78,58,90,C.amar,3)
+  elo(56,56,22,20,C.azul) +
+  cio(38,40,15,C.azul) +
+  pao('M24 40 L8 45 L24 50 Z', C.naranja) +
+  ci(35,36,3.4,C.negro) + ci(36,35,1.2,C.blanco) +
+  pao('M58 50 q16 -6 20 10 q-14 8 -20 -10 Z', C.azulO) +
+  pao('M76 60 q10 4 12 14 q-10 2 -14 -8 Z', C.azulO) +
+  li(48,76,46,90,C.naranja,3.4) + li(60,76,62,90,C.naranja,3.4)
 ),
 fish: svg(
-  el(46,50,26,17,C.naranja) +
-  pa('M72 50 L90 36 L90 64 Z', C.rojo) +
-  ci(34,45,3,C.negro) +
-  pa('M40 34 Q50 28 58 36', C.rojo) +
-  ci(66,58,2.4,C.blanco) + ci(74,64,1.8,C.blanco)
+  pao('M74 50 L94 34 L94 66 Z', C.rojo) +
+  elo(46,50,28,19,C.naranja) +
+  pao('M40 30 q10 -6 18 4 q-9 6 -18 -4 Z', C.rojo) +
+  ci(30,45,4,C.negro) + ci(31,44,1.4,C.blanco) +
+  pa('M34 56 q6 4 12 0', 'none', ' stroke="#4a3b2f" stroke-width="2.2" stroke-linecap="round"') +
+  ci(62,46,3,'#f7c48a') + ci(70,56,2.6,'#f7c48a') + ci(58,58,2.6,'#f7c48a')
 ),
 horse: svg(
-  el(46,62,24,18,C.cafe) +
-  el(70,40,11,14,C.cafe) +
-  pa('M64 30 L62 20 L70 27 Z', C.cafeO) + pa('M76 30 L78 20 L72 27 Z', C.cafeO) +
-  ci(74,40,2.6,C.negro) +
-  pa('M22 52 Q10 62 22 76', C.cafeO) +
-  li(34,78,32,92,C.cafeO,5) + li(56,78,58,92,C.cafeO,5)
+  pao('M36 88 q-4 -30 6 -44 q10 -14 26 -14 q14 0 18 10 q3 8 -4 12 l-8 4 q-6 3 -8 10 q-3 12 -2 22 Z', C.cafe) +
+  pao('M62 30 l-3 -14 l10 9 Z', C.cafeO) + pao('M76 28 l4 -13 l-9 8 Z', C.cafeO) +
+  pa('M42 34 q-8 4 -8 16 q0 10 4 16', 'none', ' stroke="'+C.cafeO+'" stroke-width="7" stroke-linecap="round"') +
+  ci(72,40,3.6,C.negro) + ci(73,39,1.3,C.blanco) +
+  elo(84,52,7,6,'#c99a6a') + ci(83,51,1.6,C.negro) +
+  li(44,88,44,92,C.cafeO,6) + li(64,88,64,92,C.cafeO,6)
 ),
 cow: svg(
-  el(50,58,26,22,C.blanco) +
-  pa('M32 44 Q42 38 46 52 Q36 58 32 44 Z', C.negro) +
-  pa('M64 66 Q74 62 76 74 Q64 76 64 66 Z', C.negro) +
-  cara(50,50,11) +
-  el(50,66,9,6.5,C.rosa) + ci(47,66,1.6,C.negro) + ci(53,66,1.6,C.negro) +
-  pa('M26 40 Q20 32 28 30', C.blanco, ' stroke="'+C.grisO+'" stroke-width="3"') +
-  pa('M74 40 Q80 32 72 30', C.blanco, ' stroke="'+C.grisO+'" stroke-width="3"')
+  pao('M18 46 q-8 -4 -6 -12 q8 -2 12 6 Z', '#e8e2d8') +
+  pao('M82 46 q8 -4 6 -12 q-8 -2 -12 6 Z', '#e8e2d8') +
+  elo(20,54,10,13,C.blanco) + elo(80,54,10,13,C.blanco) +
+  elo(50,52,28,26,C.blanco) +
+  pa('M30 36 q10 -6 15 6 q-9 8 -15 -6 Z', C.negro) +
+  pa('M68 68 q8 -3 8 8 q-9 3 -8 -8 Z', C.negro) +
+  ci(40,46,4.2,C.negro) + ci(60,46,4.2,C.negro) +
+  ci(41.5,44.5,1.5,C.blanco) + ci(61.5,44.5,1.5,C.blanco) +
+  elo(50,66,15,11,C.rosa) +
+  ci(45,64,2.2,'#c96b8e') + ci(55,64,2.2,'#c96b8e') +
+  pa('M44 71 q6 4 12 0', 'none', ' stroke="#c96b8e" stroke-width="2.2" stroke-linecap="round"')
 ),
 elephant: svg(
-  el(52,56,26,22,C.gris) +
-  el(26,50,10,16,C.gris) +
-  pa('M40 66 Q30 82 40 90 Q46 84 44 70 Z', C.gris) +
-  cara(56,50,10) +
-  li(66,74,66,88,C.gris,7) + li(80,72,80,86,C.gris,7)
+  elo(52,58,30,26,C.gris) +
+  pao('M22 50 q-14 -6 -12 10 q2 14 14 10 Z', '#b6c0ca') +
+  pao('M40 70 q-4 16 4 20 q8 3 8 -8 q0 -8 -4 -14 Z', C.gris) +
+  ci(46,50,4.2,C.negro) + ci(64,50,4.2,C.negro) +
+  ci(47.5,48.5,1.5,C.blanco) + ci(65.5,48.5,1.5,C.blanco) +
+  pao('M64 66 l6 12 l-6 2 Z', C.crema) +
+  li(76,74,76,88,C.gris,8) + li(60,80,60,90,C.gris,8)
 ),
 lion: svg(
-  ci(50,54,30,C.amar) +
-  ci(50,54,22,C.naranja) +
-  cara(50,50,10) +
-  el(50,60,5,4,C.cafeO) +
-  li(26,54,14,50,C.negro,2) + li(26,60,14,60,C.negro,2) +
-  li(74,54,86,50,C.negro,2) + li(74,60,86,60,C.negro,2)
+  cio(50,54,32,C.amar) +
+  ci(50,54,31,'none') +
+  cio(50,54,22,'#f5a623') +
+  ci(42,50,4.2,C.negro) + ci(58,50,4.2,C.negro) +
+  ci(43.5,48.5,1.5,C.blanco) + ci(59.5,48.5,1.5,C.blanco) +
+  pao('M50 58 l-5 -4 h10 Z', C.cafeO) +
+  pa('M50 62 q-6 6 -11 1', 'none', ' stroke="#4a3b2f" stroke-width="2.4" stroke-linecap="round"') +
+  pa('M50 62 q6 6 11 1', 'none', ' stroke="#4a3b2f" stroke-width="2.4" stroke-linecap="round"') +
+  cio(36,28,8,C.amar) + cio(64,28,8,C.amar)
 ),
 duck: svg(
-  el(50,62,22,18,C.amar) +
-  ci(64,40,13,C.amar) +
-  pa('M76 40 L92 44 L76 49 Z', C.naranja) +
-  ci(67,37,2.6,C.negro) +
-  li(44,80,42,90,C.naranja,4) + li(56,80,58,90,C.naranja,4)
+  elo(46,64,24,18,C.amar) +
+  cio(66,42,15,C.amar) +
+  pao('M78 40 L94 45 L78 51 Z', C.naranja) +
+  ci(64,38,3.4,C.negro) + ci(65,37,1.2,C.blanco) +
+  pao('M32 60 q-12 4 -8 14 q10 2 14 -8 Z', '#e0b02a') +
+  li(42,80,40,90,C.naranja,3.6) + li(54,80,56,90,C.naranja,3.6)
 ),
 frog: svg(
-  el(50,62,26,20,C.verde) +
-  ci(36,40,10,C.verde) + ci(64,40,10,C.verde) +
-  ci(36,40,5,C.blanco) + ci(64,40,5,C.blanco) +
-  ci(36,40,2.6,C.negro) + ci(64,40,2.6,C.negro) +
-  pa('M36 64 Q50 74 64 64', C.verdeO, ' stroke="'+C.verdeO+'" stroke-width="3" fill="none"') +
-  el(28,78,9,5,C.verdeO) + el(72,78,9,5,C.verdeO)
+  elo(50,64,30,22,C.verde) +
+  cio(34,40,12,C.verde) + cio(66,40,12,C.verde) +
+  ci(34,40,6,C.blanco) + ci(66,40,6,C.blanco) +
+  ci(34,41,3.2,C.negro) + ci(66,41,3.2,C.negro) +
+  pa('M34 64 q16 12 32 0', 'none', ' stroke="#2f6b2a" stroke-width="3" stroke-linecap="round"') +
+  ci(42,58,2.4,'#7cc46e') + ci(58,58,2.4,'#7cc46e') +
+  pao('M22 76 q-8 4 -4 10 q8 2 12 -6 Z', C.verdeO) +
+  pao('M78 76 q8 4 4 10 q-8 2 -12 -6 Z', C.verdeO)
 ),
 bear: svg(
-  ci(30,32,10,C.cafeO) + ci(70,32,10,C.cafeO) +
-  ci(50,56,28,C.cafe) +
-  el(50,66,13,10,C.crema) +
-  cara(50,50,11) +
-  el(50,62,5.5,4,C.negro)
+  cio(28,30,12,C.cafeO) + cio(72,30,12,C.cafeO) +
+  ci(28,30,6,'#c98b52') + ci(72,30,6,'#c98b52') +
+  cio(50,56,29,C.cafe) +
+  elo(50,66,15,12,C.crema) +
+  ci(40,50,4.2,C.negro) + ci(60,50,4.2,C.negro) +
+  ci(41.5,48.5,1.5,C.blanco) + ci(61.5,48.5,1.5,C.blanco) +
+  elo(50,62,6,4.6,C.negro) +
+  pa('M50 67 v3', 'none', ' stroke="#4a3b2f" stroke-width="2.2" stroke-linecap="round"') +
+  pa('M43 72 q7 5 14 0', 'none', ' stroke="#4a3b2f" stroke-width="2.2" stroke-linecap="round"')
 ),
 rabbit: svg(
-  el(50,64,22,20,C.blanco) +
-  ci(50,44,15,C.blanco) +
-  el(41,24,6,15,C.blanco) + el(59,24,6,15,C.blanco) +
-  el(41,24,3,10,C.rosa) + el(59,24,3,10,C.rosa) +
-  cara(50,42,8,2.4) +
-  ci(50,50,2.6,C.rosa)
+  elo(41,26,7,17,C.blanco) + elo(59,26,7,17,C.blanco) +
+  el(41,27,3.4,11,C.rosa) + el(59,27,3.4,11,C.rosa) +
+  elo(50,68,24,20,C.blanco) +
+  cio(50,48,16,C.blanco) +
+  ci(44,46,3.6,C.negro) + ci(56,46,3.6,C.negro) +
+  ci(45,45,1.3,C.blanco) + ci(57,45,1.3,C.blanco) +
+  pao('M50 54 l-4 -3 h8 Z', C.rosa) +
+  pa('M50 57 q-5 5 -9 1', 'none', ' stroke="#4a3b2f" stroke-width="2.2" stroke-linecap="round"') +
+  pa('M50 57 q5 5 9 1', 'none', ' stroke="#4a3b2f" stroke-width="2.2" stroke-linecap="round"')
 ),
 
 /* ---------- COMIDA ---------- */
@@ -142,8 +179,9 @@ banana: svg(
   pa('M22 34 Q26 30 30 30 Q30 40 40 52 Q60 72 84 68 Q86 72 84 74 Q56 76 34 54 Q24 44 22 34 Z', '#e0b02a')
 ),
 bread: svg(
-  pa('M18 54 Q18 34 50 34 Q82 34 82 54 L82 76 Q82 82 76 82 L24 82 Q18 82 18 76 Z', C.cafe) +
-  pa('M24 54 Q24 42 50 42 Q76 42 76 54 Z', '#d9a05b')
+  pao('M16 56 q0 -22 34 -22 q34 0 34 22 v20 q0 6 -6 6 H22 q-6 0 -6 -6 Z', C.cafe) +
+  pa('M24 54 q0 -12 26 -12 q26 0 26 12 Z', '#e0b878') +
+  li(34,66,34,78,'#8a5622',2.4) + li(50,66,50,78,'#8a5622',2.4) + li(66,66,66,78,'#8a5622',2.4)
 ),
 milk: svg(
   pa('M34 38 L34 82 Q34 86 38 86 L62 86 Q66 86 66 82 L66 38 Z', C.blanco, ' stroke="'+C.gris+'" stroke-width="2"') +
@@ -169,22 +207,29 @@ cake: svg(
   li(50,44,50,28,C.amar,4) + el(50,24,3.4,5,C.naranja)
 ),
 rice: svg(
-  pa('M18 58 Q50 42 82 58 Q82 80 50 84 Q18 80 18 58 Z', C.blanco, ' stroke="'+C.gris+'" stroke-width="2"') +
-  el(50,54,26,8,C.crema)
+  pao('M16 58 q34 -18 68 0 q0 24 -34 28 q-34 -4 -34 -28 Z', C.blanco) +
+  elo(50,56,28,9,'#f7f2e7') +
+  el(42,54,4,2.4,'#e8e2d8') + el(56,53,4,2.4,'#e8e2d8') + el(50,59,4,2.4,'#e8e2d8')
 ),
 chicken: svg(
-  el(50,60,28,20,C.cafe) +
-  el(50,52,24,14,'#d9a05b') +
-  li(24,64,14,76,'#e8d5a8',6) + li(76,64,86,76,'#e8d5a8',6)
+  elo(46,64,26,20,'#e8d5a8') +
+  cio(64,42,14,'#f2e3c0') +
+  pao('M60 28 q-3 -8 3 -8 q2 -6 7 -1 q6 -3 5 4 q6 2 1 7 Z', C.rojo) +
+  pao('M78 42 L90 46 L78 50 Z', C.naranja) +
+  ci(62,40,3.4,C.negro) + ci(63,39,1.2,C.blanco) +
+  pao('M24 62 q-10 6 -6 14 q10 2 14 -8 Z', '#d9c48c') +
+  li(42,82,40,92,C.naranja,3.4) + li(54,82,56,92,C.naranja,3.4)
 ),
 
 
 /* ---------- CASA Y OBJETOS ---------- */
 house: svg(
-  re(24,50,52,38,C.crema,3) +
-  pa('M16 52 L50 22 L84 52 Z', C.rojo) +
-  re(44,66,14,22,C.cafeO,2) + ci(55,77,1.8,C.amar) +
-  re(30,58,12,12,C.azul,2) + re(60,58,12,12,C.azul,2)
+  pao('M22 50 h56 v38 H22 Z', C.crema) +
+  pao('M12 52 L50 18 L88 52 Z', C.rojo) +
+  reo(43,64,15,24,C.cafeO,2) + ci(54,77,2,C.amar) +
+  reo(28,58,14,13,'#bfe3ff',2) + reo(60,58,14,13,'#bfe3ff',2) +
+  li(35,58,35,71,C.blanco,2) + li(28,64.5,42,64.5,C.blanco,2) +
+  li(67,58,67,71,C.blanco,2) + li(60,64.5,74,64.5,C.blanco,2)
 ),
 door: svg(
   re(30,20,40,68,C.cafe,4) +
@@ -223,17 +268,19 @@ ball: svg(
   li(50,34,50,24,C.negro,2) + li(64,44,76,40,C.negro,2) + li(36,44,24,40,C.negro,2)
 ),
 car: svg(
-  pa('M14 62 L18 48 Q20 42 28 42 L64 42 Q72 42 76 48 L86 62 Z', C.rojo) +
-  pa('M28 48 L44 48 L44 58 L24 58 Z', C.azul) + pa('M50 48 L64 48 L70 58 L50 58 Z', C.azul) +
-  re(12,60,76,10,'#c23b1c',4) +
-  ci(30,72,9,C.negro) + ci(30,72,4,C.gris) +
-  ci(70,72,9,C.negro) + ci(70,72,4,C.gris)
+  pao('M10 64 l6 -18 q3 -8 12 -8 h44 q9 0 12 8 l6 18 Z', C.rojo) +
+  pao('M28 46 h18 v12 H22 Z', '#bfe3ff') + pao('M52 46 h18 l6 12 H52 Z', '#bfe3ff') +
+  reo(8,62,84,12,'#c23b1c',5) +
+  cio(28,76,10,C.negro) + ci(28,76,4.4,C.gris) +
+  cio(72,76,10,C.negro) + ci(72,76,4.4,C.gris) +
+  ci(16,58,3.4,C.amar) + ci(84,58,3.4,C.amar)
 ),
 bus: svg(
-  re(14,30,72,42,C.amar,6) +
-  re(20,38,20,14,C.azul,2) + re(44,38,20,14,C.azul,2) + re(68,38,12,14,C.azul,2) +
-  ci(32,74,8,C.negro) + ci(32,74,3.4,C.gris) +
-  ci(68,74,8,C.negro) + ci(68,74,3.4,C.gris)
+  reo(12,28,76,44,C.amar,8) +
+  pao('M18 38 h20 v14 H18 Z', '#bfe3ff') + pao('M44 38 h20 v14 H44 Z', '#bfe3ff') + pao('M70 38 h12 v14 H70 Z', '#bfe3ff') +
+  reo(18,58,26,10,'#e0b02a',3) +
+  cio(30,76,9,C.negro) + ci(30,76,3.8,C.gris) +
+  cio(70,76,9,C.negro) + ci(70,76,3.8,C.gris)
 ),
 bike: svg(
   '<circle cx="26" cy="66" r="16" fill="none" stroke="'+C.negro+'" stroke-width="4"/>' +
@@ -267,44 +314,56 @@ clock: svg(
 
 /* ---------- CUERPO Y PERSONAS ---------- */
 hand: svg(
-  pa('M34 88 L34 46 Q34 40 40 40 Q46 40 46 46 L46 30 Q46 24 52 24 Q58 24 58 30 L58 34 Q58 28 64 28 Q70 28 70 34 L70 44 Q70 38 74 38 Q80 38 80 46 L80 68 Q80 88 60 88 Z', C.piel)
+  pao('M30 88 V50 q0 -8 7 -8 q7 0 7 8 V30 q0 -8 7 -8 q7 0 7 8 v6 q0 -8 7 -8 q7 0 7 8 v10 q0 -6 6 -6 q7 0 7 9 v19 q0 22 -22 22 Z', C.piel) +
+  pa('M44 50 v14 M58 44 v20 M72 50 v14', 'none', ' stroke="#d9a271" stroke-width="2.2" stroke-linecap="round"')
 ),
 eye: svg(
-  el(50,54,34,20,C.blanco, ' stroke="'+C.negro+'" stroke-width="3"') +
-  ci(50,54,12,C.cafe) + ci(50,54,5,C.negro) + ci(46,50,3,C.blanco)
+  pao('M12 54 q38 -30 76 0 q-38 30 -76 0 Z', C.blanco) +
+  cio(50,54,14,C.cafe) +
+  ci(50,54,6.5,C.negro) + ci(45,49,3.6,C.blanco) +
+  pa('M14 50 q36 -28 72 0', 'none', ' stroke="#4a3b2f" stroke-width="3" stroke-linecap="round"')
 ),
 boy: svg(
-  ci(50,32,16,C.piel) +
-  pa('M34 28 Q34 14 50 14 Q66 14 66 28 Q58 22 50 24 Q42 26 34 28 Z', C.pelo) +
-  ci(45,32,2.4,C.negro) + ci(55,32,2.4,C.negro) +
-  pa('M44 38 Q50 43 56 38', 'none', ' stroke="'+C.negro+'" stroke-width="2" stroke-linecap="round"') +
-  pa('M32 88 Q32 52 50 52 Q68 52 68 88 Z', C.azul)
+  pao('M32 90 q0 -34 18 -34 q18 0 18 34 Z', C.azul) +
+  cio(50,34,17,C.piel) +
+  pao('M32 30 q0 -16 18 -16 q18 0 18 16 q-9 -7 -18 -5 q-9 2 -18 5 Z', C.pelo) +
+  ci(44,34,3.4,C.negro) + ci(56,34,3.4,C.negro) +
+  ci(45,33,1.2,C.blanco) + ci(57,33,1.2,C.blanco) +
+  pa('M43 42 q7 6 14 0', 'none', ' stroke="#4a3b2f" stroke-width="2.4" stroke-linecap="round"') +
+  ci(33,38,3.6,'#f0a48a') + ci(67,38,3.6,'#f0a48a')
 ),
 girl: svg(
-  ci(50,32,16,C.piel) +
-  pa('M30 34 Q30 12 50 12 Q70 12 70 34 Q70 22 50 22 Q30 22 30 34 Z', C.cafeO) +
-  el(30,42,7,14,C.cafeO) + el(70,42,7,14,C.cafeO) +
-  ci(45,32,2.4,C.negro) + ci(55,32,2.4,C.negro) +
-  pa('M44 38 Q50 43 56 38', 'none', ' stroke="'+C.negro+'" stroke-width="2" stroke-linecap="round"') +
-  pa('M50 52 L72 88 L28 88 Z', C.rosa)
+  pao('M50 56 L74 90 H26 Z', C.rosa) +
+  cio(50,34,17,C.piel) +
+  pao('M30 36 q0 -22 20 -22 q20 0 20 22 q0 -12 -20 -12 q-20 0 -20 12 Z', C.cafeO) +
+  elo(29,46,7,14,C.cafeO) + elo(71,46,7,14,C.cafeO) +
+  ci(44,34,3.4,C.negro) + ci(56,34,3.4,C.negro) +
+  ci(45,33,1.2,C.blanco) + ci(57,33,1.2,C.blanco) +
+  pa('M43 42 q7 6 14 0', 'none', ' stroke="#4a3b2f" stroke-width="2.4" stroke-linecap="round"') +
+  ci(34,38,3.4,'#f0a48a') + ci(66,38,3.4,'#f0a48a')
 ),
 family: svg(
-  ci(32,38,12,C.piel) + pa('M18 86 Q18 56 32 56 Q46 56 46 86 Z', C.azul) +
-  ci(32,32,13,C.pelo) +
-  ci(64,36,13,C.piel) + pa('M48 86 Q48 54 64 54 Q80 54 80 86 Z', C.rosa) +
-  pa('M50 32 Q50 14 64 14 Q78 14 78 32 Q78 20 64 20 Q50 20 50 32 Z', C.cafeO) +
-  ci(50,62,9,C.piel) + pa('M40 88 Q40 72 50 72 Q60 72 60 88 Z', C.amar) +
-  ci(50,58,10,C.pelo)
+  pao('M14 88 q0 -30 18 -30 q18 0 18 30 Z', C.azul) +
+  cio(32,40,13,C.piel) + pao('M20 38 q0 -14 12 -14 q12 0 12 14 q-6 -6 -12 -5 q-6 1 -12 5 Z', C.pelo) +
+  ci(28,40,2.8,C.negro) + ci(36,40,2.8,C.negro) +
+  pao('M50 88 q0 -34 16 -34 q16 0 16 34 Z', C.rosa) +
+  cio(66,38,13,C.piel) + pao('M53 40 q0 -18 13 -18 q13 0 13 18 q0 -9 -13 -9 q-13 0 -13 9 Z', C.cafeO) +
+  ci(62,38,2.8,C.negro) + ci(70,38,2.8,C.negro) +
+  pao('M38 90 q0 -18 11 -18 q11 0 11 18 Z', C.amar) +
+  cio(49,62,10,C.piel) + pao('M40 61 q0 -11 9 -11 q9 0 9 11 q-5 -5 -9 -4 q-4 1 -9 4 Z', C.pelo) +
+  ci(46,62,2.4,C.negro) + ci(52,62,2.4,C.negro)
 ),
 
 /* ---------- NATURALEZA ---------- */
 sun: svg(
-  ci(50,52,20,C.amar) +
-  li(50,20,50,8,C.naranja,5) + li(50,84,50,96,C.naranja,5) +
-  li(18,52,6,52,C.naranja,5) + li(82,52,94,52,C.naranja,5) +
-  li(27,29,19,21,C.naranja,5) + li(73,29,81,21,C.naranja,5) +
-  li(27,75,19,83,C.naranja,5) + li(73,75,81,83,C.naranja,5) +
-  cara(50,48,7,2.2)
+  li(50,18,50,6,C.naranja,5.5) + li(50,86,50,98,C.naranja,5.5) +
+  li(18,52,6,52,C.naranja,5.5) + li(82,52,94,52,C.naranja,5.5) +
+  li(27,29,18,20,C.naranja,5.5) + li(73,29,82,20,C.naranja,5.5) +
+  li(27,75,18,84,C.naranja,5.5) + li(73,75,82,84,C.naranja,5.5) +
+  cio(50,52,22,C.amar) +
+  ci(43,48,3.4,C.negro) + ci(57,48,3.4,C.negro) +
+  pa('M42 58 q8 8 16 0', 'none', ' stroke="#4a3b2f" stroke-width="2.6" stroke-linecap="round"') +
+  ci(36,58,3.4,'#f0a48a') + ci(64,58,3.4,'#f0a48a')
 ),
 moon: svg(
   pa('M62 14 Q30 22 30 52 Q30 82 62 90 Q34 82 34 52 Q34 22 62 14 Z', C.amar) +
@@ -323,15 +382,17 @@ rain: svg(
   li(36,66,32,80,C.azul,4) + li(50,66,46,84,C.azul,4) + li(64,66,60,80,C.azul,4)
 ),
 tree: svg(
-  re(44,58,12,30,C.cafeO,3) +
-  ci(50,38,22,C.verde) + ci(32,48,14,C.verde) + ci(68,48,14,C.verde)
+  reo(44,56,12,32,C.cafeO,3) +
+  cio(50,36,23,C.verde) + cio(31,48,15,C.verde) + cio(69,48,15,C.verde) +
+  ci(44,32,4,'#7cc46e') + ci(58,40,3.4,'#7cc46e') + ci(36,50,3.4,'#7cc46e')
 ),
 flower: svg(
-  li(50,54,50,90,C.verdeO,4) +
-  el(38,72,10,5,C.verde) + el(62,66,10,5,C.verde) +
-  el(50,30,10,14,C.rosa) + el(50,54,10,14,C.rosa) +
-  el(36,42,14,10,C.rosa) + el(64,42,14,10,C.rosa) +
-  ci(50,42,9,C.amar)
+  li(50,54,50,90,C.verdeO,4.5) +
+  pao('M50 70 q-14 -10 -18 2 q12 8 18 -2 Z', C.verde) +
+  pao('M50 62 q14 -10 18 2 q-12 8 -18 -2 Z', C.verde) +
+  elo(50,30,11,15,C.rosa) + elo(50,54,11,15,C.rosa) +
+  elo(35,42,15,11,C.rosa) + elo(65,42,15,11,C.rosa) +
+  cio(50,42,10,C.amar)
 ),
 flag: svg(
   li(28,14,28,90,C.cafeO,5) +
