@@ -1,0 +1,26 @@
+{
+  "name": "SpeakUp Kids — Inglés jugando",
+  "short_name": "SpeakUp Kids",
+  "description": "Inglés para niños de 4 a 10 años. Dibujos, voz y juegos. Sin anuncios y sin recoger datos.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ff7a45",
+  "theme_color": "#ff7a45",
+  "lang": "es",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
