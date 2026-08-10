@@ -31,13 +31,13 @@ const MUNDOS = [
       quien: 'Un gato llamado Milo', art: 'cat',
       pasos: [
         { dice: 'Hello! I am Milo. What is your name?', diceEs: '¡Hola! Soy Milo. ¿Cómo te llamas?',
-          opciones: ['My name is...', 'Hello Milo!', 'Hi!'] },
+          opciones: [{ en: "My name is...", es: "Me llamo..." }, { en: "Hello Milo!", es: "¡Hola, Milo!" }, { en: "Hi!", es: "¡Hola!" }] },
         { dice: 'Nice to meet you! Do you like animals?', diceEs: '¡Mucho gusto! ¿Te gustan los animales?',
-          opciones: ['Yes, I do!', 'I love animals!', 'A little.'] },
+          opciones: [{ en: "Yes, I do!", es: "¡Sí, me gustan!" }, { en: "I love animals!", es: "¡Me encantan los animales!" }, { en: "A little.", es: "Un poquito." }] },
         { dice: 'Me too! What is your favourite animal?', diceEs: '¡A mí también! ¿Cuál es tu animal favorito?',
-          opciones: ['The dog!', 'The cat!', 'The elephant!'] },
+          opciones: [{ en: "The dog!", es: "¡El perro!" }, { en: "The cat!", es: "¡El gato!" }, { en: "The elephant!", es: "¡El elefante!" }] },
         { dice: 'Great choice. See you later!', diceEs: 'Buena elección. ¡Hasta luego!',
-          opciones: ['Bye Milo!', 'See you!', 'Goodbye!'] }
+          opciones: [{ en: "Bye Milo!", es: "¡Adiós, Milo!" }, { en: "See you!", es: "¡Nos vemos!" }, { en: "Goodbye!", es: "¡Adiós!" }] }
       ]
     }
   },
@@ -61,13 +61,13 @@ const MUNDOS = [
       quien: 'Lía, la pintora', art: 'girl',
       pasos: [
         { dice: 'Hi! I am painting. What colour do you like?', diceEs: '¡Hola! Estoy pintando. ¿Qué color te gusta?',
-          opciones: ['I like blue.', 'I like red.', 'I like green.'] },
+          opciones: [{ en: "I like blue.", es: "Me gusta el azul." }, { en: "I like red.", es: "Me gusta el rojo." }, { en: "I like green.", es: "Me gusta el verde." }] },
         { dice: 'Nice! Look at my flower. What colour is it?', diceEs: '¡Bonito! Mira mi flor. ¿De qué color es?',
-          opciones: ['It is pink.', 'It is yellow.', 'It is purple.'] },
+          opciones: [{ en: "It is pink.", es: "Es rosada." }, { en: "It is yellow.", es: "Es amarilla." }, { en: "It is purple.", es: "Es morada." }] },
         { dice: 'Yes! Do you want to paint with me?', diceEs: '¡Sí! ¿Quieres pintar conmigo?',
-          opciones: ['Yes, please!', 'Of course!', 'Later, thank you.'] },
+          opciones: [{ en: "Yes, please!", es: "¡Sí, por favor!" }, { en: "Of course!", es: "¡Por supuesto!" }, { en: "Later, thank you.", es: "Después, gracias." }] },
         { dice: 'Yay! Here is your brush.', diceEs: '¡Bien! Aquí tienes tu pincel.',
-          opciones: ['Thank you!', 'Thanks Lia!', 'Cool!'] }
+          opciones: [{ en: "Thank you!", es: "¡Gracias!" }, { en: "Thanks Lia!", es: "¡Gracias, Lía!" }, { en: "Cool!", es: "¡Genial!" }] }
       ]
     }
   },
@@ -91,13 +91,13 @@ const MUNDOS = [
       quien: 'Tomi el conejo', art: 'rabbit',
       pasos: [
         { dice: 'Hello! How old are you?', diceEs: '¡Hola! ¿Cuántos años tienes?',
-          opciones: ['I am five.', 'I am seven.', 'I am nine.'] },
+          opciones: [{ en: "I am five.", es: "Tengo cinco." }, { en: "I am seven.", es: "Tengo siete." }, { en: "I am nine.", es: "Tengo nueve." }] },
         { dice: 'Wow! Can you count to five?', diceEs: '¡Guau! ¿Puedes contar hasta cinco?',
-          opciones: ['One, two, three, four, five!', 'Yes, I can!', 'Let me try!'] },
+          opciones: [{ en: "One, two, three, four, five!", es: "¡Uno, dos, tres, cuatro, cinco!" }, { en: "Yes, I can!", es: "¡Sí, puedo!" }, { en: "Let me try!", es: "¡Déjame intentar!" }] },
         { dice: 'Very good! How many carrots do I have?', diceEs: '¡Muy bien! ¿Cuántas zanahorias tengo?',
-          opciones: ['Three!', 'Six!', 'Ten!'] },
+          opciones: [{ en: "Three!", es: "¡Tres!" }, { en: "Six!", es: "¡Seis!" }, { en: "Ten!", es: "¡Diez!" }] },
         { dice: 'You are so smart. Bye!', diceEs: 'Eres muy listo. ¡Adiós!',
-          opciones: ['Bye Tomi!', 'See you!', 'Thank you!'] }
+          opciones: [{ en: "Bye Tomi!", es: "¡Adiós, Tomi!" }, { en: "See you!", es: "¡Nos vemos!" }, { en: "Thank you!", es: "¡Gracias!" }] }
       ]
     }
   },
@@ -119,13 +119,13 @@ const MUNDOS = [
       quien: 'Ana', art: 'girl',
       pasos: [
         { dice: 'Hi! Do you have a brother?', diceEs: '¡Hola! ¿Tienes un hermano?',
-          opciones: ['Yes, I do.', 'No, I do not.', 'I have a sister.'] },
+          opciones: [{ en: "Yes, I do.", es: "Sí, tengo." }, { en: "No, I do not.", es: "No, no me gusta." }, { en: "I have a sister.", es: "Tengo una hermana." }] },
         { dice: 'Nice! Who do you play with?', diceEs: '¡Qué bien! ¿Con quién juegas?',
-          opciones: ['With my friend.', 'With my sister.', 'With my dog!'] },
+          opciones: [{ en: "With my friend.", es: "Con mi amigo." }, { en: "With my sister.", es: "Con mi hermana." }, { en: "With my dog!", es: "¡Con mi perro!" }] },
         { dice: 'That is fun! Do you love your family?', diceEs: '¡Qué divertido! ¿Quieres a tu familia?',
-          opciones: ['Yes, a lot!', 'Of course!', 'I love them!'] },
+          opciones: [{ en: "Yes, a lot!", es: "¡Sí, mucho!" }, { en: "Of course!", es: "¡Por supuesto!" }, { en: "I love them!", es: "¡Los quiero mucho!" }] },
         { dice: 'Me too. Say hi to them!', diceEs: 'Yo también. ¡Salúdalos de mi parte!',
-          opciones: ['I will!', 'Okay!', 'Bye Ana!'] }
+          opciones: [{ en: "I will!", es: "¡Lo haré!" }, { en: "Okay!", es: "¡Está bien!" }, { en: "Bye Ana!", es: "¡Adiós, Ana!" }] }
       ]
     }
   },
@@ -149,13 +149,13 @@ const MUNDOS = [
       quien: 'Chef Beto', art: 'bear',
       pasos: [
         { dice: 'Welcome! Are you hungry?', diceEs: '¡Bienvenido! ¿Tienes hambre?',
-          opciones: ['Yes, I am!', 'A little bit.', 'Very hungry!'] },
+          opciones: [{ en: "Yes, I am!", es: "¡Sí, tengo!" }, { en: "A little bit.", es: "Un poquito." }, { en: "Very hungry!", es: "¡Mucha hambre!" }] },
         { dice: 'What do you want to eat?', diceEs: '¿Qué quieres comer?',
-          opciones: ['Rice, please.', 'Chicken, please.', 'Bread, please.'] },
+          opciones: [{ en: "Rice, please.", es: "Arroz, por favor." }, { en: "Chicken, please.", es: "Pollo, por favor." }, { en: "Bread, please.", es: "Pan, por favor." }] },
         { dice: 'Good choice! And to drink?', diceEs: '¡Buena elección! ¿Y de tomar?',
-          opciones: ['Water, please.', 'Milk, please.', 'Just water.'] },
+          opciones: [{ en: "Water, please.", es: "Agua, por favor." }, { en: "Milk, please.", es: "Leche, por favor." }, { en: "Just water.", es: "Solo agua." }] },
         { dice: 'Here you are. Enjoy your meal!', diceEs: 'Aquí tienes. ¡Buen provecho!',
-          opciones: ['Thank you!', 'Thanks a lot!', 'It looks great!'] }
+          opciones: [{ en: "Thank you!", es: "¡Gracias!" }, { en: "Thanks a lot!", es: "¡Muchas gracias!" }, { en: "It looks great!", es: "¡Se ve buenísimo!" }] }
       ]
     }
   },
@@ -178,13 +178,13 @@ const MUNDOS = [
       quien: 'Milo otra vez', art: 'cat',
       pasos: [
         { dice: 'Can I come in?', diceEs: '¿Puedo pasar?',
-          opciones: ['Yes, come in!', 'Of course!', 'Welcome!'] },
+          opciones: [{ en: "Yes, come in!", es: "¡Sí, pasa!" }, { en: "Of course!", es: "¡Por supuesto!" }, { en: "Welcome!", es: "¡Bienvenido!" }] },
         { dice: 'Thank you! Where can I sit?', diceEs: '¡Gracias! ¿Dónde me siento?',
-          opciones: ['On the chair.', 'On the bed.', 'Here, please.'] },
+          opciones: [{ en: "On the chair.", es: "En la silla." }, { en: "On the bed.", es: "En la cama." }, { en: "Here, please.", es: "Aquí, por favor." }] },
         { dice: 'Nice house! Is that your phone?', diceEs: '¡Bonita casa! ¿Ese es tu teléfono?',
-          opciones: ['Yes, it is.', 'No, it is my mom’s.', 'It is my dad’s.'] },
+          opciones: [{ en: "Yes, it is.", es: "Sí, lo es." }, { en: "No, it is my mom’s.", es: "No, es de mi mamá." }, { en: "It is my dad’s.", es: "Es de mi papá." }] },
         { dice: 'Cool. Thank you for the visit!', diceEs: 'Genial. ¡Gracias por la visita!',
-          opciones: ['You are welcome!', 'Come again!', 'Bye Milo!'] }
+          opciones: [{ en: "You are welcome!", es: "¡De nada!" }, { en: "Come again!", es: "¡Vuelve pronto!" }, { en: "Bye Milo!", es: "¡Adiós, Milo!" }] }
       ]
     }
   },
@@ -206,13 +206,13 @@ const MUNDOS = [
       quien: 'La maestra Sara', art: 'girl',
       pasos: [
         { dice: 'Good morning! How are you today?', diceEs: '¡Buenos días! ¿Cómo estás hoy?',
-          opciones: ['I am fine, thank you.', 'I am happy!', 'Very good!'] },
+          opciones: [{ en: "I am fine, thank you.", es: "Estoy bien, gracias." }, { en: "I am happy!", es: "¡Estoy feliz!" }, { en: "Very good!", es: "¡Muy bien!" }] },
         { dice: 'Do you have your book?', diceEs: '¿Tienes tu libro?',
-          opciones: ['Yes, here it is.', 'Yes, I do.', 'It is in my bag.'] },
+          opciones: [{ en: "Yes, here it is.", es: "Sí, aquí está." }, { en: "Yes, I do.", es: "Sí, tengo." }, { en: "It is in my bag.", es: "Está en mi mochila." }] },
         { dice: 'Perfect. Can you read this word?', diceEs: 'Perfecto. ¿Puedes leer esta palabra?',
-          opciones: ['Yes, I can!', 'Let me try.', 'Help me, please.'] },
+          opciones: [{ en: "Yes, I can!", es: "¡Sí, puedo!" }, { en: "Let me try.", es: "Déjame intentar." }, { en: "Help me, please.", es: "Ayúdame, por favor." }] },
         { dice: 'Very well done! See you tomorrow.', diceEs: '¡Muy bien hecho! Hasta mañana.',
-          opciones: ['Bye teacher!', 'See you tomorrow!', 'Thank you!'] }
+          opciones: [{ en: "Bye teacher!", es: "¡Adiós, maestra!" }, { en: "See you tomorrow!", es: "¡Hasta mañana!" }, { en: "Thank you!", es: "¡Gracias!" }] }
       ]
     }
   },
@@ -234,13 +234,13 @@ const MUNDOS = [
       quien: 'Doctor Oso', art: 'bear',
       pasos: [
         { dice: 'Hello! How do you feel today?', diceEs: '¡Hola! ¿Cómo te sientes hoy?',
-          opciones: ['I am happy!', 'I am fine.', 'A little sad.'] },
+          opciones: [{ en: "I am happy!", es: "¡Estoy feliz!" }, { en: "I am fine.", es: "Estoy bien." }, { en: "A little sad.", es: "Un poco triste." }] },
         { dice: 'Show me your hands, please.', diceEs: 'Muéstrame las manos, por favor.',
-          opciones: ['Here they are!', 'Okay!', 'Look!'] },
+          opciones: [{ en: "Here they are!", es: "¡Aquí están!" }, { en: "Okay!", es: "¡Está bien!" }, { en: "Look!", es: "¡Mira!" }] },
         { dice: 'Very clean! Can you close your eyes?', diceEs: '¡Muy limpias! ¿Puedes cerrar los ojos?',
-          opciones: ['Yes, I can.', 'Like this?', 'Done!'] },
+          opciones: [{ en: "Yes, I can.", es: "Sí, puedo." }, { en: "Like this?", es: "¿Así?" }, { en: "Done!", es: "¡Listo!" }] },
         { dice: 'You are very healthy. Well done!', diceEs: 'Estás muy sano. ¡Muy bien!',
-          opciones: ['Thank you doctor!', 'Yay!', 'Bye!'] }
+          opciones: [{ en: "Thank you doctor!", es: "¡Gracias, doctor!" }, { en: "Yay!", es: "¡Bien!" }, { en: "Bye!", es: "¡Adiós!" }] }
       ]
     }
   },
@@ -262,13 +262,13 @@ const MUNDOS = [
       quien: 'Rana Renata', art: 'frog',
       pasos: [
         { dice: 'Hi! Look at the sky. What do you see?', diceEs: '¡Hola! Mira el cielo. ¿Qué ves?',
-          opciones: ['I see the sun!', 'I see a cloud.', 'I see a bird!'] },
+          opciones: [{ en: "I see the sun!", es: "¡Veo el sol!" }, { en: "I see a cloud.", es: "Veo una nube." }, { en: "I see a bird!", es: "¡Veo un pájaro!" }] },
         { dice: 'Do you like the rain?', diceEs: '¿Te gusta la lluvia?',
-          opciones: ['Yes, I do!', 'No, I do not.', 'A little.'] },
+          opciones: [{ en: "Yes, I do!", es: "¡Sí, me gustan!" }, { en: "No, I do not.", es: "No, no me gusta." }, { en: "A little.", es: "Un poquito." }] },
         { dice: 'Let us sit under the tree!', diceEs: '¡Sentémonos bajo el árbol!',
-          opciones: ['Good idea!', 'Yes, let us go!', 'I am coming!'] },
+          opciones: [{ en: "Good idea!", es: "¡Buena idea!" }, { en: "Yes, let us go!", es: "¡Sí, vamos!" }, { en: "I am coming!", es: "¡Ya voy!" }] },
         { dice: 'What a nice day. Thank you!', diceEs: 'Qué lindo día. ¡Gracias!',
-          opciones: ['Thank you too!', 'See you Renata!', 'Bye bye!'] }
+          opciones: [{ en: "Thank you too!", es: "¡Gracias a ti!" }, { en: "See you Renata!", es: "¡Nos vemos, Renata!" }, { en: "Bye bye!", es: "¡Chao!" }] }
       ]
     }
   },
@@ -292,13 +292,13 @@ const MUNDOS = [
       quien: 'Tu amigo Leo', art: 'lion',
       pasos: [
         { dice: 'Wow! Is this your toy?', diceEs: '¡Guau! ¿Este es tu juguete?',
-          opciones: ['Yes, it is mine.', 'Yes, I love it.', 'It is my favourite!'] },
+          opciones: [{ en: "Yes, it is mine.", es: "Sí, es mío." }, { en: "Yes, I love it.", es: "Sí, me encanta." }, { en: "It is my favourite!", es: "¡Es mi favorito!" }] },
         { dice: 'Can I play with you?', diceEs: '¿Puedo jugar contigo?',
-          opciones: ['Yes, of course!', 'Sure!', 'Let us play!'] },
+          opciones: [{ en: "Yes, of course!", es: "¡Sí, claro!" }, { en: "Sure!", es: "¡Claro!" }, { en: "Let us play!", es: "¡Juguemos!" }] },
         { dice: 'Thank you! What is your favourite colour?', diceEs: '¡Gracias! ¿Cuál es tu color favorito?',
-          opciones: ['Blue!', 'Red!', 'Green!'] },
+          opciones: [{ en: "Blue!", es: "¡Azul!" }, { en: "Red!", es: "¡Rojo!" }, { en: "Green!", es: "¡Verde!" }] },
         { dice: 'You are a good friend. Bye!', diceEs: 'Eres un buen amigo. ¡Adiós!',
-          opciones: ['Bye Leo!', 'See you soon!', 'Thank you!'] }
+          opciones: [{ en: "Bye Leo!", es: "¡Adiós, Leo!" }, { en: "See you soon!", es: "¡Hasta pronto!" }, { en: "Thank you!", es: "¡Gracias!" }] }
       ]
     }
   }
