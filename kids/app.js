@@ -55,33 +55,58 @@ function contarDia() {
 /* ══════════════ 2. VOZ ══════════════ */
 
 const Voz = {
-  lista: [],
+  ingles: [], espanol: [],
+
   cargar() {
     if (!window.speechSynthesis) return;
-    Voz.lista = (speechSynthesis.getVoices() || []).filter(v => /^en/i.test(v.lang));
+    const todas = speechSynthesis.getVoices() || [];
+    Voz.ingles  = todas.filter(v => /^en/i.test(v.lang));
+    Voz.espanol = todas.filter(v => /^es/i.test(v.lang));
   },
-  /* Para un niño conviene una voz clara y algo más lenta de lo normal. */
-  elegir() {
-    if (!Voz.lista.length) Voz.cargar();
+
+  /* Para un niño conviene una voz clara y más lenta que la de un adulto. */
+  elegirEn() {
+    if (!Voz.ingles.length) Voz.cargar();
     if (S.ajustes.voz) {
-      const g = Voz.lista.find(v => v.voiceURI === S.ajustes.voz);
+      const g = Voz.ingles.find(v => v.voiceURI === S.ajustes.voz);
       if (g) return g;
     }
-    return Voz.lista.find(v => /female|samantha|zira|karen|moira/i.test(v.name)) ||
-           Voz.lista.find(v => /en-US/i.test(v.lang)) || Voz.lista[0] || null;
+    return Voz.ingles.find(v => /female|samantha|zira|karen|moira/i.test(v.name)) ||
+           Voz.ingles.find(v => /en-US/i.test(v.lang)) || Voz.ingles[0] || null;
   },
-  decir(texto, vel) {
-    if (!window.speechSynthesis || !texto) return;
+  elegirEs() {
+    if (!Voz.espanol.length) Voz.cargar();
+    /* si hay una voz latinoamericana, mejor que la de España para un niño de aquí */
+    return Voz.espanol.find(v => /es-(MX|US|419|CO|AR)/i.test(v.lang)) ||
+           Voz.espanol.find(v => /monica|paulina|sabina|helena/i.test(v.name)) ||
+           Voz.espanol[0] || null;
+  },
+
+  hablar(texto, idioma, vel, alTerminar) {
+    if (!window.speechSynthesis || !texto) { if (alTerminar) alTerminar(); return; }
     try {
-      speechSynthesis.cancel();
       const u = new SpeechSynthesisUtterance(texto);
-      const v = Voz.elegir();
-      if (v) { u.voice = v; u.lang = v.lang; } else { u.lang = 'en-US'; }
-      u.rate = vel || 0.82;      // más despacio que un adulto
-      u.pitch = 1.15;            // un pelín más agudo: gusta más
+      const v = idioma === 'es' ? Voz.elegirEs() : Voz.elegirEn();
+      if (v) { u.voice = v; u.lang = v.lang; } else { u.lang = idioma === 'es' ? 'es-ES' : 'en-US'; }
+      u.rate = vel || (idioma === 'es' ? 0.95 : 0.82);
+      u.pitch = 1.12;
+      if (alTerminar) { u.onend = alTerminar; u.onerror = alTerminar; }
       speechSynthesis.speak(u);
-    } catch (e) {}
+    } catch (e) { if (alTerminar) alTerminar(); }
   },
+
+  decir(texto, vel)   { Voz.parar(); Voz.hablar(texto, 'en', vel); },
+  decirEs(texto)      { Voz.parar(); Voz.hablar(texto, 'es'); },
+
+  /* Lo importante para un niño que empieza de cero: primero lo oye en
+     inglés y enseguida entiende qué significa. Sin eso, adivina. */
+  decirLasDos(en, es) {
+    Voz.parar();
+    Voz.hablar(en, 'en', null, () => {
+      setTimeout(() => Voz.hablar(es, 'es'), 260);
+    });
+  },
+
   parar() { try { speechSynthesis.cancel(); } catch (e) {} }
 };
 if (window.speechSynthesis) {
@@ -145,7 +170,7 @@ const ICO = {
 
 /* ══════════════ 5. ESTADO DE LA VISTA ══════════════ */
 
-const V = { pantalla: 'mundos', mundo: null, i: 0, juego: null, charla: null };
+const V = { pantalla: 'mundos', mundo: null, i: 0, juego: null, charla: null, paso: null };
 
 function ir(pantalla) {
   Voz.parar();
@@ -159,23 +184,42 @@ function ir(pantalla) {
 function mundoPorId(id) { return MUNDOS.find(m => m.id === id) || null; }
 function estrellas(id) { return S.estrellas[id] || 0; }
 
-/* ---- Elegir edad (lo hace el adulto) ---- */
+/* ---- Al empezar: nombre y edad ---- */
 function vistaEdad() {
+  if (V.paso === 'nombre') {
+    return '<div class="wrap">' +
+      '<div style="text-align:center;margin-bottom:18px">' +
+        '<div style="width:110px;height:110px;margin:0 auto 8px">' + dibujo('boy') + '</div>' +
+        '<h1>¿Cómo te llamas?</h1>' +
+        '<p style="color:var(--suave)">Para saludarte por tu nombre. Si prefieres, déjalo vacío.</p>' +
+      '</div>' +
+      '<div class="tarjeta">' +
+        '<input type="text" id="nombreNino" maxlength="16" placeholder="Tu nombre" autocomplete="off" ' +
+          'value="' + esc(S.nombre) + '" class="campo-nombre">' +
+      '</div>' +
+      '<button class="btn grande bloque verde" data-act="guardar-nombre">¡Vamos! →</button>' +
+      '<div style="height:10px"></div>' +
+      '<button class="btn claro bloque" data-act="saltar-nombre">Sin nombre</button>' +
+      '<p style="text-align:center;color:var(--suave);font-size:.88rem;margin-top:18px">' +
+        'El nombre se queda solo en este dispositivo. No se envía a ninguna parte.</p>' +
+    '</div>';
+  }
+
   return '<div class="wrap">' +
     '<div style="text-align:center;margin-bottom:22px">' +
       '<div style="width:120px;height:120px;margin:0 auto 10px">' + dibujo('star') + '</div>' +
       '<h1>¡Hola!</h1>' +
-      '<p style="color:var(--suave)">Antes de empezar, dinos qué edad tiene quien va a jugar. Así la app se adapta sola.</p>' +
+      '<p style="color:var(--suave)">Dinos qué edad tiene quien va a jugar. Así la app se adapta sola.</p>' +
     '</div>' +
 
     '<div class="edades">' +
       '<button class="edad peques" data-act="edad" data-modo="peques">' +
         '<span class="num">4-6</span>' +
-        '<span><b>Todavía no lee</b><span>Solo dibujos y voz. Escucha la palabra y toca el dibujo. Sin nada escrito.</span></span>' +
+        '<span><b>Todavía no lee</b><span>Solo dibujos y voz. Oye la palabra en inglés, y enseguida qué significa.</span></span>' +
       '</button>' +
       '<button class="edad grandes" data-act="edad" data-modo="grandes">' +
         '<span class="num">7-10</span>' +
-        '<span><b>Ya lee</b><span>Ve la palabra escrita junto al dibujo, y hay más juegos para leer.</span></span>' +
+        '<span><b>Ya lee</b><span>Ve la palabra escrita, su traducción y una frase de ejemplo.</span></span>' +
       '</button>' +
     '</div>' +
 
@@ -199,6 +243,14 @@ function vistaMundos() {
         '<div style="color:var(--suave);font-size:.92rem">estrellas ganadas</div>' +
       '</div>' +
     '</div>' +
+
+    (Instalar.sePuede()
+      ? '<button class="instalar-tira" data-act="instalar">' +
+          '<span>' + dibujo('gift') + '</span>' +
+          '<b>Ponla en la pantalla de inicio</b>' +
+          '<i>Para abrirla de un toque, sin internet</i>' +
+        '</button>'
+      : '') +
 
     '<div class="mundos">' +
       MUNDOS.map(m => {
@@ -236,19 +288,24 @@ function vistaAprender() {
     '<div class="wrap">' +
       '<div class="palabra-carta">' +
         '<div class="dibujo" key="' + V.i + '">' + dibujo(p.art) + '</div>' +
-        (esPeque() ? '' :
-          '<div class="en">' + esc(p.en) + '</div>' +
-          '<div class="es">' + esc(p.es) + '</div>' +
-          '<div class="frase">' + esc(p.frase) + '</div>' +
-          '<div class="frase-es">' + esc(p.fraseEs) + '</div>') +
+        (esPeque()
+          ? '<div class="es solo-adulto">' + esc(p.en) + ' · ' + esc(p.es) + '</div>'
+          : '<div class="en">' + esc(p.en) + '</div>' +
+            '<div class="es">' + esc(p.es) + '</div>' +
+            '<div class="frase">' + esc(p.frase) + '</div>' +
+            '<div class="frase-es">' + esc(p.fraseEs) + '</div>') +
       '</div>' +
 
-      '<button class="altavoz" data-act="oir" data-texto="' + esc(p.en) + '" aria-label="Escuchar">' +
-        ICO.altavoz + '</button>' +
+      '<div class="dos-voces">' +
+        '<button class="altavoz" data-act="oir" data-texto="' + esc(p.en) + '" aria-label="Escuchar en inglés">' +
+          ICO.altavoz + '<i>EN</i></button>' +
+        '<button class="altavoz es" data-act="oir-es" data-texto="' + esc(p.es) + '" aria-label="Escuchar en español">' +
+          ICO.altavoz + '<i>ES</i></button>' +
+      '</div>' +
+      '<p class="pista">Toca <b>EN</b> para oírla en inglés y <b>ES</b> para saber qué significa.</p>' +
 
-      (esPeque() ? '' :
-        '<button class="btn claro bloque" style="margin-bottom:12px" data-act="oir" data-texto="' + esc(p.frase) + '">' +
-          ICO.altavoz + ' Escuchar la frase</button>') +
+      '<button class="btn claro bloque" style="margin-bottom:12px" data-act="oir-frase" data-en="' + esc(p.frase) + '" data-es="' + esc(p.fraseEs) + '">' +
+        ICO.altavoz + ' Escuchar la frase en los dos idiomas</button>' +
 
       '<button class="btn grande bloque ' + (ultima ? 'verde' : '') + '" data-act="sig-palabra">' +
         (ultima ? '¡A jugar! ★' : 'Siguiente →') + '</button>' +
@@ -414,21 +471,33 @@ function vistaCharla() {
     '<div class="wrap">' +
       '<div class="charla-quien">' + dibujo(ch.art) + '<b>' + esc(ch.quien) + '</b></div>' +
 
-      (E.dichas || []).map(d =>
-        '<div class="burbuja mia"><div class="en">' + esc(d) + '</div></div>').slice(-1).join('') +
+      (E.dichas || []).slice(-1).map(d =>
+        '<div class="burbuja mia">' +
+          '<div class="en">' + esc(d.en) + '</div>' +
+          '<div class="es">' + esc(d.es) + '</div>' +
+        '</div>').join('') +
 
+      /* Lo que dice el personaje, siempre con su traducción. Un niño que
+         empieza de cero no puede responder a algo que no entiende. */
       '<div class="burbuja">' +
         '<div class="en">' + esc(paso.dice) + '</div>' +
-        (esPeque() ? '' : '<div class="es">' + esc(paso.diceEs) + '</div>') +
+        '<div class="es">' + esc(paso.diceEs) + '</div>' +
       '</div>' +
-      '<div style="text-align:center;margin:10px 0 4px">' +
-        '<button class="altavoz chico" data-act="oir" data-texto="' + esc(paso.dice) + '" aria-label="Escuchar otra vez">' +
-          ICO.altavoz + '</button></div>' +
+      '<div class="dos-voces chico">' +
+        '<button class="altavoz chico" data-act="oir" data-texto="' + esc(paso.dice) + '" aria-label="Otra vez en inglés">' +
+          ICO.altavoz + '<i>EN</i></button>' +
+        '<button class="altavoz chico es" data-act="oir-es" data-texto="' + esc(paso.diceEs) + '" aria-label="Qué significa">' +
+          ICO.altavoz + '<i>ES</i></button>' +
+      '</div>' +
+
+      '<p class="pista">Elige qué quieres responder. Toca el altavoz para oírlo antes.</p>' +
 
       '<div class="elegir">' +
         paso.opciones.map((o, i) =>
           '<button data-act="responder-charla" data-i="' + i + '">' +
-            '<span class="mini">' + ICO.altavoz + '</span>' + esc(o) + '</button>').join('') +
+            '<span class="mini" data-act="oir" data-texto="' + esc(o.en) + '">' + ICO.altavoz + '</span>' +
+            '<span class="txt"><b>' + esc(o.en) + '</b><i>' + esc(o.es) + '</i></span>' +
+          '</button>').join('') +
       '</div>' +
       '<div style="height:20px"></div>' +
     '</div>';
@@ -500,6 +569,14 @@ function vistaPapas() {
     '</div>' +
 
     '<div class="tarjeta">' +
+      '<h2>Instalar</h2>' +
+      '<p style="font-size:.95rem;color:var(--suave)">' + (Instalar.puesta
+        ? 'Ya está instalada en este dispositivo.'
+        : 'Puedes ponerla en la pantalla de inicio como una app más. Funciona sin internet.') + '</p>' +
+      (Instalar.puesta ? '' : '<button class="btn claro bloque" data-act="instalar">Ponerla en la pantalla</button>') +
+    '</div>' +
+
+    '<div class="tarjeta">' +
       '<h2>Privacidad</h2>' +
       '<div class="aviso">' +
         'Esta app <b>no pide ni envía ningún dato</b>. No hay cuentas, no hay anuncios y no hay publicidad dentro. ' +
@@ -511,6 +588,77 @@ function vistaPapas() {
       '<div style="height:10px"></div>' +
       '<button class="btn claro bloque" data-act="borrar" style="color:var(--rojo)">Borrar todo y empezar de cero</button>' +
     '</div>' +
+    '<div style="height:20px"></div>' +
+  '</div>';
+}
+
+/* ============================================================
+   INSTALAR EN EL DISPOSITIVO
+   En Android el navegador nos deja pedirlo con un botón.
+   En iPhone y iPad no lo permite, así que ahí explicamos
+   los dos toques que hay que dar.
+   ============================================================ */
+const Instalar = {
+  invitacion: null,
+  puesta: false,
+  esIOS: false,
+
+  init() {
+    Instalar.esIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    Instalar.puesta = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+      window.navigator.standalone === true;
+
+    window.addEventListener('beforeinstallprompt', e => {
+      e.preventDefault();
+      Instalar.invitacion = e;
+      pintar();
+    });
+    window.addEventListener('appinstalled', () => {
+      Instalar.invitacion = null; Instalar.puesta = true;
+      premio('¡Ya está en tu pantalla!');
+      pintar();
+    });
+  },
+
+  sePuede() { return !Instalar.puesta && (!!Instalar.invitacion || Instalar.esIOS); },
+
+  async pedir() {
+    if (Instalar.invitacion) {
+      Instalar.invitacion.prompt();
+      try {
+        const r = await Instalar.invitacion.userChoice;
+        if (r && r.outcome === 'accepted') Son.fiesta();
+      } catch (e) {}
+      Instalar.invitacion = null;
+      pintar();
+      return;
+    }
+    V.pantalla = 'instalar'; pintar();
+  }
+};
+
+function vistaInstalar() {
+  return '<div class="wrap">' +
+    '<button class="volver" data-act="inicio" aria-label="Volver" style="margin-bottom:14px">←</button>' +
+    '<h1>Ponla en la pantalla</h1>' +
+    '<p style="color:var(--suave)">Así queda como una app de verdad, con su ícono, a pantalla completa y funcionando sin internet.</p>' +
+    (Instalar.esIOS
+      ? '<div class="tarjeta">' +
+          '<div class="paso-i"><span>1</span><b>Toca el botón de Compartir</b>' +
+            '<i>Es el cuadrito con la flecha hacia arriba, abajo en Safari.</i></div>' +
+          '<div class="paso-i"><span>2</span><b>Baja y elige «Añadir a pantalla de inicio»</b>' +
+            '<i>Puede que tengas que deslizar un poco la lista.</i></div>' +
+          '<div class="paso-i"><span>3</span><b>Toca «Añadir»</b>' +
+            '<i>Listo. El ícono queda con tus otras apps.</i></div>' +
+          '<div class="aviso" style="margin-top:12px">Solo funciona desde <b>Safari</b>. Si estás en Chrome en el iPad, abre esta página en Safari primero.</div>' +
+        '</div>'
+      : '<div class="tarjeta">' +
+          '<div class="paso-i"><span>1</span><b>Abre el menú del navegador</b><i>Los tres puntos ⋮ de arriba.</i></div>' +
+          '<div class="paso-i"><span>2</span><b>Elige «Instalar aplicación»</b><i>O «Añadir a pantalla de inicio».</i></div>' +
+          '<div class="paso-i"><span>3</span><b>Confirma</b><i>El ícono queda en tu pantalla de inicio.</i></div>' +
+        '</div>') +
+    '<button class="btn grande bloque verde" data-act="inicio">Entendido</button>' +
     '<div style="height:20px"></div>' +
   '</div>';
 }
@@ -557,6 +705,7 @@ function pintar() {
   if (V.pantalla === 'mundos')        html = V.mundo ? (V.juego ? vistaJuego() : vistaAprender()) : vistaMundos();
   else if (V.pantalla === 'charlas')  html = V.mundo ? vistaCharla() : vistaCharlas();
   else if (V.pantalla === 'papas')    html = vistaPapas();
+  else if (V.pantalla === 'instalar') html = vistaInstalar();
   raiz.innerHTML = '<div class="view">' + html + '</div>';
 
   document.querySelectorAll('.navbtn').forEach(b => {
@@ -573,21 +722,37 @@ document.addEventListener('click', e => {
   const a = t.dataset.act;
 
   if (a === 'edad') {
-    S.modo = t.dataset.modo; S.configurado = true; guardar();
-    Son.bien(); contarDia();
-    ir('mundos'); return;
+    S.modo = t.dataset.modo; guardar();
+    Son.bien();
+    V.paso = 'nombre'; window.scrollTo(0, 0); pintar(); return;
+  }
+
+  if (a === 'guardar-nombre' || a === 'saltar-nombre') {
+    if (a === 'guardar-nombre') {
+      const c = document.getElementById('nombreNino');
+      if (c) S.nombre = c.value.trim().slice(0, 16);
+    }
+    S.configurado = true; guardar();
+    Son.fiesta(); contarDia();
+    V.paso = null;
+    ir('mundos');
+    if (S.nombre) setTimeout(() => premio('¡Hola, ' + S.nombre + '!'), 200);
+    return;
   }
   if (a === 'nav')      { ir(t.dataset.p); return; }
+  if (a === 'instalar') { Instalar.pedir(); return; }
   if (a === 'inicio')   { ir('mundos'); return; }
   if (a === 'ir-charlas'){ ir('charlas'); return; }
 
-  if (a === 'oir') { Voz.decir(t.dataset.texto); return; }
+  if (a === 'oir')    { Voz.decir(t.dataset.texto); return; }
+  if (a === 'oir-es') { Voz.decirEs(t.dataset.texto); return; }
+  if (a === 'oir-frase') { Voz.decirLasDos(t.dataset.en, t.dataset.es); return; }
 
   if (a === 'mundo') {
     V.pantalla = 'mundos'; V.mundo = t.dataset.id; V.i = 0; V.juego = null;
     Son.toque(); window.scrollTo(0, 0); pintar();
     const m = mundoPorId(V.mundo);
-    if (m) setTimeout(() => Voz.decir(m.palabras[0].en), 350);
+    if (m) setTimeout(() => Voz.decirLasDos(m.palabras[0].en, m.palabras[0].es), 350);
     return;
   }
 
@@ -596,7 +761,8 @@ document.addEventListener('click', e => {
     S.aprendidas[m.id + '/' + m.palabras[V.i].en] = true;
     if (V.i < m.palabras.length - 1) {
       V.i++; guardar(); Son.toque(); pintar();
-      setTimeout(() => Voz.decir(m.palabras[V.i].en), 300);
+      const q = m.palabras[V.i];
+      setTimeout(() => Voz.decirLasDos(q.en, q.es), 300);
     } else {
       guardar();
       V.juego = armarJuego(m);
@@ -618,7 +784,7 @@ document.addEventListener('click', e => {
     const bien = q.opciones[i].en === q.buena.en;
     S.jugadas++; if (bien) { S.aciertos++; J.aciertos++; } else J.fallos++;
     guardar();
-    if (bien) { Son.bien(); Voz.decir(q.buena.en); }
+    if (bien) { Son.bien(); Voz.decirLasDos(q.buena.en, q.buena.es); }
     else { Son.mal(); }
     pintar();
     return;
@@ -658,7 +824,7 @@ document.addEventListener('click', e => {
     V.pantalla = 'charlas'; V.mundo = m.id; V.juego = null;
     V.charla = { i: 0, dichas: [] };
     Son.toque(); window.scrollTo(0, 0); pintar();
-    setTimeout(() => Voz.decir(m.charla.pasos[0].dice), 400);
+    setTimeout(() => Voz.decirLasDos(m.charla.pasos[0].dice, m.charla.pasos[0].diceEs), 400);
     return;
   }
 
@@ -667,7 +833,7 @@ document.addEventListener('click', e => {
     const paso = m.charla.pasos[E.i];
     const dicho = paso.opciones[Number(t.dataset.i)];
     E.dichas.push(dicho);
-    Voz.decir(dicho);
+    Voz.decir(dicho.en);          // el niño oye lo que acaba de decir, para repetirlo
     Son.bien();
     setTimeout(() => {
       E.i++;
@@ -677,9 +843,9 @@ document.addEventListener('click', e => {
         premio('¡Conversaste en inglés!');
       } else {
         pintar();
-        setTimeout(() => Voz.decir(m.charla.pasos[E.i].dice), 700);
+        setTimeout(() => Voz.decirLasDos(m.charla.pasos[E.i].dice, m.charla.pasos[E.i].diceEs), 700);
       }
-    }, 1100);
+    }, 1500);
     pintar();
     return;
   }
@@ -735,6 +901,7 @@ function arrancar() {
       ).join('') +
     '</div>';
 
+  Instalar.init();
   contarDia();
   pintar();
 
