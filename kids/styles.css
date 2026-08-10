@@ -1,0 +1,327 @@
+/* ============================================================
+   SpeakUp Kids — Hoja de estilos
+
+   Reglas que me impuse, pensando en una mano pequeña:
+   · Nada que tocar mide menos de 64px.
+   · Texto grande siempre; en modo Peques, casi ninguno.
+   · Colores alegres pero con contraste suficiente para leer.
+   · Todo responde al toque: si lo tocas, algo se mueve.
+   ============================================================ */
+
+:root {
+  --naranja:  #ff7a45;
+  --naranjaO: #e25f2c;
+  --amarillo: #ffc93c;
+  --verde:    #3ec46d;
+  --verdeO:   #2a9c52;
+  --azul:     #3a8dde;
+  --azulO:    #2668a8;
+  --mora:     #9b6bd6;
+  --rosa:     #ff8fb1;
+  --rojo:     #ef4f4f;
+
+  --fondo:    #fff8f0;
+  --tarjeta:  #ffffff;
+  --borde:    #ffe0cc;
+  --texto:    #33302e;
+  --suave:    #7a736e;
+
+  --r:   22px;
+  --r-g: 32px;
+  --sombra:   0 4px 0 rgba(0,0,0,.08), 0 8px 24px rgba(255,122,69,.14);
+  --sombra-g: 0 6px 0 rgba(0,0,0,.10), 0 14px 34px rgba(255,122,69,.20);
+  --fuente: "Comic Sans MS", "Chalkboard SE", "Segoe UI Rounded", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  margin: 0; padding: 0;
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: var(--fuente);
+  font-size: 18px;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  overscroll-behavior-y: contain;
+}
+body { padding-bottom: 96px; }
+
+/* nadie debería poder seleccionar texto sin querer mientras juega */
+body { user-select: none; -webkit-user-select: none; }
+input, textarea { user-select: text; -webkit-user-select: text; }
+
+h1 { font-size: 1.9rem; margin: 0 0 8px; line-height: 1.15; }
+h2 { font-size: 1.5rem; margin: 0 0 8px; }
+p  { margin: 0 0 12px; }
+
+:focus-visible { outline: 4px solid var(--azul); outline-offset: 3px; border-radius: 12px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+
+/* ---------- Arranque ---------- */
+.arranque {
+  position: fixed; inset: 0; z-index: 200;
+  background: linear-gradient(160deg, var(--naranja), var(--amarillo));
+  color: #fff; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 6px;
+  transition: opacity .5s ease, visibility .5s;
+}
+.arranque img {
+  width: 110px; height: 110px; border-radius: 30px; margin-bottom: 16px;
+  box-shadow: 0 14px 34px rgba(0,0,0,.22);
+  animation: brinca .7s cubic-bezier(.2,.9,.3,1.3) both;
+}
+.arranque b { font-size: 1.9rem; animation: sube .5s ease .3s both; }
+.arranque span { font-size: 1.05rem; opacity: .9; animation: sube .5s ease .5s both; }
+.arranque.fuera { opacity: 0; visibility: hidden; }
+@keyframes brinca { from { opacity: 0; transform: scale(.5) rotate(-12deg); } to { opacity: 1; transform: none; } }
+@keyframes sube   { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+/* ---------- Estructura ---------- */
+.wrap { max-width: 620px; margin: 0 auto; padding: 0 16px; }
+main { padding-top: 18px; }
+.view { animation: entra .3s ease; }
+@keyframes entra { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+.barra {
+  display: flex; align-items: center; gap: 10px;
+  max-width: 620px; margin: 0 auto 14px; padding: 0 16px;
+}
+.barra .titulo { font-size: 1.5rem; font-weight: 700; flex: 1; }
+
+/* ---------- Botones ---------- */
+.btn {
+  appearance: none; border: 0; cursor: pointer; font-family: inherit;
+  font-size: 1.1rem; font-weight: 700; color: #fff;
+  background: var(--naranja);
+  border-radius: var(--r); padding: 16px 24px;
+  min-height: 64px; display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  box-shadow: 0 4px 0 var(--naranjaO);
+  transition: transform .08s, box-shadow .08s;
+}
+.btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--naranjaO); }
+.btn.grande { font-size: 1.3rem; padding: 20px 28px; min-height: 76px; }
+.btn.bloque { display: flex; width: 100%; }
+.btn.verde { background: var(--verde); box-shadow: 0 4px 0 var(--verdeO); }
+.btn.azul  { background: var(--azul);  box-shadow: 0 4px 0 var(--azulO); }
+.btn.claro {
+  background: var(--tarjeta); color: var(--texto);
+  box-shadow: 0 4px 0 var(--borde); border: 2px solid var(--borde);
+}
+.btn svg { width: 26px; height: 26px; }
+
+.volver {
+  appearance: none; border: 0; background: var(--tarjeta); cursor: pointer;
+  width: 56px; height: 56px; min-width: 56px; border-radius: 18px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 3px 0 var(--borde); font-size: 1.6rem; color: var(--texto);
+  font-family: inherit;
+}
+.volver:active { transform: translateY(2px); box-shadow: none; }
+
+/* ---------- Tarjetas ---------- */
+.tarjeta {
+  background: var(--tarjeta); border-radius: var(--r-g);
+  padding: 20px; margin-bottom: 16px; box-shadow: var(--sombra);
+}
+
+/* ---------- Mundos ---------- */
+.mundos { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.mundo {
+  appearance: none; border: 0; cursor: pointer; font-family: inherit;
+  background: var(--tarjeta); border-radius: var(--r-g);
+  padding: 18px 12px 16px; text-align: center;
+  box-shadow: var(--sombra); position: relative;
+  transition: transform .12s;
+}
+.mundo:active { transform: scale(.96); }
+.mundo svg { width: 84px; height: 84px; display: block; margin: 0 auto 8px; }
+.mundo b { display: block; font-size: 1.05rem; line-height: 1.25; }
+.mundo .estrellas { display: flex; justify-content: center; gap: 3px; margin-top: 8px; }
+.mundo .estrellas i {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--borde); display: block;
+}
+.mundo .estrellas i.on { background: var(--amarillo); }
+.mundo.rojo     { background: linear-gradient(#fff, #ffeceb); }
+.mundo.azul     { background: linear-gradient(#fff, #e9f3fd); }
+.mundo.verde    { background: linear-gradient(#fff, #e9f9ef); }
+.mundo.amarillo { background: linear-gradient(#fff, #fff7e0); }
+.mundo.naranja  { background: linear-gradient(#fff, #fff0e8); }
+.mundo.mora     { background: linear-gradient(#fff, #f3ecfc); }
+.mundo.rosa     { background: linear-gradient(#fff, #ffeef3); }
+
+/* ---------- Carta de palabra ---------- */
+.palabra-carta {
+  background: var(--tarjeta); border-radius: var(--r-g);
+  padding: 26px 20px; text-align: center; box-shadow: var(--sombra-g);
+  margin-bottom: 18px;
+}
+.palabra-carta .dibujo {
+  width: 190px; height: 190px; margin: 0 auto 14px;
+  animation: aparece .35s cubic-bezier(.2,.9,.3,1.3) both;
+}
+.palabra-carta .dibujo svg { width: 100%; height: 100%; }
+@keyframes aparece { from { opacity: 0; transform: scale(.7); } to { opacity: 1; transform: none; } }
+.palabra-carta .en { font-size: 2.3rem; font-weight: 800; letter-spacing: -.02em; line-height: 1.1; }
+.palabra-carta .es { font-size: 1.15rem; color: var(--suave); margin-top: 2px; }
+.palabra-carta .frase { font-size: 1.05rem; margin-top: 12px; }
+.palabra-carta .frase-es { font-size: .95rem; color: var(--suave); }
+
+/* ---------- Rejilla de opciones (el juego principal) ---------- */
+.opciones { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.opciones.tres { grid-template-columns: 1fr 1fr 1fr; }
+.opcion {
+  appearance: none; border: 4px solid transparent; cursor: pointer; font-family: inherit;
+  background: var(--tarjeta); border-radius: var(--r-g);
+  padding: 14px 8px; box-shadow: var(--sombra);
+  transition: transform .12s, border-color .15s;
+  min-height: 130px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+}
+.opcion:active { transform: scale(.95); }
+.opcion svg { width: 84px; height: 84px; }
+.opcion b { font-size: 1.15rem; }
+.opcion.bien { border-color: var(--verde); background: #eafaf0; animation: latido .45s ease; }
+.opcion.mal  { border-color: var(--rojo);  background: #ffeceb; animation: tiembla .35s ease; }
+.opcion[disabled] { cursor: default; }
+@keyframes latido  { 0%,100%{transform:none} 40%{transform:scale(1.08)} }
+@keyframes tiembla { 0%,100%{transform:none} 20%,60%{transform:translateX(-7px)} 40%,80%{transform:translateX(7px)} }
+
+/* botón grande de altavoz */
+.altavoz {
+  appearance: none; border: 0; cursor: pointer;
+  width: 108px; height: 108px; border-radius: 50%;
+  background: var(--amarillo); color: #7a5200;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 18px; box-shadow: 0 6px 0 #d9a416, 0 12px 30px rgba(255,201,60,.4);
+  transition: transform .1s, box-shadow .1s;
+}
+.altavoz:active { transform: translateY(4px); box-shadow: 0 2px 0 #d9a416; }
+.altavoz svg { width: 52px; height: 52px; }
+.altavoz.sonando { animation: pulso 1s ease infinite; }
+@keyframes pulso { 0%,100%{transform:none} 50%{transform:scale(1.06)} }
+
+.altavoz.chico { width: 66px; height: 66px; margin: 0; box-shadow: 0 4px 0 #d9a416; }
+.altavoz.chico svg { width: 32px; height: 32px; }
+
+/* ---------- Progreso ---------- */
+.progreso { display: flex; gap: 6px; margin: 0 auto 18px; max-width: 620px; padding: 0 16px; }
+.progreso i {
+  flex: 1; height: 10px; border-radius: 999px; background: var(--borde); display: block;
+  transition: background .3s;
+}
+.progreso i.on { background: var(--verde); }
+.progreso i.cur { background: var(--naranja); }
+
+/* ---------- Premio ---------- */
+.premio {
+  position: fixed; inset: 0; z-index: 150;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,248,240,.86); backdrop-filter: blur(4px);
+  animation: entra .25s ease;
+}
+.premio-caja { text-align: center; padding: 24px; }
+.premio-caja .estrellota {
+  width: 150px; height: 150px; margin: 0 auto 10px;
+  animation: gira .7s cubic-bezier(.2,.9,.3,1.4) both;
+}
+.premio-caja .estrellota svg { width: 100%; height: 100%; }
+@keyframes gira { from { opacity:0; transform: scale(.3) rotate(-40deg);} to {opacity:1; transform:none;} }
+.premio-caja h2 { font-size: 2rem; color: var(--verdeO); }
+
+/* confeti: puro CSS, sin librerías */
+.confeti { position: fixed; inset: 0; pointer-events: none; z-index: 151; overflow: hidden; }
+.confeti i {
+  position: absolute; top: -20px; width: 12px; height: 16px; border-radius: 3px;
+  animation: cae linear forwards;
+}
+@keyframes cae {
+  to { transform: translateY(110vh) rotate(720deg); opacity: .2; }
+}
+
+/* ---------- Conversación guionada ---------- */
+.charla-quien { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.charla-quien svg { width: 66px; height: 66px; flex: none; }
+.charla-quien b { font-size: 1.15rem; }
+.burbuja {
+  background: var(--tarjeta); border-radius: 26px 26px 26px 8px;
+  padding: 18px 20px; box-shadow: var(--sombra); margin-bottom: 6px;
+}
+.burbuja .en { font-size: 1.35rem; font-weight: 700; }
+.burbuja .es { font-size: .98rem; color: var(--suave); margin-top: 4px; }
+.burbuja.mia {
+  border-radius: 26px 26px 8px 26px; margin-left: 40px;
+  background: var(--azul); color: #fff;
+}
+.burbuja.mia .es { color: rgba(255,255,255,.85); }
+.elegir { display: grid; gap: 12px; margin-top: 16px; }
+.elegir button {
+  appearance: none; border: 3px solid var(--borde); cursor: pointer; font-family: inherit;
+  background: var(--tarjeta); border-radius: var(--r); padding: 16px 18px;
+  font-size: 1.15rem; font-weight: 700; text-align: left; min-height: 66px;
+  box-shadow: 0 3px 0 var(--borde); color: var(--texto);
+  display: flex; align-items: center; gap: 12px;
+}
+.elegir button:active { transform: translateY(2px); box-shadow: none; }
+.elegir button .mini { width: 34px; height: 34px; flex: none; color: var(--naranja); }
+
+/* ---------- Menú de abajo ---------- */
+.nav {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 60;
+  background: var(--tarjeta); border-top: 3px solid var(--borde);
+  padding-bottom: env(safe-area-inset-bottom);
+  box-shadow: 0 -4px 20px rgba(255,122,69,.10);
+}
+.nav-in { max-width: 620px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); }
+.navbtn {
+  appearance: none; background: none; border: 0; cursor: pointer; font-family: inherit;
+  padding: 12px 4px 14px; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  color: var(--suave); font-size: .8rem; font-weight: 700;
+  min-height: 72px;
+}
+.navbtn svg { width: 30px; height: 30px; }
+.navbtn[aria-current="page"] { color: var(--naranja); }
+
+/* ---------- Elegir edad ---------- */
+.edades { display: grid; gap: 14px; }
+.edad {
+  appearance: none; border: 4px solid var(--borde); cursor: pointer; font-family: inherit;
+  background: var(--tarjeta); border-radius: var(--r-g); padding: 22px;
+  display: flex; align-items: center; gap: 18px; text-align: left;
+  box-shadow: var(--sombra); color: var(--texto);
+}
+.edad:active { transform: scale(.98); }
+.edad .num {
+  width: 74px; height: 74px; border-radius: 24px; flex: none;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem; font-weight: 800; color: #fff;
+}
+.edad.peques .num  { background: var(--rosa); }
+.edad.grandes .num { background: var(--azul); }
+.edad b { display: block; font-size: 1.25rem; }
+.edad span { display: block; font-size: .95rem; color: var(--suave); line-height: 1.4; }
+
+/* ---------- Zona de padres ---------- */
+.puerta { max-width: 420px; margin: 0 auto; text-align: center; }
+.puerta .cuenta { font-size: 2.2rem; font-weight: 800; margin: 16px 0; }
+.puerta input {
+  width: 100%; font-family: inherit; font-size: 1.6rem; text-align: center;
+  padding: 16px; border-radius: var(--r); border: 3px solid var(--borde);
+  background: var(--tarjeta); color: var(--texto);
+}
+.dato { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 2px solid var(--borde); }
+.dato:last-child { border-bottom: 0; }
+.dato b { font-size: 1.2rem; }
+.aviso {
+  background: #fff7e0; border: 3px solid var(--amarillo);
+  border-radius: var(--r); padding: 16px; font-size: .95rem; line-height: 1.5;
+}
+
+/* ---------- Escritorio ---------- */
+@media (min-width: 760px) {
+  .mundos { grid-template-columns: repeat(3, 1fr); }
+  .palabra-carta .dibujo { width: 220px; height: 220px; }
+}
