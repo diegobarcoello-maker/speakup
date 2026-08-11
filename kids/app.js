@@ -22,8 +22,13 @@ const INICIAL = {
   estrellas: {},            // mundoId -> 0..3
   aprendidas: {},           // 'mundo/palabra' -> true
   charlasHechas: {},        // mundoId -> true
+  mochila: {},             // palabra -> { m, veces, cuando } lo que toca repasar
   jugadas: 0,
   aciertos: 0,
+  metaDia: 0,              // aciertos de hoy
+  metaFecha: '',
+  racha: 0,
+  diasJugados: [],         // últimos días, para el calendario de caritas
   minutos: 0,
   ultimoDia: '',
   dias: 0,
@@ -165,16 +170,18 @@ const ICO = {
   jugar:   '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 15 9l7 .6-5.3 4.6 1.6 6.8L12 17.3 5.7 21l1.6-6.8L2 9.6 9 9z"/></svg>',
   charla:  '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z"/></svg>',
   papas:   '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-5 0-9 2.5-9 5.5V22h18v-2.5c0-3-4-5.5-9-5.5z"/></svg>',
-  micro:   '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V21h2v-3.1A7 7 0 0 0 19 11z"/></svg>'
+  micro:   '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V21h2v-3.1A7 7 0 0 0 19 11z"/></svg>',
+  bajar:   '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3a1.5 1.5 0 0 1 1.5 1.5v8.4l3-3a1.5 1.5 0 1 1 2.1 2.1l-5.5 5.5a1.5 1.5 0 0 1-2.2 0l-5.5-5.5a1.5 1.5 0 1 1 2.1-2.1l3 3V4.5A1.5 1.5 0 0 1 12 3zM4 18.5A1.5 1.5 0 0 1 5.5 17h13a1.5 1.5 0 0 1 0 3h-13A1.5 1.5 0 0 1 4 18.5z"/></svg>',
+  mochila: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 2h6a3 3 0 0 1 3 3v1h1a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3h1V5a3 3 0 0 1 3-3zm0 4h6V5H9v1zm-1 6v3h8v-3H8z"/></svg>'
 };
 
 /* ══════════════ 5. ESTADO DE LA VISTA ══════════════ */
 
-const V = { pantalla: 'mundos', mundo: null, i: 0, juego: null, charla: null, paso: null };
+const V = { pantalla: 'mundos', mundo: null, i: 0, juego: null, charla: null, paso: null, repaso: null, memoria: null, repetir: null };
 
 function ir(pantalla) {
   Voz.parar();
-  V.pantalla = pantalla; V.mundo = null; V.i = 0; V.juego = null; V.charla = null;
+  V.pantalla = pantalla; V.mundo = null; V.i = 0; V.juego = null; V.charla = null; V.repaso = null;
   window.scrollTo(0, 0);
   pintar();
 }
@@ -242,13 +249,29 @@ function vistaMundos() {
         '<b style="font-size:1.3rem">' + ganadas + ' de ' + total + '</b>' +
         '<div style="color:var(--suave);font-size:.92rem">estrellas ganadas</div>' +
       '</div>' +
+      ((S.racha || 0) > 0
+        ? '<div style="text-align:center"><b style="font-size:1.5rem;color:var(--naranja)">' + S.racha + '</b>' +
+          '<div style="color:var(--suave);font-size:.8rem">días<br>seguidos</div></div>'
+        : '') +
     '</div>' +
+
+    /* barra de la meta del día */
+    (function () {
+      ensureDia();
+      const meta = metaDelDia(), hechas = Math.min(S.metaDia || 0, meta);
+      return '<div class="tarjeta meta-dia">' +
+        '<div class="row-racha"><b>Mi meta de hoy</b><span>' + hechas + ' / ' + meta + '</span></div>' +
+        '<div class="meta-barra"><i style="width:' + Math.round(hechas / meta * 100) + '%"></i></div>' +
+        (hechas >= meta ? '<p class="meta-ok">¡Cumplida! ★</p>' : '') +
+      '</div>';
+    })() +
 
     (Instalar.sePuede()
       ? '<button class="instalar-tira" data-act="instalar">' +
-          '<span>' + dibujo('gift') + '</span>' +
-          '<b>Ponla en la pantalla de inicio</b>' +
-          '<i>Para abrirla de un toque, sin internet</i>' +
+          '<span class="ico-baja">' + ICO.bajar + '</span>' +
+          '<b>Descargar la app</b>' +
+          '<i>Queda en la pantalla y funciona sin internet</i>' +
+          '<em>Gratis</em>' +
         '</button>'
       : '') +
 
@@ -313,14 +336,186 @@ function vistaAprender() {
     '</div>';
 }
 
+/* ============================================================
+   LA MOCHILA — el repaso, en versión niño
+
+   Cada palabra que ve entra a su mochila. Vuelve a salir
+   después de 1 día, luego 3, luego 7 y luego 15. Si falla,
+   vuelve al principio. Es repetición espaciada de toda la
+   vida, pero contada como que la palabra "se guarda" y
+   "sale a saludar".
+   ============================================================ */
+
+const ESPERAS = [1, 3, 7, 15, 30];
+const DIA = 86400000;
+
+function guardarEnMochila(m, p) {
+  if (!S.mochila) S.mochila = {};
+  const k = m + '/' + p.en;
+  if (S.mochila[k]) return;
+  S.mochila[k] = { m: m, en: p.en, es: p.es, art: p.art, veces: 0, cuando: Date.now() + DIA };
+}
+function pendientes() {
+  const ahora = Date.now();
+  return Object.keys(S.mochila || {}).map(k => S.mochila[k]).filter(c => c.cuando <= ahora);
+}
+function calificar(c, bien) {
+  if (bien) {
+    c.veces = Math.min(c.veces + 1, ESPERAS.length - 1);
+    c.cuando = Date.now() + ESPERAS[c.veces] * DIA;
+  } else {
+    c.veces = 0;
+    c.cuando = Date.now() + DIA;
+  }
+  guardar();
+}
+
+/* ---- Meta del día y racha ---- */
+function metaDelDia() { return 10; }
+function ensureDia() {
+  const h = hoyClave();
+  if (S.metaFecha !== h) { S.metaFecha = h; S.metaDia = 0; }
+}
+function sumarAcierto() {
+  ensureDia();
+  S.metaDia++;
+  if (S.metaDia === metaDelDia()) {
+    const h = hoyClave();
+    if (!S.diasJugados) S.diasJugados = [];
+    if (S.diasJugados[S.diasJugados.length - 1] !== h) {
+      const ayer = new Date(Date.now() - DIA).toISOString().slice(0, 10);
+      S.racha = (S.diasJugados[S.diasJugados.length - 1] === ayer) ? S.racha + 1 : 1;
+      S.diasJugados.push(h);
+      if (S.diasJugados.length > 40) S.diasJugados = S.diasJugados.slice(-40);
+    }
+    guardar();
+    setTimeout(() => premio('¡Meta del día cumplida!'), 300);
+  }
+  guardar();
+}
+
+/* ---- La pantalla del repaso ---- */
+function vistaMochila() {
+  const listas = pendientes();
+
+  if (!V.repaso) {
+    const total = Object.keys(S.mochila || {}).length;
+    return '<div class="wrap">' +
+      '<h1>Mi mochila</h1>' +
+      '<p style="color:var(--suave);margin-top:-4px">Aquí se guardan las palabras que ya viste. Vuelven de vez en cuando para que no se te olviden.</p>' +
+
+      '<div class="tarjeta" style="display:flex;align-items:center;gap:14px">' +
+        '<div style="width:56px;height:56px;flex:none">' + dibujo('bag') + '</div>' +
+        '<div style="flex:1"><b style="font-size:1.4rem">' + total + '</b>' +
+          '<div style="color:var(--suave);font-size:.92rem">palabras guardadas</div></div>' +
+      '</div>' +
+
+      (listas.length
+        ? '<div class="tarjeta" style="text-align:center;border:4px solid var(--verde)">' +
+            '<div style="width:80px;height:80px;margin:0 auto 8px">' + dibujo('star') + '</div>' +
+            '<h2 style="color:var(--verdeO)">' + listas.length + ' palabra' + (listas.length === 1 ? '' : 's') + ' quiere' + (listas.length === 1 ? '' : 'n') + ' saludarte</h2>' +
+            '<button class="btn grande bloque verde" data-act="repaso-empezar">¡Vamos! →</button>' +
+          '</div>'
+        : total
+          ? '<div class="tarjeta" style="text-align:center">' +
+              '<div style="width:80px;height:80px;margin:0 auto 8px">' + dibujo('sleep') + '</div>' +
+              '<h2>Están descansando</h2>' +
+              '<p style="color:var(--suave)">Vuelve mañana y algunas saldrán a saludarte.</p>' +
+            '</div>'
+          : '<div class="tarjeta" style="text-align:center">' +
+              '<div style="width:80px;height:80px;margin:0 auto 8px">' + dibujo('toy') + '</div>' +
+              '<h2>Todavía está vacía</h2>' +
+              '<p style="color:var(--suave)">Juega un mundo y las palabras se guardarán aquí solas.</p>' +
+              '<button class="btn bloque" data-act="inicio">Ir a jugar</button>' +
+            '</div>') +
+
+      /* racha */
+      '<div class="tarjeta">' +
+        '<div class="row-racha"><b>' + (S.racha || 0) + ' día' + ((S.racha || 0) === 1 ? '' : 's') + ' seguidos</b>' +
+          '<span>' + Math.min(S.metaDia || 0, metaDelDia()) + ' / ' + metaDelDia() + ' hoy</span></div>' +
+        '<div class="calendario">' + calendarioCaritas() + '</div>' +
+      '</div>' +
+      '<div style="height:20px"></div>' +
+    '</div>';
+  }
+
+  /* jugando el repaso */
+  const R = V.repaso;
+  if (R.i >= R.cartas.length) {
+    return '<div class="wrap" style="text-align:center;padding-top:20px">' +
+      '<div style="width:160px;height:160px;margin:0 auto 6px">' + dibujo('star') + '</div>' +
+      '<h1>¡Repaso hecho!</h1>' +
+      '<p style="font-size:1.2rem">Acertaste <b>' + R.aciertos + '</b> de <b>' + R.cartas.length + '</b></p>' +
+      '<button class="btn grande bloque verde" data-act="repaso-salir">Muy bien</button>' +
+      '<div style="height:20px"></div>' +
+    '</div>';
+  }
+
+  const c = R.cartas[R.i];
+  const hecho = R.resp !== null;
+  return '<div class="barra">' +
+      '<button class="volver" data-act="repaso-salir" aria-label="Salir">←</button>' +
+      '<span class="titulo">Mi mochila</span>' +
+      '<span style="font-weight:800;color:var(--verdeO);font-size:1.2rem">' + R.aciertos + ' ★</span>' +
+    '</div>' +
+    '<div class="progreso">' +
+      R.cartas.map((_, i) => '<i class="' + (i < R.i ? 'on' : i === R.i ? 'cur' : '') + '"></i>').join('') +
+    '</div>' +
+    '<div class="wrap">' +
+      '<p style="text-align:center;font-size:1.15rem;font-weight:700;margin-bottom:14px">' +
+        (esPeque() ? 'Escucha y toca' : '¿Cuál es?') + '</p>' +
+      '<button class="altavoz ' + (hecho ? '' : 'sonando') + '" data-act="oir" data-texto="' + esc(c.en) + '" aria-label="Escuchar">' +
+        ICO.altavoz + '<i>EN</i></button>' +
+      '<div class="opciones">' +
+        R.opciones.map((o, i) => {
+          let cls = 'opcion';
+          if (hecho) { if (o.en === c.en) cls += ' bien'; else if (i === R.resp) cls += ' mal'; }
+          return '<button class="' + cls + '"' + (hecho ? ' disabled' : '') +
+            ' data-act="repaso-responder" data-i="' + i + '" aria-label="' + esc(o.es) + '">' +
+            dibujo(o.art) + (esPeque() ? '' : '<b>' + esc(o.en) + '</b>') + '</button>';
+        }).join('') +
+      '</div>' +
+      (hecho ? '<button class="btn grande bloque verde" style="margin-top:18px" data-act="repaso-siguiente">Siguiente →</button>' : '') +
+      '<div style="height:20px"></div>' +
+    '</div>';
+}
+
+function calendarioCaritas() {
+  const dias = [];
+  for (let k = 13; k >= 0; k--) {
+    const d = new Date(Date.now() - k * DIA).toISOString().slice(0, 10);
+    const hecho = (S.diasJugados || []).indexOf(d) >= 0;
+    dias.push('<i class="' + (hecho ? 'on' : '') + '">' + (hecho ? '★' : '') + '</i>');
+  }
+  return dias.join('');
+}
+
+function armarRepaso() {
+  const listas = mezclar(pendientes()).slice(0, 8);
+  const todas = MUNDOS.reduce((a, m) => a.concat(m.palabras), []);
+  V.repaso = {
+    cartas: listas, i: 0, aciertos: 0, resp: null,
+    opciones: []
+  };
+  ponerOpciones();
+}
+function ponerOpciones() {
+  const R = V.repaso; if (!R || R.i >= R.cartas.length) return;
+  const c = R.cartas[R.i];
+  const todas = MUNDOS.reduce((a, m) => a.concat(m.palabras), []);
+  const otras = mezclar(todas.filter(p => p.en !== c.en)).slice(0, 3);
+  R.opciones = mezclar(otras.concat([{ en: c.en, es: c.es, art: c.art }]));
+  R.resp = null;
+}
+
 /* ══════════════ 7. LOS JUEGOS ══════════════ */
 
 /* Tres rondas por mundo, cada una con su tipo. En peques solo
    entran los juegos que no necesitan leer. */
 function armarJuego(m) {
   const tipos = esPeque()
-    ? ['oirToca', 'oirToca', 'sombra']
-    : ['oirToca', 'cualEs', 'sombra'];
+    ? ['oirToca', 'falta', 'sombra']
+    : ['oirToca', 'cualEs', 'falta'];
   const preguntas = [];
   const pool = mezclar(m.palabras);
   tipos.forEach((tipo, ronda) => {
@@ -330,7 +525,9 @@ function armarJuego(m) {
       let otras = m.palabras.filter(x => x.en !== buena.en);
       otras = mezclar(otras).slice(0, 3);
       const opciones = mezclar(otras.concat([buena]));
-      preguntas.push({ tipo, buena, opciones, resp: null });
+      const p = { tipo, buena, opciones, resp: null };
+      if (tipo === 'falta') p.fase = 'mira';
+      preguntas.push(p);
     }
   });
   return { preguntas, i: 0, aciertos: 0, fallos: 0 };
@@ -360,6 +557,34 @@ function vistaJuego() {
     cabeza = '<p style="text-align:center;font-size:1.15rem;font-weight:700;margin-bottom:8px">¿Cómo se escribe?</p>' +
       '<div style="width:150px;height:150px;margin:0 auto 14px">' + dibujo(q.buena.art) + '</div>';
     rejilla = q.opciones.map((o, i) => botonOpcion(o, q, i, false, true)).join('');
+
+  } else if (q.tipo === 'falta') {
+    /* Se enseñan cuatro, se tapan un instante y desaparece uno.
+       Trabaja la memoria visual junto con la palabra. */
+    const fase = q.fase || 'mira';
+    if (fase === 'mira') {
+      cabeza = '<p style="text-align:center;font-size:1.15rem;font-weight:700;margin-bottom:14px">¡Mira bien!</p>';
+      rejilla = q.opciones.map(o =>
+        '<div class="opcion" aria-hidden="true">' + dibujo(o.art) + (esPeque() ? '' : '<b>' + esc(o.en) + '</b>') + '</div>').join('');
+      return '<div class="barra">' +
+          '<button class="volver" data-act="inicio" aria-label="Salir">←</button>' +
+          '<span class="titulo">' + esc(m.titulo) + '</span>' +
+          '<span style="font-weight:800;color:var(--verdeO);font-size:1.2rem">' + J.aciertos + ' ★</span>' +
+        '</div>' +
+        '<div class="progreso">' +
+          J.preguntas.map((_, i) => '<i class="' + (i < J.i ? 'on' : i === J.i ? 'cur' : '') + '"></i>').join('') +
+        '</div>' +
+        '<div class="wrap">' + cabeza +
+          '<div class="opciones">' + rejilla + '</div>' +
+          '<button class="btn grande bloque verde" style="margin-top:18px" data-act="falta-listo">¡Ya miré! →</button>' +
+          '<div style="height:20px"></div>' +
+        '</div>';
+    }
+    cabeza = '<p style="text-align:center;font-size:1.15rem;font-weight:700;margin-bottom:14px">¿Cuál desapareció?</p>';
+    rejilla = q.opciones.map((o, i) => {
+      if (o.en === q.buena.en && !hecho) return '<div class="opcion vacia" aria-hidden="true">?</div>';
+      return botonOpcion(o, q, i, true, !esPeque());
+    }).join('');
 
   } else { /* sombra: ve el dibujo grande y elige el nombre por voz */
     cabeza = '<p style="text-align:center;font-size:1.15rem;font-weight:700;margin-bottom:14px">' +
@@ -416,6 +641,10 @@ function vistaFinJuego(m, J) {
     '</div>' +
     '<button class="btn grande bloque verde" data-act="jugar-otra" data-id="' + m.id + '">Jugar otra vez</button>' +
     '<div style="height:10px"></div>' +
+    '<button class="btn grande bloque azul" data-act="repetir" data-id="' + m.id + '">' + ICO.micro + ' Repite conmigo</button>' +
+    '<div style="height:10px"></div>' +
+    '<button class="btn grande bloque claro" data-act="memoria" data-id="' + m.id + '">Parejas de memoria</button>' +
+    '<div style="height:10px"></div>' +
     (m.charla && !S.charlasHechas[m.id]
       ? '<button class="btn grande bloque azul" data-act="charla" data-id="' + m.id + '">Ahora a conversar →</button>' +
         '<div style="height:10px"></div>'
@@ -423,6 +652,169 @@ function vistaFinJuego(m, J) {
     '<button class="btn claro bloque" data-act="inicio">Volver a los mundos</button>' +
     '<div style="height:20px"></div>' +
   '</div>';
+}
+
+/* ---- Memoria de parejas ---- */
+function armarMemoria(m) {
+  const elegidas = mezclar(m.palabras).slice(0, 6);
+  const cartas = mezclar(elegidas.concat(elegidas).map((p, i) => ({
+    id: i, en: p.en, es: p.es, art: p.art, vuelta: false, hecha: false
+  })));
+  V.memoria = { cartas, abiertas: [], parejas: 0, intentos: 0, bloqueado: false };
+}
+
+function vistaMemoria() {
+  const m = mundoPorId(V.mundo);
+  if (!m || !V.memoria) return vistaMundos();
+  const M = V.memoria;
+
+  if (M.parejas === 6) {
+    return '<div class="wrap" style="text-align:center;padding-top:20px">' +
+      '<div style="width:160px;height:160px;margin:0 auto 6px">' + dibujo('star') + '</div>' +
+      '<h1>¡Las encontraste todas!</h1>' +
+      '<p style="font-size:1.2rem">En <b>' + M.intentos + '</b> intentos</p>' +
+      '<button class="btn grande bloque verde" data-act="memoria" data-id="' + m.id + '">Otra vez</button>' +
+      '<div style="height:10px"></div>' +
+      '<button class="btn claro bloque" data-act="inicio">Volver</button>' +
+    '</div>';
+  }
+
+  return '<div class="barra">' +
+      '<button class="volver" data-act="inicio" aria-label="Salir">←</button>' +
+      '<span class="titulo">Parejas</span>' +
+      '<span style="font-weight:800;color:var(--verdeO);font-size:1.2rem">' + M.parejas + '/6</span>' +
+    '</div>' +
+    '<div class="wrap">' +
+      '<p class="pista">Toca dos cartas y busca las que son iguales.</p>' +
+      '<div class="memoria">' +
+        M.cartas.map((c, i) =>
+          '<button class="mem' + (c.hecha ? ' hecha' : c.vuelta ? ' vuelta' : '') + '"' +
+            (c.hecha || c.vuelta || M.bloqueado ? ' disabled' : '') +
+            ' data-act="mem-voltear" data-i="' + i + '" aria-label="' + (c.vuelta || c.hecha ? esc(c.es) : 'Carta tapada') + '">' +
+            (c.vuelta || c.hecha ? dibujo(c.art) : '<span class="mem-dorso">?</span>') +
+          '</button>').join('') +
+      '</div>' +
+      '<div style="height:20px"></div>' +
+    '</div>';
+}
+
+/* ============================================================
+   REPITE CONMIGO
+   El niño dice la palabra y una carita reacciona. No es un
+   examen: aunque falle, la carita sonríe y le anima.
+   ============================================================ */
+
+const Micro = {
+  rec: null,
+  escuchando: false,
+  hay() {
+    return !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+  },
+  parar() {
+    Micro.escuchando = false;
+    if (Micro.rec) { try { Micro.rec.stop(); } catch (e) {} }
+  },
+  escuchar(objetivo, alTerminar) {
+    const R = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!R) { alTerminar(null); return; }
+    try {
+      const r = new R();
+      Micro.rec = r;
+      r.lang = 'en-US';
+      r.interimResults = false;
+      r.maxAlternatives = 3;
+      let contestado = false;
+      r.onresult = e => {
+        contestado = true;
+        const dichos = [];
+        for (let i = 0; i < e.results[0].length; i++) dichos.push(e.results[0][i].transcript);
+        alTerminar(dichos);
+      };
+      r.onerror = () => { if (!contestado) { contestado = true; alTerminar(null); } };
+      r.onend   = () => { Micro.escuchando = false; if (!contestado) alTerminar(null); };
+      Micro.escuchando = true;
+      r.start();
+    } catch (e) { alTerminar(null); }
+  },
+  /* comparación amable: a un niño no se le exige acento perfecto */
+  parecido(dichos, objetivo) {
+    if (!dichos || !dichos.length) return 0;
+    const limpia = t => String(t).toLowerCase().replace(/[^a-z ]/g, '').trim();
+    const meta = limpia(objetivo);
+    let mejor = 0;
+    for (const d of dichos) {
+      const x = limpia(d);
+      if (!x) continue;
+      if (x === meta) return 100;
+      if (x.indexOf(meta) >= 0 || meta.indexOf(x) >= 0) { mejor = Math.max(mejor, 85); continue; }
+      /* letras compartidas: suficiente para un niño de 5 años */
+      let iguales = 0;
+      const usadas = x.split('');
+      for (const c of meta) {
+        const k = usadas.indexOf(c);
+        if (k >= 0) { iguales++; usadas.splice(k, 1); }
+      }
+      mejor = Math.max(mejor, Math.round(iguales / meta.length * 75));
+    }
+    return mejor;
+  }
+};
+
+function caritaSVG(estado) {
+  const color = estado === 'bien' ? C_VERDE : estado === 'casi' ? C_AMAR : C_GRIS;
+  const boca = estado === 'bien'
+    ? '<path d="M32 58 q18 20 36 0" stroke="#31404d" stroke-width="5" fill="none" stroke-linecap="round"/>'
+    : estado === 'casi'
+      ? '<path d="M34 62 q16 8 32 0" stroke="#31404d" stroke-width="5" fill="none" stroke-linecap="round"/>'
+      : '<path d="M36 62 h28" stroke="#31404d" stroke-width="5" stroke-linecap="round"/>';
+  return '<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="' + color + '"/>' +
+    '<circle cx="36" cy="40" r="6" fill="#31404d"/><circle cx="64" cy="40" r="6" fill="#31404d"/>' +
+    boca + '</svg>';
+}
+const C_VERDE = '#3ec46d', C_AMAR = '#ffc93c', C_GRIS = '#e6e0d8';
+
+function vistaRepetir() {
+  const m = mundoPorId(V.mundo);
+  if (!m) return vistaMundos();
+  const p = m.palabras[V.i];
+  const R = V.repetir || { estado: null, puntaje: 0 };
+
+  return '<div class="barra">' +
+      '<button class="volver" data-act="inicio" aria-label="Salir">←</button>' +
+      '<span class="titulo">Repite conmigo</span>' +
+    '</div>' +
+    '<div class="progreso">' +
+      m.palabras.map((_, i) => '<i class="' + (i < V.i ? 'on' : i === V.i ? 'cur' : '') + '"></i>').join('') +
+    '</div>' +
+    '<div class="wrap">' +
+      '<div class="palabra-carta">' +
+        '<div class="dibujo">' + dibujo(p.art) + '</div>' +
+        (esPeque() ? '' : '<div class="en">' + esc(p.en) + '</div><div class="es">' + esc(p.es) + '</div>') +
+      '</div>' +
+
+      '<div class="carita">' + caritaSVG(R.estado) + '</div>' +
+      '<p class="pista">' + (
+        R.estado === 'bien' ? '¡Perfecto! Te salió muy bien.' :
+        R.estado === 'casi' ? '¡Casi! Inténtalo otra vez.' :
+        R.estado === 'nada' ? 'No te oí bien. Acércate y habla fuerte.' :
+        Micro.escuchando ? 'Te escucho… ¡di la palabra!' :
+        'Primero escúchala, después toca el micrófono y dila tú.') + '</p>' +
+
+      '<div class="dos-voces">' +
+        '<button class="altavoz" data-act="oir" data-texto="' + esc(p.en) + '" aria-label="Escuchar">' +
+          ICO.altavoz + '<i>EN</i></button>' +
+        (Micro.hay()
+          ? '<button class="altavoz micro' + (Micro.escuchando ? ' sonando' : '') + '" data-act="repetir-hablar" aria-label="Hablar">' +
+              ICO.micro + '<i>DI</i></button>'
+          : '') +
+      '</div>' +
+
+      (Micro.hay() ? '' : '<div class="aviso">Este navegador no deja usar el micrófono. Prueba en Chrome, o usa el resto de la app sin problema.</div>') +
+
+      '<button class="btn grande bloque ' + (V.i === m.palabras.length - 1 ? 'verde' : '') + '" data-act="repetir-siguiente">' +
+        (V.i === m.palabras.length - 1 ? '¡Terminamos! ★' : 'Siguiente →') + '</button>' +
+      '<div style="height:20px"></div>' +
+    '</div>';
 }
 
 /* ══════════════ 8. CONVERSACIÓN GUIONADA ══════════════ */
@@ -569,11 +961,11 @@ function vistaPapas() {
     '</div>' +
 
     '<div class="tarjeta">' +
-      '<h2>Instalar</h2>' +
+      '<h2>Descargar la app</h2>' +
       '<p style="font-size:.95rem;color:var(--suave)">' + (Instalar.puesta
-        ? 'Ya está instalada en este dispositivo.'
-        : 'Puedes ponerla en la pantalla de inicio como una app más. Funciona sin internet.') + '</p>' +
-      (Instalar.puesta ? '' : '<button class="btn claro bloque" data-act="instalar">Ponerla en la pantalla</button>') +
+        ? 'Ya está descargada en este dispositivo.'
+        : 'Queda con su propio ícono en la pantalla, se abre de un toque y funciona sin internet. Es gratis y no ocupa casi nada.') + '</p>' +
+      (Instalar.puesta ? '' : '<button class="btn bloque" data-act="instalar">' + ICO.bajar + ' Descargar la app</button>') +
     '</div>' +
 
     '<div class="tarjeta">' +
@@ -616,7 +1008,7 @@ const Instalar = {
     });
     window.addEventListener('appinstalled', () => {
       Instalar.invitacion = null; Instalar.puesta = true;
-      premio('¡Ya está en tu pantalla!');
+      premio('¡Ya está descargada!');
       pintar();
     });
   },
@@ -641,8 +1033,8 @@ const Instalar = {
 function vistaInstalar() {
   return '<div class="wrap">' +
     '<button class="volver" data-act="inicio" aria-label="Volver" style="margin-bottom:14px">←</button>' +
-    '<h1>Ponla en la pantalla</h1>' +
-    '<p style="color:var(--suave)">Así queda como una app de verdad, con su ícono, a pantalla completa y funcionando sin internet.</p>' +
+    '<h1>Descargar la app</h1>' +
+    '<p style="color:var(--suave)">Son dos toques. Después queda con su ícono junto a las demás apps, se abre sola y funciona sin internet.</p>' +
     (Instalar.esIOS
       ? '<div class="tarjeta">' +
           '<div class="paso-i"><span>1</span><b>Toca el botón de Compartir</b>' +
@@ -703,7 +1095,10 @@ function pintar() {
 
   let html = '';
   if (V.pantalla === 'mundos')        html = V.mundo ? (V.juego ? vistaJuego() : vistaAprender()) : vistaMundos();
+  else if (V.pantalla === 'repetir')  html = vistaRepetir();
+  else if (V.pantalla === 'memoria')  html = vistaMemoria();
   else if (V.pantalla === 'charlas')  html = V.mundo ? vistaCharla() : vistaCharlas();
+  else if (V.pantalla === 'mochila')  html = vistaMochila();
   else if (V.pantalla === 'papas')    html = vistaPapas();
   else if (V.pantalla === 'instalar') html = vistaInstalar();
   raiz.innerHTML = '<div class="view">' + html + '</div>';
@@ -741,6 +1136,97 @@ document.addEventListener('click', e => {
   }
   if (a === 'nav')      { ir(t.dataset.p); return; }
   if (a === 'instalar') { Instalar.pedir(); return; }
+
+  if (a === 'memoria') {
+    const m = mundoPorId(t.dataset.id); if (!m) return;
+    V.pantalla = 'memoria'; V.mundo = m.id; armarMemoria(m);
+    Son.toque(); window.scrollTo(0, 0); pintar(); return;
+  }
+  if (a === 'mem-voltear') {
+    const M = V.memoria; if (!M || M.bloqueado) return;
+    const i = Number(t.dataset.i), c = M.cartas[i];
+    if (c.hecha || c.vuelta) return;
+    c.vuelta = true; M.abiertas.push(i);
+    Voz.decir(c.en); Son.toque();
+    if (M.abiertas.length === 2) {
+      M.intentos++;
+      const [a1, b1] = M.abiertas.map(k => M.cartas[k]);
+      if (a1.en === b1.en) {
+        a1.hecha = b1.hecha = true; M.parejas++; M.abiertas = [];
+        Son.bien(); sumarAcierto();
+        if (M.parejas === 6) setTimeout(() => premio('¡Todas las parejas!'), 400);
+      } else {
+        M.bloqueado = true;
+        setTimeout(() => {
+          a1.vuelta = b1.vuelta = false; M.abiertas = []; M.bloqueado = false;
+          Son.mal(); pintar();
+        }, 900);
+      }
+    }
+    pintar(); return;
+  }
+
+  if (a === 'repetir') {
+    const m = mundoPorId(t.dataset.id); if (!m) return;
+    V.pantalla = 'repetir'; V.mundo = m.id; V.i = 0; V.repetir = { estado: null };
+    Son.toque(); window.scrollTo(0, 0); pintar();
+    setTimeout(() => Voz.decir(m.palabras[0].en), 350);
+    return;
+  }
+  if (a === 'repetir-hablar') {
+    const m = mundoPorId(V.mundo); if (!m) return;
+    const p = m.palabras[V.i];
+    if (Micro.escuchando) { Micro.parar(); pintar(); return; }
+    V.repetir = { estado: null };
+    Micro.escuchar(p.en, dichos => {
+      const n = Micro.parecido(dichos, p.en);
+      V.repetir = { estado: n >= 80 ? 'bien' : n >= 40 ? 'casi' : (dichos ? 'casi' : 'nada'), puntaje: n };
+      if (V.repetir.estado === 'bien') { Son.fiesta(); sumarAcierto(); }
+      else if (V.repetir.estado === 'casi') Son.bien();
+      else Son.mal();
+      pintar();
+    });
+    pintar();
+    return;
+  }
+  if (a === 'repetir-siguiente') {
+    const m = mundoPorId(V.mundo); if (!m) return;
+    Micro.parar();
+    if (V.i < m.palabras.length - 1) {
+      V.i++; V.repetir = { estado: null }; pintar();
+      setTimeout(() => Voz.decir(m.palabras[V.i].en), 250);
+    } else {
+      V.repetir = null; ir('mundos');
+      premio('¡Hablaste en inglés!');
+    }
+    return;
+  }
+
+  if (a === 'repaso-empezar') {
+    armarRepaso(); Son.toque(); window.scrollTo(0, 0); pintar();
+    setTimeout(() => { const c = V.repaso.cartas[0]; if (c) Voz.decirLasDos(c.en, c.es); }, 350);
+    return;
+  }
+  if (a === 'repaso-salir') { V.repaso = null; window.scrollTo(0, 0); pintar(); return; }
+  if (a === 'repaso-responder') {
+    const R = V.repaso; if (!R || R.resp !== null) return;
+    const i = Number(t.dataset.i);
+    R.resp = i;
+    const c = R.cartas[R.i];
+    const bien = R.opciones[i].en === c.en;
+    calificar(S.mochila[c.m + '/' + c.en] || c, bien);
+    if (bien) { R.aciertos++; Son.bien(); Voz.decirLasDos(c.en, c.es); sumarAcierto(); }
+    else Son.mal();
+    pintar(); return;
+  }
+  if (a === 'repaso-siguiente') {
+    const R = V.repaso; if (!R) return;
+    R.i++; ponerOpciones();
+    window.scrollTo(0, 0); pintar();
+    const c = R.cartas[R.i];
+    if (c) setTimeout(() => Voz.decir(c.en), 300);
+    return;
+  }
   if (a === 'inicio')   { ir('mundos'); return; }
   if (a === 'ir-charlas'){ ir('charlas'); return; }
 
@@ -759,6 +1245,7 @@ document.addEventListener('click', e => {
   if (a === 'sig-palabra') {
     const m = mundoPorId(V.mundo); if (!m) return;
     S.aprendidas[m.id + '/' + m.palabras[V.i].en] = true;
+    guardarEnMochila(m.id, m.palabras[V.i]);
     if (V.i < m.palabras.length - 1) {
       V.i++; guardar(); Son.toque(); pintar();
       const q = m.palabras[V.i];
@@ -775,6 +1262,14 @@ document.addEventListener('click', e => {
     return;
   }
 
+  if (a === 'falta-listo') {
+    const J = V.juego; if (!J) return;
+    J.preguntas[J.i].fase = 'responde';
+    Son.toque(); pintar();
+    setTimeout(() => { const q = J.preguntas[J.i]; Voz.decirLasDos(q.buena.en, q.buena.es); }, 250);
+    return;
+  }
+
   if (a === 'responder') {
     const J = V.juego; if (!J) return;
     const q = J.preguntas[J.i];
@@ -784,7 +1279,7 @@ document.addEventListener('click', e => {
     const bien = q.opciones[i].en === q.buena.en;
     S.jugadas++; if (bien) { S.aciertos++; J.aciertos++; } else J.fallos++;
     guardar();
-    if (bien) { Son.bien(); Voz.decirLasDos(q.buena.en, q.buena.es); }
+    if (bien) { Son.bien(); Voz.decirLasDos(q.buena.en, q.buena.es); sumarAcierto(); }
     else { Son.mal(); }
     pintar();
     return;
@@ -804,7 +1299,8 @@ document.addEventListener('click', e => {
     }
     window.scrollTo(0, 0); pintar();
     const q = J.preguntas[J.i];
-    if (q.tipo !== 'cualEs') setTimeout(() => Voz.decir(q.buena.en), 300);
+    if (q.tipo === 'falta') q.fase = 'mira';
+    else if (q.tipo !== 'cualEs') setTimeout(() => Voz.decir(q.buena.en), 300);
     return;
   }
 
@@ -895,7 +1391,8 @@ function arrancar() {
   document.getElementById('nav').className = 'nav';
   document.getElementById('nav').innerHTML =
     '<div class="nav-in">' +
-      [['mundos', ICO.jugar, 'Jugar'], ['charlas', ICO.charla, 'Conversar'], ['papas', ICO.papas, 'Papás']]
+      [['mundos', ICO.jugar, 'Jugar'], ['mochila', ICO.mochila, 'Mochila'],
+       ['charlas', ICO.charla, 'Conversar'], ['papas', ICO.papas, 'Papás']]
       .map(([p, i, l]) =>
         '<button class="navbtn" data-act="nav" data-p="' + p + '">' + i + '<span>' + l + '</span></button>'
       ).join('') +
