@@ -448,6 +448,168 @@ key: svg(
 ),
 heart: svg(
   pa('M50 84 Q14 58 14 38 Q14 20 32 20 Q44 20 50 32 Q56 20 68 20 Q86 20 86 38 Q86 58 50 84 Z', C.rojo)
+),
+/* ---------- ACCIONES ---------- */
+run: svg(
+  cio(58,22,11,C.piel) +
+  pao('M56 33 q10 2 12 12 l-4 14 l-10 -6 Z', C.rojo) +
+  pa('M68 40 l14 -8', 'none', ' stroke="'+C.piel+'" stroke-width="7" stroke-linecap="round"') +
+  pa('M54 40 l-14 6', 'none', ' stroke="'+C.piel+'" stroke-width="7" stroke-linecap="round"') +
+  pa('M58 58 l-6 16 l-14 6', 'none', ' stroke="'+C.azul+'" stroke-width="9" stroke-linecap="round" fill="none"') +
+  pa('M64 58 l10 14 l2 16', 'none', ' stroke="'+C.azul+'" stroke-width="9" stroke-linecap="round" fill="none"') +
+  li(20,30,32,30,C.gris,3) + li(16,42,28,42,C.gris,3)
+),
+jump: svg(
+  cio(50,20,11,C.piel) +
+  pao('M48 31 h4 q9 0 9 12 v10 h-22 v-10 q0 -12 9 -12 Z', C.verde) +
+  pa('M40 36 l-14 -12', 'none', ' stroke="'+C.piel+'" stroke-width="7" stroke-linecap="round"') +
+  pa('M60 36 l14 -12', 'none', ' stroke="'+C.piel+'" stroke-width="7" stroke-linecap="round"') +
+  pa('M44 53 l-8 16', 'none', ' stroke="'+C.azul+'" stroke-width="9" stroke-linecap="round"') +
+  pa('M56 53 l8 16', 'none', ' stroke="'+C.azul+'" stroke-width="9" stroke-linecap="round"') +
+  pa('M26 82 q24 -8 48 0', 'none', ' stroke="'+C.gris+'" stroke-width="3" stroke-dasharray="5 5"')
+),
+sleep: svg(
+  reo(10,58,80,22,C.azul,8) +
+  reo(16,44,26,18,C.blanco,6) +
+  cio(52,50,14,C.piel) +
+  pa('M46 48 q6 -3 6 3', 'none', ' stroke="#4a3b2f" stroke-width="2.4" stroke-linecap="round"') +
+  pa('M56 48 q6 -3 6 3', 'none', ' stroke="#4a3b2f" stroke-width="2.4" stroke-linecap="round"') +
+  '<text x="70" y="34" font-size="16" font-weight="800" fill="'+C.grisO+'">Z</text>' +
+  '<text x="82" y="22" font-size="11" font-weight="800" fill="'+C.grisO+'">z</text>'
+),
+eat: svg(
+  cio(50,40,24,C.blanco) + ci(50,40,17,'#f7f2e7') +
+  el(50,38,11,7,C.naranja) +
+  li(18,26,18,72,C.gris,4) + li(14,26,14,40,C.gris,3) + li(22,26,22,40,C.gris,3) +
+  li(82,30,82,72,C.gris,4) + el(82,30,5,9,C.gris)
+),
+play: svg(
+  cio(36,58,22,C.rojo) + cio(66,44,16,C.azul) + cio(70,72,13,C.amar) +
+  ci(30,52,5,'#ff9a80') + ci(62,38,3.6,'#8fc4f0')
+),
+read: svg(
+  pao('M50 30 q-18 -10 -36 -4 v44 q18 -6 36 4 Z', C.rojo) +
+  pao('M50 30 q18 -10 36 -4 v44 q-18 -6 -36 4 Z', C.azul) +
+  li(50,30,50,74,C.crema,3) +
+  li(22,42,42,38,C.crema,2) + li(22,52,42,48,C.crema,2) +
+  li(58,38,78,42,C.crema,2) + li(58,48,78,52,C.crema,2)
+),
+sing: svg(
+  cio(50,34,17,C.piel) +
+  pao('M32 30 q0 -16 18 -16 q18 0 18 16 q-9 -7 -18 -5 q-9 2 -18 5 Z', C.pelo) +
+  ci(44,32,3,C.negro) + ci(56,32,3,C.negro) +
+  elo(50,44,7,6,'#c0392b') +
+  pao('M34 88 q0 -32 16 -32 q16 0 16 32 Z', C.mora) +
+  pa('M74 30 v18 q-6 -2 -6 3 q0 5 6 3 v-24 l10 -3 v16 q-6 -2 -6 3 q0 5 6 3 v-22 Z', C.amar)
+),
+dance: svg(
+  cio(44,22,11,C.piel) +
+  pao('M44 55 L62 84 H26 Z', C.rosa) +
+  pa('M40 36 l-16 -6', 'none', ' stroke="'+C.piel+'" stroke-width="7" stroke-linecap="round"') +
+  pa('M50 34 l16 -14', 'none', ' stroke="'+C.piel+'" stroke-width="7" stroke-linecap="round"') +
+  pa('M74 22 l6 -10 M84 30 l8 -6', 'none', ' stroke="'+C.amar+'" stroke-width="4" stroke-linecap="round"')
+),
+
+/* ---------- OPUESTOS Y ESTADOS ---------- */
+hot: svg(
+  reo(42,20,16,50,C.blanco,8) + cio(50,76,14,C.rojo) +
+  reo(46,30,8,42,C.rojo,4) +
+  li(24,32,14,32,C.rojo,3) + li(24,44,14,44,C.rojo,3) + li(24,56,14,56,C.rojo,3) +
+  pa('M74 30 q8 8 0 16 q-8 8 0 16', 'none', ' stroke="'+C.naranja+'" stroke-width="4" stroke-linecap="round"')
+),
+cold: svg(
+  li(50,14,50,86,C.azul,5) + li(20,50,80,50,C.azul,5) +
+  li(28,28,72,72,C.azul,5) + li(72,28,28,72,C.azul,5) +
+  li(50,24,42,32,C.azul,4) + li(50,24,58,32,C.azul,4) +
+  li(50,76,42,68,C.azul,4) + li(50,76,58,68,C.azul,4) +
+  cio(50,50,7,'#bfe3ff')
+),
+up: svg(
+  cio(50,52,32,C.verde) +
+  pa('M50 30 L68 54 H56 V72 H44 V54 H32 Z', C.blanco)
+),
+down: svg(
+  cio(50,52,32,C.azul) +
+  pa('M50 74 L32 50 H44 V32 H56 V50 H68 Z', C.blanco)
+),
+open: svg(
+  pao('M22 26 h34 v62 H22 Z', C.cafe) +
+  pao('M56 20 L84 30 v52 L56 88 Z', C.cafeO) +
+  ci(62,56,3,C.amar)
+),
+closed: svg(
+  reo(24,20,52,68,C.cafe,4) +
+  reo(30,26,40,56,C.cafeO,3) +
+  ci(64,54,3.4,C.amar) +
+  reo(38,44,24,18,C.gris,3) + ci(50,52,3,C.negro)
+),
+day: svg(
+  reo(6,54,88,30,'#bfe3ff',6) +
+  cio(50,50,18,C.amar) +
+  li(50,24,50,14,C.naranja,4) + li(24,50,14,50,C.naranja,4) + li(76,50,86,50,C.naranja,4) +
+  li(31,31,24,24,C.naranja,4) + li(69,31,76,24,C.naranja,4)
+),
+night: svg(
+  reo(6,20,88,64,'#2b3f6b',8) +
+  pao('M62 26 q-22 6 -22 26 q0 20 22 26 q-30 -4 -30 -26 q0 -22 30 -26 Z', C.amar) +
+  ci(24,34,2.6,C.blanco) + ci(76,40,2.2,C.blanco) + ci(34,64,2.4,C.blanco) + ci(70,68,2,C.blanco)
+),
+fast: svg(
+  pao('M20 52 h34 l-6 -14 l26 20 l-26 20 l6 -14 H20 Z', C.rojo) +
+  li(14,36,32,36,C.naranja,4) + li(10,52,20,52,C.naranja,4) + li(14,68,32,68,C.naranja,4)
+),
+slow: svg(
+  elo(56,58,26,16,C.verde) +
+  cio(28,52,11,C.verdeO) +
+  ci(24,50,2.6,C.negro) +
+  pa('M38 68 h4 M52 70 h4 M68 68 h4', 'none', ' stroke="'+C.verdeO+'" stroke-width="6" stroke-linecap="round"') +
+  pa('M46 50 q10 -6 20 0 M52 44 q6 -4 12 0', 'none', ' stroke="'+C.verdeO+'" stroke-width="2.6"')
+),
+
+/* ---------- CLIMA Y TRANSPORTE ---------- */
+snow: svg(
+  cio(34,40,15,C.blanco) + cio(52,34,18,C.blanco) + cio(68,42,13,C.blanco) +
+  reo(34,40,34,14,C.blanco,7) +
+  ci(34,68,4,'#bfe3ff') + ci(50,74,4,'#bfe3ff') + ci(66,68,4,'#bfe3ff') +
+  ci(42,84,3.4,'#bfe3ff') + ci(58,84,3.4,'#bfe3ff')
+),
+wind: svg(
+  pa('M12 36 h44 q10 0 10 -8 q0 -8 -8 -8 q-6 0 -8 5', 'none', ' stroke="'+C.gris+'" stroke-width="5" stroke-linecap="round" fill="none"') +
+  pa('M12 54 h58 q10 0 10 8 q0 8 -8 8 q-6 0 -8 -5', 'none', ' stroke="'+C.gris+'" stroke-width="5" stroke-linecap="round" fill="none"') +
+  pa('M12 72 h30', 'none', ' stroke="'+C.gris+'" stroke-width="5" stroke-linecap="round"')
+),
+train: svg(
+  reo(14,32,58,34,C.rojo,8) +
+  pao('M72 44 h14 v22 H72 Z', '#c23b1c') +
+  reo(22,40,14,12,'#bfe3ff',2) + reo(44,40,14,12,'#bfe3ff',2) +
+  reo(10,64,80,8,'#7a4a1e',3) +
+  cio(28,76,8,C.negro) + cio(56,76,8,C.negro) +
+  ci(28,76,3.2,C.gris) + ci(56,76,3.2,C.gris) +
+  cio(24,20,7,C.blanco) + cio(32,14,5,C.blanco)
+),
+plane: svg(
+  pao('M8 52 L36 44 L58 18 q6 -6 10 0 q4 6 -2 12 L52 54 L62 76 l-8 4 L40 60 L22 66 l-4 -8 L8 52 Z', C.azul) +
+  ci(30,50,2.6,C.blanco)
+),
+boat: svg(
+  pao('M14 60 h72 l-10 20 H24 Z', C.rojo) +
+  li(50,58,50,18,C.cafeO,4) +
+  pao('M52 22 L78 50 H52 Z', C.blanco) +
+  pao('M46 30 L26 50 h20 Z', C.crema) +
+  pa('M6 84 q12 -6 22 0 q12 6 22 0 q12 -6 22 0 q12 6 22 0', 'none', ' stroke="'+C.azul+'" stroke-width="3.5"')
+),
+pants: svg(
+  pao('M28 22 h44 l4 66 h-18 l-6 -34 l-6 34 H24 Z', C.azulO) +
+  li(28,32,72,32,'#1f5288',2.6)
+),
+dress: svg(
+  pao('M38 20 h24 l6 10 l-6 6 l10 46 H30 l10 -46 l-6 -6 Z', C.rosa) +
+  ci(50,50,2.6,C.blanco) + ci(50,62,2.6,C.blanco)
+),
+jacket: svg(
+  pao('M32 24 l14 -4 l4 8 l4 -8 l14 4 l10 14 l-10 8 v40 H32 V46 l-10 -8 Z', C.verdeO) +
+  li(50,32,50,86,'#1f5c30',3) +
+  ci(50,44,2.4,C.amar) + ci(50,58,2.4,C.amar) + ci(50,72,2.4,C.amar)
 )
 };
 
@@ -463,17 +625,19 @@ Object.keys(COLORES_ART).forEach(nombre => {
 });
 
 /* Los números se dibujan como puntos, que es como los cuenta un niño */
-for (let n = 1; n <= 10; n++) {
+for (let n = 1; n <= 20; n++) {
   const puntos = [];
-  const cols = n <= 3 ? n : n <= 6 ? 3 : n <= 8 ? 4 : 5;
+  const cols = n <= 3 ? n : n <= 6 ? 3 : n <= 8 ? 4 : n <= 12 ? 4 : 5;
   const filas = Math.ceil(n / cols);
   for (let i = 0; i < n; i++) {
     const f = Math.floor(i / cols), c = i % cols;
     const enFila = Math.min(cols, n - f * cols);
     const ancho = 100 / (cols + 1);
     const x = 50 - (enFila - 1) * ancho / 2 + c * ancho;
-    const y = 50 - (filas - 1) * 16 / 2 + f * 16 + 4;
-    puntos.push(ci(x, y, 8, C.azul));
+    const paso = filas > 3 ? 13 : 16;
+    const r = filas > 3 ? 6.5 : 8;
+    const y = 50 - (filas - 1) * paso / 2 + f * paso + 4;
+    puntos.push(ci(x, y, r, C.azul));
   }
   ART['num' + n] = svg(puntos.join(''));
 }
