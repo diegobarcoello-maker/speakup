@@ -1385,6 +1385,79 @@ document.addEventListener('click', e => {
   }
 });
 
+/* ============================================================
+   ACTUALIZAR SOLA
+   Cuando hay una versión nueva se cambia sin que nadie tenga
+   que cerrar y volver a abrir. Si el niño está en medio de un
+   juego o de una conversación, espera a que termine: nada peor
+   que una pantalla que se reinicia a mitad de la partida.
+   ============================================================ */
+const Actualizacion = {
+  reg: null,
+  esperando: null,
+  pedida: false,
+  ultima: 0,
+
+  init(reg) {
+    Actualizacion.reg = reg;
+    if (reg.waiting && navigator.serviceWorker.controller) Actualizacion.lista(reg.waiting);
+
+    reg.addEventListener('updatefound', () => {
+      const nuevo = reg.installing;
+      if (!nuevo) return;
+      nuevo.addEventListener('statechange', () => {
+        if (nuevo.state === 'installed' && navigator.serviceWorker.controller) Actualizacion.lista(nuevo);
+      });
+    });
+
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!Actualizacion.pedida) return;
+      Actualizacion.pedida = false;
+      window.location.reload();
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') Actualizacion.buscar();
+    });
+    window.addEventListener('focus', Actualizacion.buscar);
+    setInterval(Actualizacion.buscar, 30 * 60 * 1000);
+  },
+
+  buscar() {
+    if (!Actualizacion.reg) return;
+    const ahora = Date.now();
+    if (ahora - Actualizacion.ultima < 60000) return;
+    Actualizacion.ultima = ahora;
+    Actualizacion.reg.update().catch(() => {});
+  },
+
+  /* ¿está el niño metido en algo que no conviene cortar? */
+  ocupado() {
+    if (V.juego) return true;
+    if (V.charla) return true;
+    if (V.memoria) return true;
+    if (V.repaso) return true;
+    if (Micro.escuchando) return true;
+    if (V.mundo) return true;
+    return false;
+  },
+
+  lista(sw) {
+    Actualizacion.esperando = sw;
+    if (Actualizacion.ocupado()) { setTimeout(() => Actualizacion.lista(sw), 20000); return; }
+    Actualizacion.aplicar();
+  },
+
+  aplicar() {
+    const sw = Actualizacion.esperando;
+    if (!sw) return;
+    Actualizacion.esperando = null;
+    Actualizacion.pedida = true;
+    try { sw.postMessage('saltar-espera'); }
+    catch (e) { Actualizacion.pedida = false; window.location.reload(); }
+  }
+};
+
 /* ══════════════ 13. ARRANQUE ══════════════ */
 
 function arrancar() {
@@ -1410,7 +1483,9 @@ function arrancar() {
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(() => {});
+      navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
+        .then(reg => Actualizacion.init(reg))
+        .catch(() => {});
     });
   }
 }
