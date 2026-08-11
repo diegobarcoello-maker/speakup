@@ -1204,7 +1204,7 @@ document.addEventListener('click', e => {
 
   if (a === 'repaso-empezar') {
     armarRepaso(); Son.toque(); window.scrollTo(0, 0); pintar();
-    setTimeout(() => { const c = V.repaso.cartas[0]; if (c) Voz.decirLasDos(c.en, c.es); }, 350);
+    setTimeout(() => { if (!V.repaso) return; const c = V.repaso.cartas[0]; if (c) Voz.decirLasDos(c.en, c.es); }, 350);
     return;
   }
   if (a === 'repaso-salir') { V.repaso = null; window.scrollTo(0, 0); pintar(); return; }
@@ -1255,6 +1255,7 @@ document.addEventListener('click', e => {
       V.juego = armarJuego(m);
       Son.toque(); window.scrollTo(0, 0); pintar();
       setTimeout(() => {
+        if (!V.juego) return;
         const q = V.juego.preguntas[0];
         if (q.tipo !== 'cualEs') Voz.decir(q.buena.en);
       }, 400);
@@ -1266,7 +1267,7 @@ document.addEventListener('click', e => {
     const J = V.juego; if (!J) return;
     J.preguntas[J.i].fase = 'responde';
     Son.toque(); pintar();
-    setTimeout(() => { const q = J.preguntas[J.i]; Voz.decirLasDos(q.buena.en, q.buena.es); }, 250);
+    setTimeout(() => { if (!V.juego) return; const q = J.preguntas[J.i]; if (q) Voz.decirLasDos(q.buena.en, q.buena.es); }, 250);
     return;
   }
 
@@ -1309,6 +1310,7 @@ document.addEventListener('click', e => {
     V.pantalla = 'mundos'; V.mundo = m.id; V.juego = armarJuego(m);
     Son.toque(); window.scrollTo(0, 0); pintar();
     setTimeout(() => {
+      if (!V.juego) return;
       const q = V.juego.preguntas[0];
       if (q.tipo !== 'cualEs') Voz.decir(q.buena.en);
     }, 350);
