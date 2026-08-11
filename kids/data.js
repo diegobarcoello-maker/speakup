@@ -25,7 +25,11 @@ const MUNDOS = [
       { en: 'duck',     es: 'pato',     art: 'duck',     frase: 'The duck likes water.',  fraseEs: 'Al pato le gusta el agua.' },
       { en: 'frog',     es: 'rana',     art: 'frog',     frase: 'The frog is green.',     fraseEs: 'La rana es verde.' },
       { en: 'bear',     es: 'oso',      art: 'bear',     frase: 'The bear is sleepy.',    fraseEs: 'El oso tiene sueño.' },
-      { en: 'rabbit',   es: 'conejo',   art: 'rabbit',   frase: 'The rabbit jumps.',      fraseEs: 'El conejo salta.' }
+      { en: 'rabbit',   es: 'conejo',   art: 'rabbit',   frase: 'The rabbit jumps.',      fraseEs: 'El conejo salta.' },
+      { en: "pet", es: "mascota", art: "dog", frase: "I have a pet.", fraseEs: "Tengo una mascota." },
+      { en: "farm", es: "granja", art: "cow", frase: "The cow is on the farm.", fraseEs: "La vaca está en la granja." },
+      { en: "big cat", es: "gato grande", art: "lion", frase: "A lion is a big cat.", fraseEs: "Un león es un gato grande." },
+      { en: "wing", es: "ala", art: "bird", frase: "The bird has wings.", fraseEs: "El pájaro tiene alas." }
     ],
     charla: {
       quien: 'Un gato llamado Milo', art: 'cat',
@@ -55,7 +59,11 @@ const MUNDOS = [
       { en: 'pink',   es: 'rosado',   art: 'pink',   frase: 'The flower is pink.',  fraseEs: 'La flor es rosada.' },
       { en: 'brown',  es: 'café',     art: 'brown',  frase: 'The bear is brown.',   fraseEs: 'El oso es café.' },
       { en: 'black',  es: 'negro',    art: 'black',  frase: 'The night is black.',  fraseEs: 'La noche es negra.' },
-      { en: 'white',  es: 'blanco',   art: 'white',  frase: 'The milk is white.',   fraseEs: 'La leche es blanca.' }
+      { en: 'white',  es: 'blanco',   art: 'white',  frase: 'The milk is white.',   fraseEs: 'La leche es blanca.' },
+      { en: "grey", es: "gris", art: "grey", frase: "The elephant is grey.", fraseEs: "El elefante es gris." },
+      { en: "colour", es: "color", art: "flower", frase: "What colour is it?", fraseEs: "¿De qué color es?" },
+      { en: "dark", es: "oscuro", art: "night", frase: "It is dark now.", fraseEs: "Ahora está oscuro." },
+      { en: "light", es: "claro", art: "day", frase: "The room is light.", fraseEs: "El cuarto está claro." }
     ],
     charla: {
       quien: 'Lía, la pintora', art: 'girl',
@@ -85,7 +93,11 @@ const MUNDOS = [
       { en: 'seven', es: 'siete',  art: 'num7',  frase: 'Seven days a week.',   fraseEs: 'Siete días a la semana.' },
       { en: 'eight', es: 'ocho',   art: 'num8',  frase: 'Eight yellow stars.',  fraseEs: 'Ocho estrellas amarillas.' },
       { en: 'nine',  es: 'nueve',  art: 'num9',  frase: 'Nine blue balls.',     fraseEs: 'Nueve pelotas azules.' },
-      { en: 'ten',   es: 'diez',   art: 'num10', frase: 'I can count to ten!',  fraseEs: '¡Puedo contar hasta diez!' }
+      { en: 'ten',   es: 'diez',   art: 'num10', frase: 'I can count to ten!',  fraseEs: '¡Puedo contar hasta diez!' },
+      { en: "zero", es: "cero", art: "num1", frase: "Zero, one, two!", fraseEs: "¡Cero, uno, dos!" },
+      { en: "count", es: "contar", art: "num5", frase: "Let us count!", fraseEs: "¡Vamos a contar!" },
+      { en: "how many", es: "cuántos", art: "num3", frase: "How many apples?", fraseEs: "¿Cuántas manzanas?" },
+      { en: "first", es: "primero", art: "num1", frase: "I am first!", fraseEs: "¡Soy el primero!" }
     ],
     charla: {
       quien: 'Tomi el conejo', art: 'rabbit',
@@ -113,13 +125,18 @@ const MUNDOS = [
       { en: 'baby',    es: 'bebé',    art: 'toy',    frase: 'The baby is happy.',    fraseEs: 'El bebé está feliz.' },
       { en: 'family',  es: 'familia', art: 'family', frase: 'This is my family.',    fraseEs: 'Esta es mi familia.' },
       { en: 'friend',  es: 'amigo',   art: 'boy',    frase: 'He is my friend.',      fraseEs: 'Él es mi amigo.' },
-      { en: 'home',    es: 'casa',    art: 'house',  frase: 'I am at home.',         fraseEs: 'Estoy en casa.' }
+      { en: 'home',    es: 'casa',    art: 'house',  frase: 'I am at home.',         fraseEs: 'Estoy en casa.' },
+      { en: "grandma", es: "abuela", art: "girl", frase: "I love my grandma.", fraseEs: "Quiero a mi abuela." },
+      { en: "grandpa", es: "abuelo", art: "boy", frase: "My grandpa is funny.", fraseEs: "Mi abuelo es gracioso." },
+      { en: "pet dog", es: "perrito", art: "dog", frase: "Our pet dog is small.", fraseEs: "Nuestro perrito es pequeño." },
+      { en: "together", es: "juntos", art: "family", frase: "We are together.", fraseEs: "Estamos juntos." },
+      { en: "love", es: "querer", art: "heart", frase: "I love you!", fraseEs: "¡Te quiero!" }
     ],
     charla: {
       quien: 'Ana', art: 'girl',
       pasos: [
         { dice: 'Hi! Do you have a brother?', diceEs: '¡Hola! ¿Tienes un hermano?',
-          opciones: [{ en: "Yes, I do.", es: "Sí, tengo." }, { en: "No, I do not.", es: "No, no me gusta." }, { en: "I have a sister.", es: "Tengo una hermana." }] },
+          opciones: [{ en: "Yes, I do.", es: "Sí, tengo." }, { en: "No, I do not.", es: "No, no tengo." }, { en: "I have a sister.", es: "Tengo una hermana." }] },
         { dice: 'Nice! Who do you play with?', diceEs: '¡Qué bien! ¿Con quién juegas?',
           opciones: [{ en: "With my friend.", es: "Con mi amigo." }, { en: "With my sister.", es: "Con mi hermana." }, { en: "With my dog!", es: "¡Con mi perro!" }] },
         { dice: 'That is fun! Do you love your family?', diceEs: '¡Qué divertido! ¿Quieres a tu familia?',
@@ -143,7 +160,13 @@ const MUNDOS = [
       { en: 'cheese',  es: 'queso',   art: 'cheese',  frase: 'I love cheese!',       fraseEs: '¡Me encanta el queso!' },
       { en: 'rice',    es: 'arroz',   art: 'rice',    frase: 'We eat rice today.',   fraseEs: 'Hoy comemos arroz.' },
       { en: 'chicken', es: 'pollo',   art: 'chicken', frase: 'The chicken is hot.',  fraseEs: 'El pollo está caliente.' },
-      { en: 'cake',    es: 'pastel',  art: 'cake',    frase: 'Happy birthday cake!', fraseEs: '¡Pastel de cumpleaños!' }
+      { en: 'cake',    es: 'pastel',  art: 'cake',    frase: 'Happy birthday cake!', fraseEs: '¡Pastel de cumpleaños!' },
+      { en: "apple juice", es: "jugo de manzana", art: "apple", frase: "I want apple juice.", fraseEs: "Quiero jugo de manzana." },
+      { en: "breakfast", es: "desayuno", art: "egg", frase: "Breakfast is ready!", fraseEs: "¡El desayuno está listo!" },
+      { en: "lunch", es: "almuerzo", art: "rice", frase: "Lunch is at one.", fraseEs: "El almuerzo es a la una." },
+      { en: "dinner", es: "cena", art: "chicken", frase: "Dinner is ready.", fraseEs: "La cena está lista." },
+      { en: "hungry", es: "con hambre", art: "eat", frase: "I am hungry!", fraseEs: "¡Tengo hambre!" },
+      { en: "yummy", es: "rico", art: "cake", frase: "This is yummy!", fraseEs: "¡Esto está rico!" }
     ],
     charla: {
       quien: 'Chef Beto', art: 'bear',
@@ -172,7 +195,11 @@ const MUNDOS = [
       { en: 'bed',    es: 'cama',      art: 'bed',    frase: 'I sleep in my bed.',    fraseEs: 'Duermo en mi cama.' },
       { en: 'key',    es: 'llave',     art: 'key',    frase: 'Where is the key?',     fraseEs: '¿Dónde está la llave?' },
       { en: 'clock',  es: 'reloj',     art: 'clock',  frase: 'Look at the clock.',    fraseEs: 'Mira el reloj.' },
-      { en: 'phone',  es: 'teléfono',  art: 'phone',  frase: 'That is my phone.',     fraseEs: 'Ese es mi teléfono.' }
+      { en: 'phone',  es: 'teléfono',  art: 'phone',  frase: 'That is my phone.',     fraseEs: 'Ese es mi teléfono.' },
+      { en: "room", es: "cuarto", art: "bed", frase: "This is my room.", fraseEs: "Este es mi cuarto." },
+      { en: "kitchen", es: "cocina", art: "table", frase: "Mom is in the kitchen.", fraseEs: "Mamá está en la cocina." },
+      { en: "light", es: "luz", art: "sun", frase: "Turn on the light.", fraseEs: "Enciende la luz." },
+      { en: "toy box", es: "caja de juguetes", art: "gift", frase: "My toys are in the box.", fraseEs: "Mis juguetes están en la caja." }
     ],
     charla: {
       quien: 'Milo otra vez', art: 'cat',
@@ -200,7 +227,12 @@ const MUNDOS = [
       { en: 'teacher',  es: 'maestra',  art: 'girl',     frase: 'My teacher is nice.',  fraseEs: 'Mi maestra es amable.' },
       { en: 'friend',   es: 'amigo',    art: 'boy',      frase: 'She is my friend.',    fraseEs: 'Ella es mi amiga.' },
       { en: 'ball',     es: 'pelota',   art: 'ball',     frase: 'Let us play ball!',    fraseEs: '¡Juguemos a la pelota!' },
-      { en: 'bus',      es: 'bus',      art: 'bus',      frase: 'I go by bus.',         fraseEs: 'Voy en bus.' }
+      { en: 'bus',      es: 'bus',      art: 'bus',      frase: 'I go by bus.',         fraseEs: 'Voy en bus.' },
+      { en: "desk", es: "pupitre", art: "table", frase: "My desk is clean.", fraseEs: "Mi pupitre está limpio." },
+      { en: "school", es: "escuela", art: "house", frase: "I go to school.", fraseEs: "Voy a la escuela." },
+      { en: "paper", es: "papel", art: "book", frase: "I draw on paper.", fraseEs: "Dibujo en papel." },
+      { en: "please", es: "por favor", art: "heart", frase: "Please and thank you.", fraseEs: "Por favor y gracias." },
+      { en: "write", es: "escribir", art: "pencil", frase: "I write my name.", fraseEs: "Escribo mi nombre." }
     ],
     charla: {
       quien: 'La maestra Sara', art: 'girl',
@@ -228,7 +260,12 @@ const MUNDOS = [
       { en: 'happy', es: 'feliz',  art: 'sun',   frase: 'I am very happy!',   fraseEs: '¡Estoy muy feliz!' },
       { en: 'sad',   es: 'triste', art: 'rain',  frase: 'Do not be sad.',     fraseEs: 'No estés triste.' },
       { en: 'big',   es: 'grande', art: 'elephant', frase: 'The elephant is big.', fraseEs: 'El elefante es grande.' },
-      { en: 'small', es: 'pequeño',art: 'bird',  frase: 'The bird is small.', fraseEs: 'El pájaro es pequeño.' }
+      { en: 'small', es: 'pequeño',art: 'bird',  frase: 'The bird is small.', fraseEs: 'El pájaro es pequeño.' },
+      { en: "nose", es: "nariz", art: "boy", frase: "Touch your nose!", fraseEs: "¡Tócate la nariz!" },
+      { en: "mouth", es: "boca", art: "sing", frase: "Open your mouth.", fraseEs: "Abre la boca." },
+      { en: "ear", es: "oreja", art: "rabbit", frase: "I hear with my ears.", fraseEs: "Oigo con las orejas." },
+      { en: "tired", es: "cansado", art: "sleep", frase: "I am tired.", fraseEs: "Estoy cansado." },
+      { en: "sick", es: "enfermo", art: "rain", frase: "I feel sick.", fraseEs: "Me siento enfermo." }
     ],
     charla: {
       quien: 'Doctor Oso', art: 'bear',
@@ -256,7 +293,12 @@ const MUNDOS = [
       { en: 'rain',   es: 'lluvia',  art: 'rain',   frase: 'I like the rain.',     fraseEs: 'Me gusta la lluvia.' },
       { en: 'tree',   es: 'árbol',   art: 'tree',   frase: 'The tree is tall.',    fraseEs: 'El árbol es alto.' },
       { en: 'flower', es: 'flor',    art: 'flower', frase: 'A flower for you.',    fraseEs: 'Una flor para ti.' },
-      { en: 'water',  es: 'agua',    art: 'water',  frase: 'The water is cold.',   fraseEs: 'El agua está fría.' }
+      { en: 'water',  es: 'agua',    art: 'water',  frase: 'The water is cold.',   fraseEs: 'El agua está fría.' },
+      { en: "sky", es: "cielo", art: "cloud", frase: "The sky is blue.", fraseEs: "El cielo es azul." },
+      { en: "grass", es: "pasto", art: "tree", frase: "The grass is green.", fraseEs: "El pasto es verde." },
+      { en: "sea", es: "mar", art: "boat", frase: "The sea is big.", fraseEs: "El mar es grande." },
+      { en: "bird song", es: "canto del pájaro", art: "bird", frase: "I hear a bird song.", fraseEs: "Oigo el canto de un pájaro." },
+      { en: "outside", es: "afuera", art: "run", frase: "Let us go outside!", fraseEs: "¡Vamos afuera!" }
     ],
     charla: {
       quien: 'Rana Renata', art: 'frog',
@@ -264,7 +306,7 @@ const MUNDOS = [
         { dice: 'Hi! Look at the sky. What do you see?', diceEs: '¡Hola! Mira el cielo. ¿Qué ves?',
           opciones: [{ en: "I see the sun!", es: "¡Veo el sol!" }, { en: "I see a cloud.", es: "Veo una nube." }, { en: "I see a bird!", es: "¡Veo un pájaro!" }] },
         { dice: 'Do you like the rain?', diceEs: '¿Te gusta la lluvia?',
-          opciones: [{ en: "Yes, I do!", es: "¡Sí, me gustan!" }, { en: "No, I do not.", es: "No, no me gusta." }, { en: "A little.", es: "Un poquito." }] },
+          opciones: [{ en: "Yes, I do!", es: "¡Sí, me gusta!" }, { en: "No, I do not.", es: "No, no me gusta." }, { en: "A little.", es: "Un poquito." }] },
         { dice: 'Let us sit under the tree!', diceEs: '¡Sentémonos bajo el árbol!',
           opciones: [{ en: "Good idea!", es: "¡Buena idea!" }, { en: "Yes, let us go!", es: "¡Sí, vamos!" }, { en: "I am coming!", es: "¡Ya voy!" }] },
         { dice: 'What a nice day. Thank you!', diceEs: 'Qué lindo día. ¡Gracias!',
@@ -286,7 +328,12 @@ const MUNDOS = [
       { en: 'shirt',   es: 'camisa',  art: 'shirt',   frase: 'My shirt is blue.',    fraseEs: 'Mi camisa es azul.' },
       { en: 'shoe',    es: 'zapato',  art: 'shoe',    frase: 'Put on your shoes.',   fraseEs: 'Ponte los zapatos.' },
       { en: 'hat',     es: 'gorra',   art: 'hat',     frase: 'I like your hat!',     fraseEs: '¡Me gusta tu gorra!' },
-      { en: 'heart',   es: 'corazón', art: 'heart',   frase: 'I love you!',          fraseEs: '¡Te quiero!' }
+      { en: 'heart',   es: 'corazón', art: 'heart',   frase: 'I love you!',          fraseEs: '¡Te quiero!' },
+      { en: "doll", es: "muñeca", art: "toy", frase: "This is my doll.", fraseEs: "Esta es mi muñeca." },
+      { en: "book", es: "libro", art: "book", frase: "I read my book.", fraseEs: "Leo mi libro." },
+      { en: "game", es: "juego", art: "play", frase: "Let us play a game!", fraseEs: "¡Juguemos un juego!" },
+      { en: "my friend", es: "mi amigo", art: "boy", frase: "He is my friend.", fraseEs: "Él es mi amigo." },
+      { en: "mine", es: "mío", art: "heart", frase: "That is mine!", fraseEs: "¡Eso es mío!" }
     ],
     charla: {
       quien: 'Tu amigo Leo', art: 'lion',
@@ -299,6 +346,175 @@ const MUNDOS = [
           opciones: [{ en: "Blue!", es: "¡Azul!" }, { en: "Red!", es: "¡Rojo!" }, { en: "Green!", es: "¡Verde!" }] },
         { dice: 'You are a good friend. Bye!', diceEs: 'Eres un buen amigo. ¡Adiós!',
           opciones: [{ en: "Bye Leo!", es: "¡Adiós, Leo!" }, { en: "See you soon!", es: "¡Hasta pronto!" }, { en: "Thank you!", es: "¡Gracias!" }] }
+      ]
+    }
+  },
+  {
+    id: "numerosdos", titulo: "Contar más", emoji: "num15", color: "azul",
+    saludo: "¡Ahora contamos hasta veinte!",
+    palabras: [
+      { en: "eleven", es: "once", art: "num11", frase: "Eleven red apples.", fraseEs: "Once manzanas rojas." },
+      { en: "twelve", es: "doce", art: "num12", frase: "Twelve months a year.", fraseEs: "Doce meses al año." },
+      { en: "thirteen", es: "trece", art: "num13", frase: "Thirteen little stars.", fraseEs: "Trece estrellitas." },
+      { en: "fourteen", es: "catorce", art: "num14", frase: "Fourteen blue balls.", fraseEs: "Catorce pelotas azules." },
+      { en: "fifteen", es: "quince", art: "num15", frase: "I count to fifteen.", fraseEs: "Cuento hasta quince." },
+      { en: "sixteen", es: "dieciséis", art: "num16", frase: "Sixteen green frogs.", fraseEs: "Dieciséis ranas verdes." },
+      { en: "seventeen", es: "diecisiete", art: "num17", frase: "Seventeen yellow ducks.", fraseEs: "Diecisiete patos amarillos." },
+      { en: "eighteen", es: "dieciocho", art: "num18", frase: "Eighteen small fish.", fraseEs: "Dieciocho peces pequeños." },
+      { en: "nineteen", es: "diecinueve", art: "num19", frase: "Nineteen big trees.", fraseEs: "Diecinueve árboles grandes." },
+      { en: "twenty", es: "veinte", art: "num20", frase: "I can count to twenty!", fraseEs: "¡Puedo contar hasta veinte!" }
+    ],
+    charla: {
+      quien: "Tomi otra vez", art: "rabbit",
+      pasos: [
+        { dice: "Hello again! Can you count to twenty?", diceEs: "¡Hola otra vez! ¿Puedes contar hasta veinte?",
+          opciones: [{ en: "Yes, I can!", es: "¡Sí, puedo!" }, { en: "Let me try!", es: "¡Déjame intentar!" }, { en: "It is easy!", es: "¡Es fácil!" }] },
+        { dice: "How many carrots are here?", diceEs: "¿Cuántas zanahorias hay aquí?",
+          opciones: [{ en: "Twelve!", es: "¡Doce!" }, { en: "Fifteen!", es: "¡Quince!" }, { en: "Twenty!", es: "¡Veinte!" }] },
+        { dice: "Very good! How old is your sister?", diceEs: "¡Muy bien! ¿Cuántos años tiene tu hermana?",
+          opciones: [{ en: "She is eleven.", es: "Tiene once." }, { en: "She is thirteen.", es: "Tiene trece." }, { en: "I do not have a sister.", es: "No tengo hermana." }] },
+        { dice: "Thank you! You count very well.", diceEs: "¡Gracias! Cuentas muy bien.",
+          opciones: [{ en: "Thank you!", es: "¡Gracias!" }, { en: "Bye Tomi!", es: "¡Adiós, Tomi!" }, { en: "See you!", es: "¡Nos vemos!" }] }
+      ]
+    }
+  },
+  {
+    id: "ropa", titulo: "Mi ropa", emoji: "shirt", color: "mora",
+    saludo: "¡Vamos a vestirnos!",
+    palabras: [
+      { en: "shirt", es: "camisa", art: "shirt", frase: "My shirt is blue.", fraseEs: "Mi camisa es azul." },
+      { en: "pants", es: "pantalón", art: "pants", frase: "These pants are new.", fraseEs: "Este pantalón es nuevo." },
+      { en: "dress", es: "vestido", art: "dress", frase: "What a pretty dress!", fraseEs: "¡Qué vestido tan lindo!" },
+      { en: "jacket", es: "chaqueta", art: "jacket", frase: "Put on your jacket.", fraseEs: "Ponte la chaqueta." },
+      { en: "shoes", es: "zapatos", art: "shoe", frase: "My shoes are red.", fraseEs: "Mis zapatos son rojos." },
+      { en: "socks", es: "medias", art: "sock", frase: "Where are my socks?", fraseEs: "¿Dónde están mis medias?" },
+      { en: "hat", es: "gorra", art: "hat", frase: "I like your hat!", fraseEs: "¡Me gusta tu gorra!" },
+      { en: "bag", es: "mochila", art: "bag", frase: "My bag is heavy.", fraseEs: "Mi mochila pesa." }
+    ],
+    charla: {
+      quien: "Mamá", art: "girl",
+      pasos: [
+        { dice: "Good morning! Are you ready?", diceEs: "¡Buenos días! ¿Estás listo?",
+          opciones: [{ en: "Not yet!", es: "¡Todavía no!" }, { en: "Yes, I am!", es: "¡Sí, estoy listo!" }, { en: "One minute!", es: "¡Un minuto!" }] },
+        { dice: "Put on your shoes, please.", diceEs: "Ponte los zapatos, por favor.",
+          opciones: [{ en: "Okay, mom!", es: "¡Está bien, mamá!" }, { en: "Where are they?", es: "¿Dónde están?" }, { en: "Yes, mom!", es: "¡Sí, mamá!" }] },
+        { dice: "It is cold. Take your jacket.", diceEs: "Hace frío. Lleva tu chaqueta.",
+          opciones: [{ en: "Thank you!", es: "¡Gracias!" }, { en: "The blue one?", es: "¿La azul?" }, { en: "Okay!", es: "¡Está bien!" }] },
+        { dice: "Perfect. Have a nice day!", diceEs: "Perfecto. ¡Que tengas buen día!",
+          opciones: [{ en: "Bye mom!", es: "¡Adiós, mamá!" }, { en: "You too!", es: "¡Tú también!" }, { en: "See you later!", es: "¡Hasta luego!" }] }
+      ]
+    }
+  },
+  {
+    id: "clima", titulo: "¿Qué tiempo hace?", emoji: "cloud", color: "azul",
+    saludo: "¡Mira por la ventana!",
+    palabras: [
+      { en: "sunny", es: "soleado", art: "sun", frase: "It is sunny today!", fraseEs: "¡Hoy está soleado!" },
+      { en: "rainy", es: "lluvioso", art: "rain", frase: "It is a rainy day.", fraseEs: "Es un día lluvioso." },
+      { en: "cloudy", es: "nublado", art: "cloud", frase: "The sky is cloudy.", fraseEs: "El cielo está nublado." },
+      { en: "windy", es: "ventoso", art: "wind", frase: "It is very windy.", fraseEs: "Hace mucho viento." },
+      { en: "snow", es: "nieve", art: "snow", frase: "Look at the snow!", fraseEs: "¡Mira la nieve!" },
+      { en: "hot", es: "caliente", art: "hot", frase: "It is hot today.", fraseEs: "Hoy hace calor." },
+      { en: "cold", es: "frío", art: "cold", frase: "It is cold outside.", fraseEs: "Hace frío afuera." },
+      { en: "night", es: "noche", art: "night", frase: "Good night!", fraseEs: "¡Buenas noches!" },
+      { en: "day", es: "día", art: "day", frase: "Have a nice day!", fraseEs: "¡Que tengas buen día!" }
+    ],
+    charla: {
+      quien: "Renata la rana", art: "frog",
+      pasos: [
+        { dice: "Good morning! How is the weather?", diceEs: "¡Buenos días! ¿Qué tiempo hace?",
+          opciones: [{ en: "It is sunny!", es: "¡Está soleado!" }, { en: "It is rainy.", es: "Está lluvioso." }, { en: "It is cloudy.", es: "Está nublado." }] },
+        { dice: "Is it hot or cold?", diceEs: "¿Hace calor o frío?",
+          opciones: [{ en: "It is hot!", es: "¡Hace calor!" }, { en: "It is cold.", es: "Hace frío." }, { en: "Just right!", es: "¡Está perfecto!" }] },
+        { dice: "Do you want to play outside?", diceEs: "¿Quieres jugar afuera?",
+          opciones: [{ en: "Yes, let us go!", es: "¡Sí, vamos!" }, { en: "Maybe later.", es: "Tal vez después." }, { en: "Of course!", es: "¡Por supuesto!" }] },
+        { dice: "What a beautiful day. Bye!", diceEs: "Qué día tan bonito. ¡Adiós!",
+          opciones: [{ en: "Bye Renata!", es: "¡Adiós, Renata!" }, { en: "See you!", es: "¡Nos vemos!" }, { en: "Thank you!", es: "¡Gracias!" }] }
+      ]
+    }
+  },
+  {
+    id: "acciones", titulo: "¿Qué hago?", emoji: "run", color: "verde",
+    saludo: "¡A movernos!",
+    palabras: [
+      { en: "run", es: "correr", art: "run", frase: "I run very fast!", fraseEs: "¡Corro muy rápido!" },
+      { en: "jump", es: "saltar", art: "jump", frase: "Can you jump?", fraseEs: "¿Puedes saltar?" },
+      { en: "sleep", es: "dormir", art: "sleep", frase: "I sleep at night.", fraseEs: "Duermo de noche." },
+      { en: "eat", es: "comer", art: "eat", frase: "I eat an apple.", fraseEs: "Como una manzana." },
+      { en: "play", es: "jugar", art: "play", frase: "Let us play!", fraseEs: "¡Juguemos!" },
+      { en: "read", es: "leer", art: "read", frase: "I read a book.", fraseEs: "Leo un libro." },
+      { en: "sing", es: "cantar", art: "sing", frase: "I sing a song.", fraseEs: "Canto una canción." },
+      { en: "dance", es: "bailar", art: "dance", frase: "I like to dance!", fraseEs: "¡Me gusta bailar!" },
+      { en: "walk", es: "caminar", art: "boy", frase: "We walk to school.", fraseEs: "Caminamos a la escuela." },
+      { en: "drink", es: "beber", art: "water", frase: "I drink water.", fraseEs: "Tomo agua." }
+    ],
+    charla: {
+      quien: "Leo el león", art: "lion",
+      pasos: [
+        { dice: "Hi! What do you like to do?", diceEs: "¡Hola! ¿Qué te gusta hacer?",
+          opciones: [{ en: "I like to play!", es: "¡Me gusta jugar!" }, { en: "I like to run!", es: "¡Me gusta correr!" }, { en: "I like to sing!", es: "¡Me gusta cantar!" }] },
+        { dice: "Can you jump like me?", diceEs: "¿Puedes saltar como yo?",
+          opciones: [{ en: "Yes, look!", es: "¡Sí, mira!" }, { en: "I can try!", es: "¡Puedo intentar!" }, { en: "Of course!", es: "¡Por supuesto!" }] },
+        { dice: "Wow! Are you tired now?", diceEs: "¡Guau! ¿Estás cansado ahora?",
+          opciones: [{ en: "A little.", es: "Un poquito." }, { en: "No, I am fine!", es: "¡No, estoy bien!" }, { en: "Yes, very!", es: "¡Sí, mucho!" }] },
+        { dice: "Let us rest. Good job!", diceEs: "Descansemos. ¡Buen trabajo!",
+          opciones: [{ en: "Thank you Leo!", es: "¡Gracias, Leo!" }, { en: "That was fun!", es: "¡Fue divertido!" }, { en: "Bye!", es: "¡Adiós!" }] }
+      ]
+    }
+  },
+  {
+    id: "opuestos", titulo: "Uno y su contrario", emoji: "up", color: "rojo",
+    saludo: "¡Grande y pequeño, arriba y abajo!",
+    palabras: [
+      { en: "big", es: "grande", art: "elephant", frase: "The elephant is big.", fraseEs: "El elefante es grande." },
+      { en: "small", es: "pequeño", art: "bird", frase: "The bird is small.", fraseEs: "El pájaro es pequeño." },
+      { en: "up", es: "arriba", art: "up", frase: "Look up!", fraseEs: "¡Mira arriba!" },
+      { en: "down", es: "abajo", art: "down", frase: "Sit down, please.", fraseEs: "Siéntate, por favor." },
+      { en: "open", es: "abierto", art: "open", frase: "The door is open.", fraseEs: "La puerta está abierta." },
+      { en: "closed", es: "cerrado", art: "closed", frase: "The door is closed.", fraseEs: "La puerta está cerrada." },
+      { en: "fast", es: "rápido", art: "fast", frase: "The car is fast.", fraseEs: "El carro es rápido." },
+      { en: "slow", es: "lento", art: "slow", frase: "The turtle is slow.", fraseEs: "La tortuga es lenta." },
+      { en: "happy", es: "feliz", art: "sun", frase: "I am happy today!", fraseEs: "¡Hoy estoy feliz!" },
+      { en: "sad", es: "triste", art: "rain", frase: "Do not be sad.", fraseEs: "No estés triste." }
+    ],
+    charla: {
+      quien: "Milo el gato", art: "cat",
+      pasos: [
+        { dice: "Look at me! Am I big or small?", diceEs: "¡Mírame! ¿Soy grande o pequeño?",
+          opciones: [{ en: "You are small!", es: "¡Eres pequeño!" }, { en: "You are big!", es: "¡Eres grande!" }, { en: "Just right!", es: "¡Perfecto!" }] },
+        { dice: "Is the door open or closed?", diceEs: "¿La puerta está abierta o cerrada?",
+          opciones: [{ en: "It is open.", es: "Está abierta." }, { en: "It is closed.", es: "Está cerrada." }, { en: "I do not know.", es: "No sé." }] },
+        { dice: "Are you happy or sad today?", diceEs: "¿Estás feliz o triste hoy?",
+          opciones: [{ en: "I am happy!", es: "¡Estoy feliz!" }, { en: "A little sad.", es: "Un poco triste." }, { en: "Very happy!", es: "¡Muy feliz!" }] },
+        { dice: "Good! Me too. See you!", diceEs: "¡Bien! Yo también. ¡Nos vemos!",
+          opciones: [{ en: "Bye Milo!", es: "¡Adiós, Milo!" }, { en: "See you soon!", es: "¡Hasta pronto!" }, { en: "Thank you!", es: "¡Gracias!" }] }
+      ]
+    }
+  },
+  {
+    id: "transporte", titulo: "¡A viajar!", emoji: "car", color: "naranja",
+    saludo: "¿En qué vamos a ir?",
+    palabras: [
+      { en: "car", es: "carro", art: "car", frase: "My car is red.", fraseEs: "Mi carro es rojo." },
+      { en: "bus", es: "bus", art: "bus", frase: "I go by bus.", fraseEs: "Voy en bus." },
+      { en: "bike", es: "bicicleta", art: "bike", frase: "I ride my bike.", fraseEs: "Monto mi bicicleta." },
+      { en: "train", es: "tren", art: "train", frase: "The train is long.", fraseEs: "El tren es largo." },
+      { en: "plane", es: "avión", art: "plane", frase: "The plane flies high.", fraseEs: "El avión vuela alto." },
+      { en: "boat", es: "barco", art: "boat", frase: "The boat is on the sea.", fraseEs: "El barco está en el mar." },
+      { en: "street", es: "calle", art: "house", frase: "Look at the street.", fraseEs: "Mira la calle." },
+      { en: "fast", es: "rápido", art: "fast", frase: "The train is fast!", fraseEs: "¡El tren es rápido!" }
+    ],
+    charla: {
+      quien: "Beto el oso", art: "bear",
+      pasos: [
+        { dice: "Hello! Where do you want to go?", diceEs: "¡Hola! ¿A dónde quieres ir?",
+          opciones: [{ en: "To the park!", es: "¡Al parque!" }, { en: "To school!", es: "¡A la escuela!" }, { en: "To my house!", es: "¡A mi casa!" }] },
+        { dice: "How do you want to go?", diceEs: "¿Cómo quieres ir?",
+          opciones: [{ en: "By car!", es: "¡En carro!" }, { en: "By bus!", es: "¡En bus!" }, { en: "By bike!", es: "¡En bicicleta!" }] },
+        { dice: "Great! Are you ready?", diceEs: "¡Genial! ¿Estás listo?",
+          opciones: [{ en: "Yes, let us go!", es: "¡Sí, vamos!" }, { en: "One minute!", es: "¡Un minuto!" }, { en: "I am ready!", es: "¡Estoy listo!" }] },
+        { dice: "Here we go! Hold on!", diceEs: "¡Allá vamos! ¡Agárrate!",
+          opciones: [{ en: "This is fun!", es: "¡Qué divertido!" }, { en: "Wheee!", es: "¡Yupi!" }, { en: "Thank you Beto!", es: "¡Gracias, Beto!" }] }
       ]
     }
   }
