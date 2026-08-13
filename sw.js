@@ -11,7 +11,7 @@
    petición que no sea a este mismo sitio.
    ============================================================ */
 
-const VERSION = 'speakup-v24';
+const VERSION = 'speakup-v26';
 
 const ESENCIALES = [
   './',
