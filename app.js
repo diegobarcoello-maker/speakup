@@ -139,7 +139,8 @@ const DEFAULT_STATE = {
     recordatorio: false,
     recordatorioHora: '19:00',
     sonido: true,
-    voiceURI: ''
+    voiceURI: '',
+    voiceEsURI: ''     // voz para leer las explicaciones en español
   }
 };
 let S = load();
@@ -349,6 +350,20 @@ const Voice = {
     return Voice.list.find(v => v.lang && v.lang.toLowerCase().startsWith('en')) || null;
   },
   englishVoices() { return Voice.list.filter(v => v.lang && v.lang.toLowerCase().startsWith('en')); },
+  spanishVoices() { return Voice.list.filter(v => v.lang && v.lang.toLowerCase().startsWith('es')); },
+  /* Para leer las explicaciones. Prefiere español de América: suena más
+     cercano a quien aprende desde Ecuador que el de España. */
+  pickEs() {
+    const es = Voice.spanishVoices();
+    if (!es.length) return null;
+    if (S.settings.voiceEsURI) {
+      const g = es.find(v => v.voiceURI === S.settings.voiceEsURI);
+      if (g) return g;
+    }
+    return es.find(v => /es-(419|MX|US|CO|EC|PE|CL|AR)/i.test(v.lang)) ||
+           es.find(v => /google|paulina|monica|natural|premium/i.test(v.name)) ||
+           es[0];
+  },
   /* Dos voces distintas para que un diálogo suene a dos personas */
   pickPair() {
     const primera = Voice.pick();
@@ -548,6 +563,7 @@ function go(tab) {
   V.pack = null;
   V.packQuiz = null;
   sayAllToken++;            // detiene la lectura encadenada del vocabulario
+  if (typeof Lector !== 'undefined') Lector.parar(true);
   if (tab === 'review') V.review = null;   // recalcular las tarjetas pendientes al entrar
   stopListening();
   stopDialogue();
@@ -1973,6 +1989,204 @@ function viewUnit() {
   return viewUnitDone(u);
 }
 
+/* ══════════════════ LECTOR EN VOZ ALTA ══════════════════
+   Leer explicaciones largas cansa. Aquí las lee el dispositivo.
+
+   Dos detalles que importan:
+   · Las frases de ejemplo en inglés que van entrecomilladas dentro
+     de la explicación se leen con voz inglesa, no con acento español.
+     Si no, el alumno memoriza una pronunciación que no existe.
+   · Se lee frase por frase, no todo de un tirón. Chrome corta las
+     locuciones largas a los quince segundos, y así además se puede
+     resaltar el párrafo que va sonando.                                  */
+
+const PALABRAS_EN = /\b(the|and|is|are|am|was|were|be|been|being|do|does|did|don't|doesn't|didn't|have|has|had|will|would|can|could|should|must|i|you|he|she|it|we|they|my|your|his|her|our|their|this|that|these|those|there|to|of|in|on|at|for|from|with|about|not|but|or|if|what|how|when|where|who|why|going|want|need|like|make|take|get|give|know|think|say|see|come|go|let|please|thank|thanks|sorry|yes|no|very|more|than|too|also|because|so|nice|good|meet|name)\b/i;
+
+const Lector = {
+  estado: 'parado',        // parado | leyendo | pausa
+  id: null,                // qué bloque se está leyendo
+  trozos: [],              // [{ texto, idioma, parrafo }]
+  i: 0,
+  vel: 1,
+  latido: null,
+  token: 0,
+
+  /* Recupera el texto a partir de su identificador, así no hay que
+     meter párrafos enteros dentro de un atributo del HTML. */
+  texto(id) {
+    const partes = String(id || '').split('|');
+    if (partes[0] === 'snd') {
+      const g = (typeof soundById === 'function') ? soundById(partes[1]) : null;
+      return g ? g.titulo + '. ' + g.es : '';
+    }
+    const u = unitById(partes[1]);
+    if (!u) return '';
+    if (partes[0] === 'g')  return u.grammar.title + '. ' + u.grammar.es;
+    if (partes[0] === 'gm') {
+      const m = (u.grammar.more || [])[Number(partes[2])];
+      return m ? m.title + '. ' + m.es : '';
+    }
+    if (partes[0] === 'goal') return u.title + '. ' + u.goal;
+    return '';
+  },
+
+  /* Parte el texto en trozos cortos y decide el idioma de cada uno. */
+  partir(texto) {
+    const out = [];
+    let parrafo = 0;
+    String(texto || '').split(/\n{2,}/).forEach((bloque, np) => {
+      parrafo = np;
+      /* separar lo entrecomillado del resto */
+      const piezas = bloque.split(/([“"«][^“”"«»]{2,}[”"»])/);
+      piezas.forEach(pieza => {
+        if (!pieza || !pieza.trim()) return;
+        const entrecomillado = /^[“"«]/.test(pieza);
+        const limpio = pieza.replace(/[“”"«»]/g, ' ').replace(/\s+/g, ' ').trim();
+        if (!limpio) return;
+        const pareceIngles = entrecomillado &&
+          !/[áéíóúñ¿¡ÁÉÍÓÚÑ]/.test(limpio) && PALABRAS_EN.test(limpio);
+        if (pareceIngles) { out.push({ texto: limpio, idioma: 'en', parrafo }); return; }
+        /* el español se corta por frases para poder pausar a tiempo */
+        limpio.split(/(?<=[.;:!?])\s+/).forEach(frase => {
+          const f = frase.trim();
+          if (f) out.push({ texto: f, idioma: 'es', parrafo });
+        });
+      });
+    });
+    return out;
+  },
+
+  leyendoAhora(id) { return Lector.id === id && Lector.estado !== 'parado'; },
+  parrafoActual()  { const t = Lector.trozos[Lector.i]; return t ? t.parrafo : -1; },
+
+  empezar(id) {
+    if (!('speechSynthesis' in window)) { toast('Tu navegador no permite reproducir audio.'); return; }
+    const texto = Lector.texto(id);
+    if (!texto) return;
+    Lector.parar(true);
+    Lector.id = id;
+    Lector.trozos = Lector.partir(texto);
+    Lector.i = 0;
+    Lector.estado = 'leyendo';
+    Lector.token++;
+    Lector.corazon();
+    Lector.siguiente();
+    hito('oir');
+    render();
+  },
+
+  siguiente() {
+    const token = Lector.token;
+    if (Lector.estado !== 'leyendo') return;
+    if (Lector.i >= Lector.trozos.length) { Lector.parar(); render(); return; }
+    const t = Lector.trozos[Lector.i];
+    try {
+      const u = new SpeechSynthesisUtterance(t.texto);
+      const v = t.idioma === 'en' ? Voice.pick() : Voice.pickEs();
+      if (v) { u.voice = v; u.lang = v.lang; }
+      else u.lang = t.idioma === 'en' ? S.settings.accent : 'es-ES';
+      /* el inglés, un poco más lento: es lo que el alumno está aprendiendo */
+      u.rate = (t.idioma === 'en' ? 0.86 : 1) * Lector.vel;
+      u.pitch = 1;
+      u.onend = () => {
+        if (token !== Lector.token || Lector.estado !== 'leyendo') return;
+        Lector.i++;
+        const cambia = Lector.trozos[Lector.i] && Lector.trozos[Lector.i].parrafo !== t.parrafo;
+        Lector.siguiente();
+        if (cambia) Lector.pintarMarca();
+      };
+      u.onerror = () => { if (token === Lector.token) { Lector.i++; Lector.siguiente(); } };
+      window.speechSynthesis.speak(u);
+    } catch (e) { Lector.parar(); render(); }
+  },
+
+  pausar() {
+    if (Lector.estado !== 'leyendo') return;
+    Lector.estado = 'pausa';
+    try { window.speechSynthesis.pause(); } catch (e) {}
+    render();
+  },
+  seguir() {
+    if (Lector.estado !== 'pausa') return;
+    Lector.estado = 'leyendo';
+    try { window.speechSynthesis.resume(); } catch (e) {}
+    render();
+  },
+  parar(silencioso) {
+    Lector.token++;
+    Lector.estado = 'parado';
+    Lector.id = null;
+    Lector.trozos = [];
+    Lector.i = 0;
+    if (Lector.latido) { clearInterval(Lector.latido); Lector.latido = null; }
+    try { window.speechSynthesis.cancel(); } catch (e) {}
+    if (!silencioso) Lector.pintarMarca();
+  },
+  cambiarVel() {
+    const pasos = [1, 1.25, 1.5, 0.8];
+    Lector.vel = pasos[(pasos.indexOf(Lector.vel) + 1) % pasos.length];
+    if (Lector.estado === 'leyendo') {
+      /* aplicar la velocidad nueva desde la frase que sigue */
+      Lector.token++;
+      const guardaId = Lector.id, guardaI = Lector.i, guardaTrozos = Lector.trozos;
+      try { window.speechSynthesis.cancel(); } catch (e) {}
+      Lector.id = guardaId; Lector.trozos = guardaTrozos; Lector.i = guardaI;
+      Lector.estado = 'leyendo';
+      Lector.token++;
+      Lector.siguiente();
+    }
+    render();
+  },
+
+  /* Chrome deja de hablar solo después de unos segundos si nadie lo toca. */
+  corazon() {
+    if (Lector.latido) clearInterval(Lector.latido);
+    Lector.latido = setInterval(() => {
+      if (Lector.estado !== 'leyendo') return;
+      try { window.speechSynthesis.pause(); window.speechSynthesis.resume(); } catch (e) {}
+    }, 9000);
+  },
+
+  /* Resaltar el párrafo que suena sin volver a dibujar toda la pantalla */
+  pintarMarca() {
+    const n = Lector.parrafoActual();
+    document.querySelectorAll('[data-lp]').forEach(el => {
+      const mio = el.dataset.lp === Lector.id + ':' + n;
+      el.classList.toggle('leyendo', mio && Lector.estado !== 'parado');
+    });
+  }
+};
+
+/* La barra de controles que va encima de cada explicación */
+function barraLector(id) {
+  const activo = Lector.leyendoAhora(id);
+  const leyendo = activo && Lector.estado === 'leyendo';
+  return '<div class="lector' + (activo ? ' on' : '') + '">' +
+    '<button class="lector-play" data-act="' +
+      (!activo ? 'leer' : leyendo ? 'leer-pausa' : 'leer-seguir') + '" data-id="' + esc(id) + '" ' +
+      'aria-label="' + (!activo ? 'Escuchar la explicación' : leyendo ? 'Pausar' : 'Continuar') + '">' +
+      ic(leyendo ? 'pause' : 'play') +
+      '<span>' + (!activo ? 'Escuchar la explicación' : leyendo ? 'Pausa' : 'Continuar') + '</span>' +
+    '</button>' +
+    (activo
+      ? '<button class="lector-chip" data-act="leer-vel" aria-label="Cambiar la velocidad">' + Lector.vel + '×</button>' +
+        '<button class="lector-chip" data-act="leer-parar" aria-label="Detener la lectura">' + ic('x') + '</button>' +
+        '<span class="lector-avance">' + Math.min(Lector.i + 1, Lector.trozos.length) + '/' + Lector.trozos.length + '</span>'
+      : '<span class="lector-nota">o síguela leyendo tú</span>') +
+  '</div>';
+}
+
+/* Como paras(), pero marcando cada párrafo para poder resaltarlo */
+function parasLeibles(text, id) {
+  return String(text || '').split(/\n{2,}/).map((p, k) => {
+    let h = esc(p.trim()).replace(/\n/g, '<br>');
+    h = h.replace(/\b([A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑ' ]{3,}[A-ZÁÉÍÓÚÑ])\b/g, '<b>$1</b>');
+    if (!h) return '';
+    const marca = Lector.leyendoAhora(id) && Lector.parrafoActual() === k ? ' leyendo' : '';
+    return '<p class="lp' + marca + '" data-lp="' + esc(id + ':' + k) + '">' + h + '</p>';
+  }).join('');
+}
+
 function viewUnitStudy(u) {
   return '' +
   '<button class="back-link" data-act="tab" data-tab="lessons">' + ic('left') + ' Lecciones</button>' +
@@ -1982,17 +2196,19 @@ function viewUnitStudy(u) {
   '<div class="card">' +
     '<div class="grammar">' +
       '<h3>' + esc(u.grammar.title) + '</h3>' +
-      paras(u.grammar.es) +
+      barraLector('g|' + u.id) +
+      parasLeibles(u.grammar.es, 'g|' + u.id) +
       '<div class="ex-head">Ejemplos</div>' +
       u.grammar.examples.map(exampleRow).join('') +
     '</div>' +
   '</div>' +
 
-  (u.grammar.more || []).map(m =>
+  (u.grammar.more || []).map((m, nm) =>
     '<div class="card">' +
       '<div class="grammar alt">' +
         '<h3>' + esc(m.title) + '</h3>' +
-        paras(m.es) +
+        barraLector('gm|' + u.id + '|' + nm) +
+        parasLeibles(m.es, 'gm|' + u.id + '|' + nm) +
         '<div class="ex-head">Ejemplos</div>' +
         m.examples.map(exampleRow).join('') +
       '</div>' +
@@ -2893,7 +3109,8 @@ function viewSounds() {
   '<div class="card">' +
     '<div class="grammar">' +
       '<h3>Qué pasa aquí</h3>' +
-      paras(g.es) +
+      barraLector('snd|' + g.id) +
+      parasLeibles(g.es, 'snd|' + g.id) +
       '<div class="ex-head">El truco</div>' +
       '<p style="margin:0">' + esc(g.consejo) + '</p>' +
     '</div>' +
@@ -3319,6 +3536,20 @@ function viewSettings() {
       '</select>' +
       '<div class="hint">' + (voices.length ? 'Las voces dependen de tu sistema operativo y navegador.' : 'No se detectaron voces en inglés. Prueba en Chrome o Edge.') + '</div></div>' +
     '<button class="btn btn-ghost btn-sm" data-act="say" data-text="This is how your tutor will sound. Let\'s practice together.">' + ic('volume') + ' Probar la voz</button>' +
+
+    (function () {
+      const esp = Voice.spanishVoices();
+      return '<div class="field" style="margin-top:16px"><label for="setvoces">Voz que lee las explicaciones</label>' +
+        '<select id="setvoces">' +
+          '<option value="">Automática (español de América si la hay)</option>' +
+          esp.map(v => '<option value="' + esc(v.voiceURI) + '"' +
+            (st.voiceEsURI === v.voiceURI ? ' selected' : '') + '>' + esc(v.name) + ' · ' + esc(v.lang) + '</option>').join('') +
+        '</select>' +
+        '<div class="hint">' + (esp.length
+          ? 'Es la que suena al tocar «Escuchar la explicación» dentro de una lección. Las frases de ejemplo en inglés se leen igual con la voz del tutor.'
+          : 'No se detectaron voces en español en este dispositivo.') + '</div></div>' +
+        '<button class="btn btn-ghost btn-sm" data-act="probar-voz-es">' + ic('volume') + ' Probar la lectura</button>';
+    })() +
   '</div>' +
 
   '<div class="card">' +
@@ -3451,7 +3682,26 @@ document.addEventListener('click', async (e) => {
   if (act === 'go-mistakes') { V.reviewTab = 'errors'; go('review'); return; }
 
   /* --- audio --- */
-  if (act === 'say')      { Voice.speak(t.dataset.text); hito('oir'); return; }
+  if (act === 'probar-voz-es') {
+    const sel = document.getElementById('setvoces');
+    if (sel) S.settings.voiceEsURI = sel.value || '';
+    Lector.parar(true);
+    try {
+      const u = new SpeechSynthesisUtterance('Así se van a leer las explicaciones de cada lección.');
+      const v = Voice.pickEs();
+      if (v) { u.voice = v; u.lang = v.lang; } else u.lang = 'es-ES';
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(u);
+    } catch (e) { toast('Tu navegador no permite reproducir audio.'); }
+    return;
+  }
+  if (act === 'leer')        { Lector.empezar(t.dataset.id); return; }
+  if (act === 'leer-pausa')  { Lector.pausar(); return; }
+  if (act === 'leer-seguir') { Lector.seguir(); return; }
+  if (act === 'leer-parar')  { Lector.parar(); render(); return; }
+  if (act === 'leer-vel')    { Lector.cambiarVel(); return; }
+
+  if (act === 'say')      { Lector.parar(); Voice.speak(t.dataset.text); hito('oir'); return; }
   if (act === 'say-slow') { Voice.speak(t.dataset.text, 0.62); hito('oir'); return; }
   if (act === 'say-all') {
     const u = unitById(t.dataset.id);
@@ -3970,6 +4220,7 @@ document.addEventListener('click', async (e) => {
     S.settings.dailyGoal = Number(g('setgoal')) || 50;
     S.settings.accent = g('setaccent') || 'en-US';
     S.settings.voiceURI = g('setvoice') || '';
+    S.settings.voiceEsURI = g('setvoces') || '';
     S.settings.apiKey = (g('setkey') || '').trim();
     S.settings.codigo = (g('setcodigo') || '').trim();
     S.settings.proxyUrl = (g('setproxy') || '').trim();
