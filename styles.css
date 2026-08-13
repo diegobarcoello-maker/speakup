@@ -386,6 +386,41 @@ input:focus, select:focus, textarea:focus { border-color: var(--brand); }
 .grammar.alt .ex-head { border-top-color: color-mix(in srgb, var(--brand) 25%, transparent); }
 [data-theme="dark"] .grammar.alt h3, [data-theme="dark"] .grammar.alt .ex-head { color: var(--brand); }
 
+/* ---- Lector en voz alta de las explicaciones ---- */
+.lector {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  margin: 10px 0 14px; padding: 8px; border-radius: 12px;
+  background: color-mix(in srgb, var(--accent) 9%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+}
+.lector.on { background: color-mix(in srgb, var(--accent) 16%, transparent); }
+.lector-play {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: var(--accent); color: #fff; border: 0; cursor: pointer;
+  font-family: inherit; font-size: .84rem; font-weight: 700;
+  padding: 8px 14px 8px 11px; border-radius: 999px;
+  min-height: 38px; transition: filter .15s, transform .1s;
+}
+.lector-play:hover { filter: brightness(1.07); }
+.lector-play:active { transform: scale(.97); }
+.lector-play svg { width: 17px; height: 17px; }
+.lector-chip {
+  background: var(--surface); color: var(--text); cursor: pointer;
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  border-radius: 999px; font-family: inherit; font-size: .8rem; font-weight: 700;
+  min-width: 38px; min-height: 34px; padding: 0 10px;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.lector-chip:hover { border-color: var(--accent); color: var(--accent); }
+.lector-chip svg { width: 15px; height: 15px; }
+.lector-avance { font-size: .74rem; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+.lector-nota { font-size: .78rem; color: var(--text-dim); }
+
+/* el párrafo que va sonando */
+.grammar p.lp { border-radius: 8px; padding: 2px 6px; margin-left: -6px; margin-right: -6px; transition: background .25s; }
+.grammar p.lp.leyendo { background: color-mix(in srgb, var(--accent) 20%, transparent); }
+@media (prefers-reduced-motion: reduce) { .grammar p.lp { transition: none; } }
+
 /* ---- Errores típicos ---- */
 .mistake { padding: 11px 0; border-bottom: 1px solid var(--border); }
 .mistake:last-child { border-bottom: 0; padding-bottom: 0; }
